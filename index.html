@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arcade</title>
 <meta name="theme-color" content="#ff4d97">
 <meta name="mobile-web-app-capable" content="yes">
@@ -293,6 +293,124 @@ html,body{margin:0;padding:0;}
 .osmall.ghost{background:transparent;}
 .osmall[disabled]{opacity:.45;cursor:default;}
 .g-my .gglyph{background:var(--err);color:#fff;}
+
+/* =====================================================================
+   UI/UX ENHANCEMENTS
+   Desktop layout, a real spacing scale, responsive type, accessibility
+   and a dark mode. Appended so the cascade overrides earlier rules of
+   equal specificity. Phone layout (<=430px) is intentionally untouched.
+   ===================================================================== */
+
+/* --- Spacing scale + responsive shell widths (#1,#3,#7,#8) --- */
+:root{
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  --wrap-max:520px;    /* phone width */
+  --play-max:480px;    /* square-board games on desktop (sudoku/minesweeper) */
+  --play-wide:680px;   /* wider games (solitaire/mahjong) */
+  --focus:#9b5de5;
+}
+@media(min-width:768px){ :root{ --wrap-max:760px; } }
+@media(min-width:1024px){ :root{ --wrap-max:960px; } }
+
+/* #1  Widen the desktop shell instead of stranding everything at 520px */
+.sk-wrap{ max-width:var(--wrap-max); }
+
+/* #6  Anchor content to the top on big screens so tall windows don't
+       leave huge empty gaps above and below the app */
+@media(min-width:768px){
+  .sk-root{ align-items:flex-start; padding-top:max(48px,env(safe-area-inset-top)); padding-bottom:56px; }
+}
+
+/* #4  Constrain the PLAY areas (not the shell) so boards stay dense and
+       centered while the home screen gets to use the full width */
+@media(min-width:768px){
+  .game,.my{ max-width:var(--play-max); margin-inline:auto; }
+  .sol,.mj{ max-width:var(--play-wide); margin-inline:auto; }
+}
+
+/* #2  Responsive game grid: 1 col on phones, 2 on tablets, 3 on desktop */
+@media(min-width:560px){ .gamegrid{ grid-template-columns:repeat(2,1fr); } }
+@media(min-width:900px){ .gamegrid{ grid-template-columns:repeat(3,1fr); } }
+
+/* #5  Use the empty desktop space: two-column hero on the home screen,
+       branding on the left, game menu on the right */
+@media(min-width:900px){
+  .home{
+    display:grid; text-align:left; align-items:center;
+    column-gap:var(--s6); row-gap:0;
+    grid-template-columns:minmax(240px,0.85fr) 1.15fr;
+    grid-template-rows:auto auto auto;
+    grid-template-areas:"k g" "t g" "s g";
+  }
+  .home .kicker{ grid-area:k; align-self:end; }
+  .home .title{ grid-area:t; }
+  .home .subtitle{ grid-area:s; align-self:start; }
+  .home .gamegrid{ grid-area:g; align-self:center; margin-top:0; grid-template-columns:1fr; }
+}
+
+/* #9,#10  Snap clearly off-scale desktop spacing onto the scale.
+           Scoped to >=431px so the tuned phone layout is preserved. */
+@media(min-width:431px){
+  .bar{ margin-bottom:var(--s5); }                 /* 22 -> 24 */
+  .pad{ margin-top:var(--s5); }                    /* 22 -> 24 */
+  .diffs{ gap:var(--s4); }                         /* 14 -> 16 */
+  .gamegrid{ gap:var(--s4); margin-top:var(--s5); }/* 16/28 -> 16/24 */
+}
+
+/* #11,#12,#13  Typography: fixed desktop steps instead of vw scaling that
+                stalls awkwardly, plus tighter display line-height */
+.title{ line-height:.9; }
+@media(min-width:768px){
+  .title{ font-size:84px; }
+  .subtitle{ font-size:20px; }
+  .gname{ font-size:22px; }
+  .gdesc{ font-size:14px; }
+}
+
+/* #14  Visible keyboard focus (the design previously had ZERO focus styles) */
+:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; border-radius:6px; }
+button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible,
+.diff:focus-visible,.cell:focus-visible,.sw:focus-visible,.pick:focus-visible{
+  outline:3px solid var(--focus); outline-offset:3px;
+}
+
+/* #16  Respect reduced-motion preferences */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important; animation-iteration-count:1!important;
+    transition-duration:.001ms!important; scroll-behavior:auto!important;
+  }
+}
+
+/* #17  Stronger contrast for muted text (was #6b5d77 on cream) */
+:root{ --txt-soft:#574a64; }
+
+/* #19  Pointer cursor on every interactive control */
+.gcard,.diff,.num,.tool,.sw,.back,.play-btn,.osmall,.pick,.pausebtn,
+.cell,.ms-cell,.mj-tile,.card,.toggle{ cursor:pointer; }
+.osmall[disabled],.play-btn:disabled{ cursor:default; }
+
+/* #20  Denser controls for precise (mouse) pointers on desktop */
+@media(min-width:768px) and (pointer:fine){
+  .tool{ padding:13px 8px; }
+  .num{ font-size:18px; }
+}
+
+/* #18  Dark mode — "dark table, light game pieces". The page chrome and
+        on-page text go dark/light; the white panels (boards, cards, chips)
+        stay light so their dark ink and borders remain readable.
+        NOTE: worth a visual pass — the base design hardcodes many colors. */
+@media(prefers-color-scheme:dark){
+  :root{ --cream:#15101d; --txt-soft:#c3b2cf; }
+  body{ color:#f4ead9; }                 /* on-page default text -> light   */
+  .label{ color:#f4ead9; }               /* explicit dark on-page label      */
+  .toggle{ color:#f4ead9; border-color:rgba(244,234,217,.5); }
+  /* light panels keep their dark ink so inner text stays readable */
+  .gcard,.chip,.board,.cell,.num,.tool,.diff,.card,.mj-tile,
+  .my-grid,.myc,.myh,.pick,.accbox,.ms-cell{ color:var(--ink); }
+  .accbox{ background:#fff; }
+  .overlay{ background:rgba(21,16,29,.88); }
+}
 
 </style>
 </head>
