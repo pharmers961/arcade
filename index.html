@@ -737,19 +737,27 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0;var t=a[i];a[i]=a[j];a[j]=t;}return a;}
     function permsOf(k){var res=[];(function go(cur,used){if(cur.length===k){res.push(cur.slice());return;}for(var i=0;i<k;i++)if(!used[i]){used[i]=1;cur.push(i);go(cur,used);cur.pop();used[i]=0;}})([],{});return res;}
     function idxOf(a,v){return a.indexOf(v);}
-    function tst(c,ww,ll){switch(c.t){case'NegSW':return ww[c.a]!==c.b;case'NegSL':return ll[c.a]!==c.b;case'PosSW':return ww[c.a]===c.b;case'PosWL':return ll[idxOf(ww,c.a)]===c.b;case'NegWL':return ll[idxOf(ww,c.a)]!==c.b;}}
+    function tst(c,ww,ll){switch(c.t){case'NegSW':return ww[c.a]!==c.b;case'NegSL':return ll[c.a]!==c.b;case'PosSW':return ww[c.a]===c.b;case'PosSL':return ll[c.a]===c.b;case'PosWL':return ll[idxOf(ww,c.a)]===c.b;case'NegWL':return ll[idxOf(ww,c.a)]!==c.b;}}
     function pool(){var p=[],s,j,k;for(s=0;s<n;s++)for(j=0;j<n;j++)if(w[s]!==j)p.push({t:'NegSW',a:s,b:j});
       for(s=0;s<n;s++)for(j=0;j<n;j++)if(l[s]!==j)p.push({t:'NegSL',a:s,b:j});
       for(j=0;j<n;j++)for(k=0;k<n;k++){var o=idxOf(w,j);p.push(l[o]===k?{t:'PosWL',a:j,b:k}:{t:'NegWL',a:j,b:k});}
-      for(s=0;s<n;s++)p.push({t:'PosSW',a:s,b:w[s]});return p;}
+      for(s=0;s<n;s++)p.push({t:'PosSW',a:s,b:w[s]});
+      for(s=0;s<n;s++)p.push({t:'PosSL',a:s,b:l[s]});return p;}
     function countSol(cl,aw,al,cap){var c=0;for(var a=0;a<aw.length;a++)for(var b=0;b<al.length;b++){var ok=true;for(var i=0;i<cl.length;i++)if(!tst(cl[i],aw[a],al[b])){ok=false;break;}if(ok){c++;if(c>=cap)return c;}}return c;}
     function gen(){var aw=permsOf(n),al=permsOf(n);var p=shuffle(pool());var ch=[],g=0;
-      while(countSol(ch,aw,al,2)>1){g++;if(g>300)return false;var best=-1,bc=1e9;for(var i=0;i<p.length;i++){var cc=countSol(ch.concat([p[i]]),aw,al,1000);if(cc>=1&&cc<bc){bc=cc;best=i;}}if(best<0)return false;ch.push(p[best]);p.splice(best,1);}
-      for(i=ch.length-1;i>=0;i--){var wo=ch.slice(0,i).concat(ch.slice(i+1));if(countSol(wo,aw,al,2)===1)ch.splice(i,1);}clues=shuffle(ch);return true;}
+      while(countSol(ch,aw,al,2)>1){g++;if(g>400)return false;var best=-1,bc=1e9;for(var i=0;i<p.length;i++){var cc=countSol(ch.concat([p[i]]),aw,al,1000);if(cc>=1&&cc<bc){bc=cc;best=i;}}if(best<0)return false;ch.push(p[best]);p.splice(best,1);}
+      for(i=ch.length-1;i>=0;i--){var wo=ch.slice(0,i).concat(ch.slice(i+1));if(countSol(wo,aw,al,2)===1)ch.splice(i,1);}
+      /* The minimal unique set above is solvable only via tricky cross-grid
+         deduction. Top it up with extra TRUE clues (positives first, for
+         concrete anchors) so the case is comfortably solvable by hand. */
+      var tgt=(n===3)?6:9,ap=shuffle(pool()),ord=ap.filter(function(c){return c.t.charAt(0)==='P';}).concat(ap.filter(function(c){return c.t.charAt(0)==='N';}));
+      for(var pi=0;pi<ord.length&&ch.length<tgt;pi++){var cd=ord[pi],dup=false;for(var ci=0;ci<ch.length;ci++)if(ch[ci].t===cd.t&&ch[ci].a===cd.a&&ch[ci].b===cd.b){dup=true;break;}if(!dup)ch.push(cd);}
+      clues=shuffle(ch);return true;}
     function clueText(c){switch(c.t){
       case'NegSW':return S[c.a].e+' '+S[c.a].n+' did not carry the '+W[c.b].n+' '+W[c.b].e+'.';
       case'NegSL':return S[c.a].e+' '+S[c.a].n+' was not seen at '+L[c.b].n+' '+L[c.b].e+'.';
       case'PosSW':return S[c.a].e+' '+S[c.a].n+' carried the '+W[c.b].n+' '+W[c.b].e+'.';
+      case'PosSL':return S[c.a].e+' '+S[c.a].n+' was seen at '+L[c.b].n+' '+L[c.b].e+'.';
       case'PosWL':return 'The '+W[c.a].n+' '+W[c.a].e+' was at '+L[c.b].n+' '+L[c.b].e+'.';
       case'NegWL':return 'The '+W[c.a].n+' '+W[c.a].e+' was not at '+L[c.b].n+' '+L[c.b].e+'.';}}
     function newGame(d){n=(d==='Sleuth')?4:3;diff=d;S=shuffle(SUS.slice()).slice(0,n);W=shuffle(WEP.slice()).slice(0,n);L=shuffle(LOC.slice()).slice(0,n);
