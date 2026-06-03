@@ -435,7 +435,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div class="sk-root"><div class="sk-wrap" id="app"></div></div>
 <script>
 
 (function(){
@@ -450,7 +450,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   function renderHome(){
     app.innerHTML='<div class="home"><div class="kicker">Pocket</div>'
       +'<h1 class="title">Ar<em>ca</em>de</h1>'
-      +'<p class="subtitle">Three classics \u00B7 no internet needed</p>'
+      +'<p class="subtitle">Six little games \u00B7 no internet needed</p>'
       +'<div class="gamegrid">'
         +gcard('sudoku','Sudoku','Logic & numbers','g-su','9')
         +gcard('mines','Minesweeper','Flags & nerve','g-mi','\u273A')
