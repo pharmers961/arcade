@@ -265,14 +265,14 @@ html,body{margin:0;padding:0;}
 .card .rk{position:absolute;top:3px;left:5px;line-height:1;font-size:clamp(11px,3.3vw,15px);}
 .card .su{position:absolute;bottom:2px;right:5px;line-height:1;font-size:clamp(12px,3.6vw,17px);}
 .card.sel{outline:3px solid var(--pink);outline-offset:-1px;box-shadow:0 0 0 3px rgba(255,77,151,.35);}
-.sol-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;}
+.sol-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px;margin-top:4px;}
 
 /* ---- Mahjong ---- */
 .mj{--tw:40px;--th:calc(var(--tw)*1.3);--zo:calc(var(--tw)*0.13);animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
 .mj-board{position:relative;margin:18px auto 0;width:calc(8*var(--tw) + 3*var(--zo));height:calc(4*var(--th) + 3*var(--zo));}
 .mj-tile{position:absolute;width:var(--tw);height:var(--th);border:2px solid var(--black);border-radius:6px;background:#fff;
   display:flex;align-items:center;justify-content:center;font-family:'Fredoka';font-weight:700;cursor:pointer;
-  box-shadow:2px 2px 0 rgba(36,26,46,.55);font-size:calc(var(--tw)*0.52);}
+  box-shadow:2px 2px 0 rgba(36,26,46,.55);font-size:calc(var(--tw)*0.56);}
 .mj-tile.blk{filter:brightness(.84) saturate(.7);cursor:default;}
 .mj-tile.sel{outline:3px solid var(--pink);outline-offset:-1px;box-shadow:0 0 0 3px rgba(255,77,151,.4),2px 2px 0 rgba(36,26,46,.55);}
 .mj-tile.hintpulse{animation:hintp 1s ease 2;}
@@ -733,7 +733,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   /* =================================================== MAHJONG SOLITAIRE */
   function createMahjong(){
     var app, resizeH=null;
-    var FG={circle:'pink',square:'teal',tri:'purple',diamond:'gold',star:'sun',heart:'red',flower:'pink',sun:'sun',moon:'moon',spark:'spark',cross:'teal',snow:'moon',triD:'spark',umbrella:'red'};
+    var FACECOL={circle:['#ff3d8b','#ffe1ee'],square:['#0ea5a5','#d6f4f4'],tri:['#8b46e0','#ece0fb'],diamond:['#d98a00','#faecc7'],star:['#e0a200','#fcf0c2'],heart:['#ff2e63','#ffd9e1'],flower:['#d6409f','#fbe0f0'],sun:['#ff7a1a','#ffe6d2'],moon:['#4f5bd5','#e0e2fb'],spark:['#17a35f','#d4f3e3'],cross:['#0a93c7','#d3eefb'],snow:['#3a86ff','#dbe8ff'],triD:['#7b3ff2','#e7dcfd'],umbrella:['#ff5d7d','#ffe0e6']};
     var GLY={circle:'\u25CF',square:'\u25A0',tri:'\u25B2',diamond:'\u25C6',star:'\u2605\uFE0E',heart:'\u2764\uFE0E',flower:'\u273F\uFE0E',sun:'\u2600\uFE0E',moon:'\u263E\uFE0E',spark:'\u2726\uFE0E',cross:'\u271A\uFE0E',snow:'\u2744\uFE0E',triD:'\u25BC',umbrella:'\u2602\uFE0E'};
     function buildLayout(){var L=[[[0,7],[0,3]],[[1,6],[1,2]],[[2,5],[1,2]],[[3,4],[1,2]]];var p=[];for(var z=0;z<L.length;z++){var xs=L[z][0],ys=L[z][1];for(var x=xs[0];x<=xs[1];x++)for(var y=ys[0];y<=ys[1];y++)p.push({x:x,y:y,z:z});}return p;}
     function keyOf(p){return p.x+'_'+p.y+'_'+p.z;}
@@ -755,9 +755,9 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function remaining(){var n=0;for(var i=0;i<M.present.length;i++)if(M.present[i])n++;return n;}
     function freePairExists(){var fr=[];for(var i=0;i<pos.length;i++)if(M.present[i]&&free(i,M.present))fr.push(i);
       for(var a=0;a<fr.length;a++)for(var b=a+1;b<fr.length;b++)if(M.face[fr[a]]===M.face[fr[b]])return [fr[a],fr[b]];return null;}
-    function tileHTML(i){if(!M.present[i])return '';var p=pos[i];var f=M.face[i];var g=GLY[f]||f;var col=FG[f]||'ink';
-      var cls='mj-tile c-'+col+(free(i,M.present)?'':' blk')+(M.sel===i?' sel':'');
-      var st='left:calc('+p.x+'*var(--tw) + '+(3-p.z)+'*var(--zo));top:calc('+p.y+'*var(--th) + '+(3-p.z)+'*var(--zo));z-index:'+(p.z*100+p.y*8+p.x)+';';
+    function tileHTML(i){if(!M.present[i])return '';var p=pos[i];var f=M.face[i];var g=GLY[f]||f;var fc=FACECOL[f]||['#241a2e','#fff'];
+      var cls='mj-tile'+(free(i,M.present)?'':' blk')+(M.sel===i?' sel':'');
+      var st='left:calc('+p.x+'*var(--tw) + '+(3-p.z)+'*var(--zo));top:calc('+p.y+'*var(--th) + '+(3-p.z)+'*var(--zo));z-index:'+(p.z*100+p.y*8+p.x)+';background:'+fc[1]+';color:'+fc[0]+';';
       return '<div class="'+cls+'" style="'+st+'" data-mj="'+i+'"><span class="mg">'+g+'</span></div>';}
     function render(){var tiles='';for(var i=0;i<pos.length;i++)tiles+=tileHTML(i);
       app.innerHTML='<div class="mj"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'
