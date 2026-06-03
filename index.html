@@ -328,8 +328,8 @@ html,body{margin:0;padding:0;}
 :root{
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
   --wrap-max:520px;    /* phone width */
-  --play-max:480px;    /* square-board games on desktop (sudoku/minesweeper) */
-  --play-wide:680px;   /* wider games (solitaire/mahjong) */
+  --play-max:640px;    /* square-board games on desktop (sudoku/minesweeper/zip) */
+  --play-wide:820px;   /* wider games (solitaire/mahjong) */
   --focus:#9b5de5;
 }
 @media(min-width:768px){ :root{ --wrap-max:760px; } }
@@ -342,13 +342,26 @@ html,body{margin:0;padding:0;}
        leave huge empty gaps above and below the app */
 @media(min-width:768px){
   .sk-root{ align-items:flex-start; padding-top:max(48px,env(safe-area-inset-top)); padding-bottom:56px; }
+  /* On a game screen the tall hero padding just steals room the board could use,
+     so tighten it (and vertically center) to let boards grow bigger. */
+  .sk-root:has(.game),.sk-root:has(.sol),.sk-root:has(.mj),.sk-root:has(.my){
+    align-items:center; padding-top:24px; padding-bottom:24px; }
 }
 
 /* #4  Constrain the PLAY areas (not the shell) so boards stay dense and
        centered while the home screen gets to use the full width */
 @media(min-width:768px){
-  .game,.my{ max-width:var(--play-max); margin-inline:auto; }
+  /* Size the whole game (board + controls together) to the smaller of the cap
+     and the height budget, so square games grow to fill the screen and the
+     number pad / tools stay flush with the board instead of overhanging it. */
+  .game{ max-width:min(var(--play-max), calc(100svh - 288px)); margin-inline:auto; }
   .sol,.mj{ max-width:var(--play-wide); margin-inline:auto; }
+  /* Mystery is a content-driven deduction page (intro + clues + grid), not a
+     square board — keep it at its original fixed width; it scrolls naturally. */
+  .my{ max-width:480px; margin-inline:auto; }
+  /* Let the board fill the (already height-constrained) game width so it lines
+     up with the pad/tools below it. */
+  .game .boardwrap{ max-width:100%; }
 }
 
 /* #2  Responsive game grid: 1 col on phones, 2 on tablets, 3 on desktop */
@@ -425,6 +438,15 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 @media(min-width:768px) and (pointer:fine){
   .tool{ padding:13px 8px; }
   .num{ font-size:18px; }
+}
+
+/* #21  Compact the game controls on desktop so the board fills more height.
+        Placed last so it wins over #9 (bar/pad margins) and #20 (tool padding). */
+@media(min-width:768px){
+  .bar{ margin-bottom:16px; }
+  .pad{ margin-top:16px; }
+  .tools{ margin-top:12px; }
+  .tool{ padding:9px 8px; gap:4px; }
 }
 
 /* #18  Dark mode — "dark table, light game pieces". The page chrome and
