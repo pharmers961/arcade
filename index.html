@@ -37,7 +37,7 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
     var(--cream);
   position:relative;overflow-x:hidden;
   display:flex;align-items:center;justify-content:center;
-  padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+  padding:max(14px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
 }
 .sk-root:before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
@@ -104,8 +104,8 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
 /* ---- Game screen ---- */
 .game{animation:rise .55s cubic-bezier(.2,.8,.2,1) both;display:flex;flex-direction:column;}
 .boardwrap{position:relative;width:100%;margin:0 auto;
-  max-width:min(100%,calc(100vh - 288px));
-  max-width:min(100%,calc(100svh - 288px));}
+  max-width:min(100%,calc(100vh - 230px));
+  max-width:min(100%,calc(100svh - 230px));}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 28px;}
 .back{background:none;border:none;cursor:pointer;font-family:'Bungee';font-size:14px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--purple);display:flex;align-items:center;gap:8px;padding:8px 4px;margin-left:-4px;}
@@ -225,8 +225,8 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
 
 /* ===== ZIP ===== */
 .g-zi .gglyph{background:var(--orange);color:#fff;}
-.zip-wrap{position:relative;width:min(100%,calc(100vh - 270px));
-  width:min(100%,calc(100svh - 270px));margin:0 auto;}
+.zip-wrap{position:relative;width:min(100%,calc(100vh - 230px));
+  width:min(100%,calc(100svh - 230px));margin:0 auto;}
 .zip-board{position:relative;display:grid;border:3px solid var(--black);border-radius:10px;
   overflow:hidden;box-shadow:6px 6px 0 var(--teal);aspect-ratio:1;background:#fff;
   touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;}
@@ -268,12 +268,17 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
 .sol-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px;margin-top:4px;}
 
 /* ---- Mahjong ---- */
-.mj{--tw:40px;--th:calc(var(--tw)*1.3);--zo:calc(var(--tw)*0.13);animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
+.mj{--tw:40px;--th:calc(var(--tw)*1.5);--zo:calc(var(--tw)*0.13);animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
 .mj-board{position:relative;margin:18px auto 0;width:calc(8*var(--tw) + 3*var(--zo));height:calc(4*var(--th) + 3*var(--zo));}
 .mj-tile{position:absolute;width:var(--tw);height:var(--th);border:2px solid var(--black);border-radius:6px;background:#fff;
   display:flex;align-items:center;justify-content:center;font-family:'Fredoka';font-weight:700;cursor:pointer;
   box-shadow:2px 2px 0 rgba(36,26,46,.55);font-size:calc(var(--tw)*0.56);}
-.mj-tile.blk{filter:brightness(.84) saturate(.7);cursor:default;}
+/* Blocked tiles (a tile on top, OR a neighbour on BOTH sides) are only gently
+   greyed so they don't look "covered"; playable (free) tiles sit raised with a
+   chunkier shadow so it's obvious which ones you can take. */
+.mj-tile.blk{filter:brightness(.95) saturate(.9);cursor:default;}
+.mj-tile.free{box-shadow:3px 3px 0 rgba(36,26,46,.6);cursor:pointer;}
+.mj-tile.free:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 rgba(36,26,46,.6);}
 .mj-tile.sel{outline:3px solid var(--pink);outline-offset:-1px;box-shadow:0 0 0 3px rgba(255,77,151,.4),2px 2px 0 rgba(36,26,46,.55);}
 .mj-tile.hintpulse{animation:hintp 1s ease 2;}
 .c-ink{color:var(--black);}.c-teal{color:var(--teal);}.c-gold{color:var(--gold);}.c-pink{color:var(--pink);}
@@ -322,7 +327,7 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
 .bg-board{display:flex;gap:5px;border:3px solid var(--black);border-radius:10px;background:#3f8f86;
   padding:6px;box-shadow:6px 6px 0 var(--purple);}
 .bg-main{flex:1;display:flex;flex-direction:column;}
-.bg-half{flex:1;display:flex;align-items:stretch;min-height:165px;}
+.bg-half{flex:1;display:flex;align-items:stretch;min-height:min(36vh,230px);}
 .bg-quad{flex:1;display:flex;gap:2px;}
 .bg-point{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:pointer;padding:3px 0;}
 .bg-point.bottom{justify-content:flex-end;}
@@ -398,8 +403,8 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
 :root{
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
   --wrap-max:520px;    /* phone width */
-  --play-max:640px;    /* square-board games on desktop (sudoku/minesweeper/zip) */
-  --play-wide:820px;   /* wider games (solitaire/mahjong) */
+  --play-max:720px;    /* square-board games on desktop (sudoku/minesweeper/zip) */
+  --play-wide:900px;   /* wider games (solitaire/mahjong) */
   --focus:#9b5de5;
 }
 @media(min-width:768px){ :root{ --wrap-max:760px; } }
@@ -424,7 +429,7 @@ html,body{margin:0;padding:0;background:#fdf2e6;}
   /* Size the whole game (board + controls together) to the smaller of the cap
      and the height budget, so square games grow to fill the screen and the
      number pad / tools stay flush with the board instead of overhanging it. */
-  .game{ max-width:min(var(--play-max), calc(100svh - 300px)); margin-inline:auto; }
+  .game{ max-width:min(var(--play-max), calc(100svh - 250px)); margin-inline:auto; }
   .sol,.mj,.bg{ max-width:var(--play-wide); margin-inline:auto; }
   /* Mystery is a content-driven deduction page (intro + clues + grid), not a
      square board — keep it at its original fixed width; it scrolls naturally. */
@@ -649,6 +654,22 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 .sol{ display:flex; flex-direction:column; min-height:calc(100svh - 96px); }
 .sol .ms-tools{ margin-top:auto; padding-top:28px; }
 
+/* ---- Fill the screen on phones: play screens take the full viewport height,
+   the board sits up top and the control rows are pinned to the bottom, so games
+   stretch edge-to-edge instead of floating in the middle. Start menus (.start)
+   are deliberately excluded so they stay centred. ---- */
+@media(max-width:767px){
+  #screen:has(.game),#screen:has(.mj),#screen:has(.bg){
+    display:flex; flex-direction:column; min-height:calc(100svh - 28px); }
+  .game{ flex:1; display:flex; flex-direction:column; }
+  /* push the bottom control cluster to the floor of the screen */
+  .game .pad,.game .ms-tools,.game .zip-tools{ margin-top:auto; }
+  .mj{ flex:1; display:flex; flex-direction:column; }
+  .mj .boardwrap{ margin-top:auto; }   /* centre the board… */
+  .mj .mj-note{ margin-top:auto; }      /* …and pin note + tools to the bottom */
+  .bg{ flex:1; display:flex; flex-direction:column; justify-content:center; }
+}
+
 /* =====================================================================
    WORDLE FIXES — full-bleed keyboard, no white gap, guess history.
    ===================================================================== */
@@ -780,9 +801,20 @@ html,body{ background:var(--cream); }
     active.mount(el);
   }
   function goHome(){ if(active&&active.unmount)active.unmount(); active=null; renderHome(); }
+  /* History so the phone/browser Back button returns to the menu instead of
+     closing the app. Opening a game pushes an entry; Back (popstate) pops it
+     and re-renders. The on-screen "Menu" button just calls history.back() so
+     both paths stay in sync. */
+  function pushGame(key){try{history.pushState({arcade:'game',key:key},'');}catch(_){}}
+  function navMenu(){var inGame=!!active;if(inGame){try{history.back();return;}catch(_){}}goHome();}
+  window.addEventListener('popstate',function(e){
+    var st=e.state;
+    if(st&&st.arcade==='game'){ if(!active)openGame(st.key); }
+    else { if(active)goHome(); }
+  });
   app.addEventListener('click',function(e){
-    var nav=e.target.closest('[data-nav]'); if(nav){ if(nav.dataset.nav==='menu')goHome(); return; }
-    var g=e.target.closest('[data-game]'); if(g){ openGame(g.dataset.game); return; }
+    var nav=e.target.closest('[data-nav]'); if(nav){ if(nav.dataset.nav==='menu')navMenu(); return; }
+    var g=e.target.closest('[data-game]'); if(g){ openGame(g.dataset.game); pushGame(g.dataset.game); return; }
   });
 
   /* =================================================== SUDOKU */
@@ -938,7 +970,7 @@ html,body{ background:var(--cream); }
           return '<button class="diff" data-mslevel="'+name+'"><span class="dot">'+d+'</span><span class="dn">'+name+'</span><span class="dd">'+LV[name].c+'\u00D7'+LV[name].r+' \u00B7 '+LV[name].m+' mines</span></button>';}).join('')+'</div></div>';return;}
       var left=M.mines-M.flags;
       var cells='';for(var r=0;r<M.rows;r++)for(var c=0;c<M.cols;c++)cells+=cellHTML(r,c);
-      var style='grid-template-columns:repeat('+M.cols+',1fr);grid-template-rows:repeat('+M.rows+',1fr);aspect-ratio:'+M.cols+'/'+M.rows+';width:min(100%,calc((100svh - 270px) * '+M.cols+' / '+M.rows+'));margin:0 auto;';
+      var style='grid-template-columns:repeat('+M.cols+',1fr);grid-template-rows:repeat('+M.rows+',1fr);aspect-ratio:'+M.cols+'/'+M.rows+';width:min(100%,calc((100svh - 230px) * '+M.cols+' / '+M.rows+'));margin:0 auto;';
       app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">\u2190 Menu</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+left+'</div><div class="cl">Mines</div></div>'
         +'<div class="chip"><div class="cv" id="m_time">'+fmt(M.seconds)+'</div><div class="cl">'+M.level+'</div></div>'
@@ -1096,7 +1128,7 @@ html,body{ background:var(--cream); }
     function freePairExists(){var fr=[];for(var i=0;i<pos.length;i++)if(M.present[i]&&free(i,M.present))fr.push(i);
       for(var a=0;a<fr.length;a++)for(var b=a+1;b<fr.length;b++)if(M.face[fr[a]]===M.face[fr[b]])return [fr[a],fr[b]];return null;}
     function tileHTML(i){if(!M.present[i])return '';var p=pos[i];var f=M.face[i];var g=GLY[f]||f;var fc=FACECOL[f]||['#241a2e','#fff'];
-      var cls='mj-tile'+(free(i,M.present)?'':' blk')+(M.sel===i?' sel':'');
+      var cls='mj-tile'+(free(i,M.present)?' free':' blk')+(M.sel===i?' sel':'');
       var st='left:calc('+p.x+'*var(--tw) + '+(3-p.z)+'*var(--zo));top:calc('+p.y+'*var(--th) + '+(3-p.z)+'*var(--zo));z-index:'+(p.z*100+p.y*8+p.x)+';background:'+fc[1]+';color:'+fc[0]+';';
       return '<div class="'+cls+'" style="'+st+'" data-mj="'+i+'" role="gridcell" aria-label="'+(NAMES[f]||f)+' tile'+(free(i,M.present)?'':', blocked')+'"><span class="mg">'+g+'</span></div>';}
     function render(){var tiles='';for(var i=0;i<pos.length;i++)tiles+=tileHTML(i);
@@ -1110,7 +1142,13 @@ html,body{ background:var(--cream); }
         +'<button class="tool" data-mjaction="hint"><span class="ic">\u2726</span>Hint<span class="badge">find pair</span></button>'
         +'<button class="tool" data-mjaction="shuffle"><span class="ic">\u21C4</span>Shuffle<span class="badge">re-deal</span></button></div></div>';
       measure();}
-    function measure(){var bw=app.querySelector('.boardwrap');if(!bw)return;var w=bw.clientWidth;if(!w)return;app.querySelector('.mj').style.setProperty('--tw',(w/9.2)+'px');}
+    function measure(){var bw=app.querySelector('.boardwrap');if(!bw)return;var w=bw.clientWidth;if(!w)return;
+      /* Make the tiles as large as possible against BOTH the available width
+         (8.39 tile-widths across) and height (6.39 tile-widths tall, since
+         --th = 1.5·tw), so the board fills the screen on any shape. */
+      var vh=(window.innerHeight||window.innerWidth||640),availH=Math.max(220,vh-210);
+      var tw=Math.max(26,Math.min(w/8.45, availH/6.55));
+      app.querySelector('.mj').style.setProperty('--tw',tw+'px');}
     function removePair(a,b){M.undo.push([a,b,M.face[a]]);M.present[a]=false;M.present[b]=false;M.sel=-1;M.note='';
       if(remaining()===0){M.won=true;Stats.rec('mahjong',{win:true});Store.del('save.mahjong');haptic(winBuzz);announce('Board cleared \u2014 every tile matched!');return;}
       if(!freePairExists())M.note='No free matches \u2014 use Shuffle';}
@@ -1625,6 +1663,7 @@ html,body{ background:var(--cream); }
       unmount:function(){if(aiT)clearTimeout(aiT);}};
   }
 
+  try{history.replaceState({arcade:'home'},'');}catch(_){}
   renderHome();
 })();
 
