@@ -1105,13 +1105,13 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 
   /* =================================================== BACKGAMMON */
   function createBackgammon(){
-    var app, aiT=null;
+    var app, aiT=null, matchYou=0, matchBot=0, TARGET=7;
     /* pts[0..23]: +n = n White checkers, -n = n Black. White (you) moves high->low,
        bears off past index 0. Black (bot) moves low->high, bears off past 23. */
-    var B={pts:[],barW:0,barB:0,offW:0,offB:0,turn:'W',dice:[],rolled:false,sel:null,selDests:{},over:false,msg:''};
+    var B={pts:[],barW:0,barB:0,offW:0,offB:0,turn:'W',dice:[],rolled:false,sel:null,selDests:{},allowed:[],over:false,winInfo:null,msg:''};
     function setup(){var p=[];for(var i=0;i<24;i++)p.push(0);
       p[23]=2;p[12]=5;p[7]=3;p[5]=5; p[0]=-2;p[11]=-5;p[16]=-3;p[18]=-5;
-      B.pts=p;B.barW=0;B.barB=0;B.offW=0;B.offB=0;B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.over=false;B.msg='Tap Roll to begin.';}
+      B.pts=p;B.barW=0;B.barB=0;B.offW=0;B.offB=0;B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.over=false;B.winInfo=null;B.msg='Tap Roll to begin.';}
     function dir(pl){return pl==='W'?-1:1;}
     function homeAll(pl){var i;if(pl==='W'){if(B.barW)return false;for(i=6;i<24;i++)if(B.pts[i]>0)return false;return true;}
       if(B.barB)return false;for(i=0;i<18;i++)if(B.pts[i]<0)return false;return true;}
@@ -1130,6 +1130,33 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function froms(pl){var a=[],i;if(pl==='W'){if(B.barW)return ['bar'];for(i=0;i<24;i++)if(B.pts[i]>0)a.push(i);}else{if(B.barB)return ['bar'];for(i=0;i<24;i++)if(B.pts[i]<0)a.push(i);}return a;}
     function diceUniq(){var u={};B.dice.forEach(function(d){u[d]=1;});return Object.keys(u).map(Number);}
     function legalMoves(pl){var ms=[];froms(pl).forEach(function(f){diceUniq().forEach(function(d){if(!hasC(pl,f))return;var t=dest(pl,f,d);if(t!==null)ms.push({from:f,d:d,to:t});});});return ms;}
+    /* --- Tournament rule: a player must play as many dice as legally possible,
+       and when only one of two different dice can be played, must play the higher. --- */
+    function snap(){return {pts:B.pts.slice(),barW:B.barW,barB:B.barB,offW:B.offW,offB:B.offB};}
+    function sHome(S,pl){var i;if(pl==='W'){if(S.barW)return false;for(i=6;i<24;i++)if(S.pts[i]>0)return false;return true;}if(S.barB)return false;for(i=0;i<18;i++)if(S.pts[i]<0)return false;return true;}
+    function sBlk(S,i,pl){return pl==='W'?S.pts[i]<=-2:S.pts[i]>=2;}
+    function sDest(S,pl,from,d){
+      if(from==='bar'){var di=pl==='W'?(24-d):(d-1);return sBlk(S,di,pl)?null:di;}
+      if(pl==='W'&&S.barW)return null;if(pl==='B'&&S.barB)return null;
+      var i=from,to=i+(pl==='W'?-d:d),k;
+      if(pl==='W'){if(to>=0)return sBlk(S,to,pl)?null:to;if(!sHome(S,'W'))return null;if(to===-1)return 'off';for(k=i+1;k<=5;k++)if(S.pts[k]>0)return null;return 'off';}
+      if(to<=23)return sBlk(S,to,pl)?null:to;if(!sHome(S,'B'))return null;if(to===24)return 'off';for(k=i-1;k>=18;k--)if(S.pts[k]<0)return null;return 'off';}
+    function sHas(S,pl,f){if(f==='bar')return pl==='W'?S.barW>0:S.barB>0;return pl==='W'?S.pts[f]>0:S.pts[f]<0;}
+    function sFroms(S,pl){var a=[],i;if(pl==='W'){if(S.barW)return['bar'];for(i=0;i<24;i++)if(S.pts[i]>0)a.push(i);}else{if(S.barB)return['bar'];for(i=0;i<24;i++)if(S.pts[i]<0)a.push(i);}return a;}
+    function sApply(S,pl,from,d,to){if(from==='bar'){if(pl==='W')S.barW--;else S.barB--;}else{S.pts[from]+=pl==='W'?-1:1;}
+      if(to==='off'){if(pl==='W')S.offW++;else S.offB++;}
+      else{if(pl==='W'){if(S.pts[to]===-1){S.pts[to]=0;S.barB++;}S.pts[to]+=1;}else{if(S.pts[to]===1){S.pts[to]=0;S.barW++;}S.pts[to]-=1;}}}
+    function cloneS(S){return {pts:S.pts.slice(),barW:S.barW,barB:S.barB,offW:S.offW,offB:S.offB};}
+    function distinct(a){var u={};a.forEach(function(x){u[x]=1;});return Object.keys(u).map(Number);}
+    function maxPlays(S,pl,dice){if(!dice.length)return 0;var best=0;
+      distinct(dice).forEach(function(d){sFroms(S,pl).forEach(function(f){if(!sHas(S,pl,f))return;var to=sDest(S,pl,f,d);if(to===null)return;
+        var S2=cloneS(S);sApply(S2,pl,f,d,to);var d2=dice.slice();d2.splice(d2.indexOf(d),1);var r=1+maxPlays(S2,pl,d2);if(r>best)best=r;});});return best;}
+    function allowedMoves(pl){var base=legalMoves(pl);if(!base.length)return [];
+      var mx=maxPlays(snap(),pl,B.dice);
+      var res=base.filter(function(m){var S=snap();sApply(S,pl,m.from,m.d,m.to);var d2=B.dice.slice();d2.splice(d2.indexOf(m.d),1);return 1+maxPlays(S,pl,d2)===mx;});
+      if(mx===1){var u=distinct(B.dice);if(u.length===2){var hi=Math.max(u[0],u[1]);var hiM=res.filter(function(m){return m.d===hi;});if(hiM.length)res=hiM;}}
+      return res;}
+    function refreshAllowed(){B.allowed=(B.turn==='W'&&B.rolled&&!B.over)?allowedMoves('W'):[];}
     function applyMove(pl,from,d){var to=dest(pl,from,d);if(to===null)return false;
       if(from==='bar'){if(pl==='W')B.barW--;else B.barB--;}else{B.pts[from]+=pl==='W'?-1:1;}
       if(to==='off'){if(pl==='W')B.offW++;else B.offB++;}
@@ -1139,21 +1166,28 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       return true;}
     function rollDice(){var a=1+(Math.random()*6|0),b=1+(Math.random()*6|0);B.dice=a===b?[a,a,a,a]:[a,b];B.rolled=true;}
     function computeSelDests(){B.selDests={};if(B.sel===null)return;
-      diceUniq().forEach(function(d){var t=dest('W',B.sel,d);if(t===null)return;var key=(t==='off')?'off':String(t);
-        if(B.selDests[key]===undefined||(key==='off'&&d===(B.sel+1)))B.selDests[key]=d;});}
-    function humanRoll(){if(B.turn!=='W'||B.rolled||B.over)return;rollDice();
-      B.msg=legalMoves('W').length?'Your move.':'No moves — tap End turn.';render();}
-    function afterWhiteMove(){B.sel=null;B.selDests={};if(B.over){B.msg='You win!';render();return;}
-      if(B.dice.length===0){toAI();return;}render();}
-    function toAI(){B.turn='B';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.msg='Bot is thinking…';render();aiT=setTimeout(aiStart,650);}
+      B.allowed.forEach(function(m){if(m.from!==B.sel)return;var key=(m.to==='off')?'off':String(m.to);
+        if(B.selDests[key]===undefined||(key==='off'&&m.d===(B.sel+1)))B.selDests[key]=m.d;});}
+    function humanRoll(){if(B.turn!=='W'||B.rolled||B.over)return;rollDice();refreshAllowed();
+      B.msg=B.allowed.length?'Your move.':'No legal moves — tap End turn.';render();}
+    function afterWhiteMove(){B.sel=null;B.selDests={};if(B.over){endGame();return;}
+      if(B.dice.length===0){toAI();return;}
+      refreshAllowed();if(!B.allowed.length)B.msg='No more moves — tap End turn.';render();}
+    function toAI(){B.turn='B';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.msg='Bot is thinking…';render();aiT=setTimeout(aiStart,650);}
     function aiStart(){rollDice();B.msg='Bot rolled '+B.dice.slice(0,2).join(' & ')+'.';render();aiT=setTimeout(aiStep,700);}
-    function aiStep(){if(B.over){B.msg='Bot wins.';render();return;}
-      var ms=legalMoves('B');if(!ms.length||B.dice.length===0){toHuman();return;}
+    function aiStep(){if(B.over){endGame();return;}
+      var ms=allowedMoves('B');if(!ms.length||B.dice.length===0){toHuman();return;}
       var best=ms[0],bestS=-1e9;ms.forEach(function(m){var s=scoreAI(m);if(s>bestS){bestS=s;best=m;}});
       applyMove('B',best.from,best.d);render();
-      if(B.over){B.msg='Bot wins.';render();return;}
+      if(B.over){endGame();return;}
       aiT=setTimeout(aiStep,650);}
-    function toHuman(){B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.msg='Your roll.';render();}
+    function toHuman(){B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.msg='Your roll.';render();}
+    function winType(winner){var loserOff=winner==='W'?B.offB:B.offW;if(loserOff>0)return 1;var i,bg=false;
+      if(winner==='W'){if(B.barB>0)bg=true;else for(i=0;i<6;i++)if(B.pts[i]<0){bg=true;break;}}
+      else{if(B.barW>0)bg=true;else for(i=18;i<24;i++)if(B.pts[i]>0){bg=true;break;}}
+      return bg?3:2;}
+    function endGame(){if(aiT){clearTimeout(aiT);aiT=null;}var winner=B.offW===15?'W':'B';var pts=winType(winner);
+      if(winner==='W')matchYou+=pts;else matchBot+=pts;B.over=true;B.winInfo={winner:winner,pts:pts};render();}
     function scoreAI(m){var s=Math.random()*0.5;
       if(m.to==='off')return 120+s;var to=m.to;
       if(B.pts[to]===1)s+=60; if(B.pts[to]===-1)s+=22; if(B.pts[to]<=-2)s+=8;
@@ -1162,16 +1196,15 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var isNum=(ptStr!=='bar'&&ptStr!=='off');
       if(B.sel===null){
         var src=(ptStr==='bar')?'bar':(isNum?parseInt(ptStr,10):null);if(src===null)return;
-        if(B.barW&&src!=='bar')return; if(!hasC('W',src))return;
-        if(!diceUniq().some(function(d){return dest('W',src,d)!==null;}))return;
+        if(!B.allowed.some(function(m){return m.from===src;}))return;
         B.sel=src;computeSelDests();render();return;}
       var key=isNum?String(parseInt(ptStr,10)):ptStr;
       if(B.selDests[key]!==undefined){applyMove('W',B.sel,B.selDests[key]);afterWhiteMove();return;}
-      if(isNum){var s2=parseInt(ptStr,10);if(!B.barW&&hasC('W',s2)&&diceUniq().some(function(d){return dest('W',s2,d)!==null;})){B.sel=s2;computeSelDests();render();return;}}
-      if(ptStr==='bar'&&B.barW){B.sel='bar';computeSelDests();render();return;}
+      if(isNum){var s2=parseInt(ptStr,10);if(B.allowed.some(function(m){return m.from===s2;})){B.sel=s2;computeSelDests();render();return;}}
+      if(ptStr==='bar'&&B.allowed.some(function(m){return m.from==='bar';})){B.sel='bar';computeSelDests();render();return;}
       B.sel=null;B.selDests={};render();}
     function checkersHTML(n,pl){var h='',show=Math.min(n,5);for(var k=0;k<show;k++){var lbl=(k===show-1&&n>5)?'<span class="bg-cnt">'+n+'</span>':'';h+='<div class="bg-chk '+pl+'">'+lbl+'</div>';}return h;}
-    function srcOK(idx){return B.sel===null&&B.turn==='W'&&B.rolled&&!B.over&&!B.barW&&B.pts[idx]>0&&diceUniq().some(function(d){return dest('W',idx,d)!==null;});}
+    function srcOK(idx){return B.sel===null&&B.turn==='W'&&B.rolled&&!B.over&&B.allowed.some(function(m){return m.from===idx;});}
     function pointHTML(idx,isTop){var v=B.pts[idx],pl=v>0?'w':(v<0?'b':''),n=Math.abs(v);
       var cls='bg-point '+(isTop?'top':'bottom');
       if(B.sel!==null&&B.selDests[String(idx)]!==undefined)cls+=' dst';
@@ -1180,11 +1213,11 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function quadHTML(list,isTop){return list.map(function(i){return pointHTML(i,isTop);}).join('');}
     function barHTML(isTop){var n=isTop?B.barB:B.barW,pl=isTop?'b':'w',cls='bg-barslot '+(isTop?'top':'bottom');
       if(!isTop){if(B.sel==='bar')cls+=' selp';
-        if(B.sel===null&&B.turn==='W'&&B.rolled&&!B.over&&B.barW&&diceUniq().some(function(d){return dest('W','bar',d)!==null;}))cls+=' src';}
+        if(B.sel===null&&B.turn==='W'&&B.rolled&&!B.over&&B.allowed.some(function(m){return m.from==='bar';}))cls+=' src';}
       return '<div class="'+cls+'" data-pt="bar">'+checkersHTML(n,pl)+'</div>';}
     function diceHTML(){if(!B.rolled||!B.dice.length)return '';var h='<span class="bg-dice">';B.dice.forEach(function(d){h+='<span class="bg-die">'+d+'</span>';});return h+'</span>';}
     function rollBtn(){if(B.over||B.turn!=='W')return '';if(!B.rolled)return ' <button class="bg-roll" data-bgaction="roll">Roll</button>';
-      if(!legalMoves('W').length)return ' <button class="bg-roll" data-bgaction="endturn">End turn</button>';return '';}
+      if(!B.allowed.length)return ' <button class="bg-roll" data-bgaction="endturn">End turn</button>';return '';}
     function render(){
       var top='<div class="bg-half top">'+quadHTML([12,13,14,15,16,17],true)+barHTML(true)+quadHTML([18,19,20,21,22,23],true)+'</div>';
       var bot='<div class="bg-half bottom">'+quadHTML([11,10,9,8,7,6],false)+barHTML(false)+quadHTML([5,4,3,2,1,0],false)+'</div>';
@@ -1192,15 +1225,21 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var offW='<div class="bg-off bottom'+(B.selDests['off']!==undefined?' dst':'')+'" data-pt="off"><div class="bg-offlabel">You</div><div class="bg-offnum">'+B.offW+'</div></div>';
       var board='<div class="bg-board"><div class="bg-main">'+top+bot+'</div><div class="bg-offcol">'+offB+offW+'</div></div>';
       app.innerHTML='<div class="bg"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
-        +'<div class="stats"><div class="chip"><div class="cv">'+B.offW+'</div><div class="cl">You off</div></div>'
-        +'<div class="chip"><div class="cv">'+B.offB+'</div><div class="cl">Bot off</div></div></div>'
+        +'<div class="stats"><div class="chip"><div class="cv">'+matchYou+'</div><div class="cl">You</div></div>'
+        +'<div class="chip"><div class="cv">'+matchBot+'</div><div class="cl">Bot</div></div></div>'
         +'<button class="pausebtn" data-bgaction="new" title="New game">↻</button></div>'
         +'<div class="bg-status">'+B.msg+diceHTML()+rollBtn()+'</div>'
-        +board
-        +(B.over?'<div class="overlay '+(B.offW===15?'win':'')+'"><div><div class="ot">'+(B.offW===15?'You win<em>!</em>':'Bot wins<em>.</em>')+'</div><div class="os">'+(B.offW===15?'All 15 borne off':'The bot bore off first')+'</div><button class="osmall" data-bgaction="new">New game</button></div></div>':'')
+        +board+overlayHTML()
         +'</div>';}
+    function overlayHTML(){if(!B.over)return '';var wi=B.winInfo||{winner:'B',pts:1};
+      var names={1:'Single game',2:'Gammon',3:'Backgammon'};var youWon=wi.winner==='W';
+      var matchOver=(matchYou>=TARGET||matchBot>=TARGET);
+      var title=matchOver?(matchYou>=TARGET?'Match won<em>!</em>':'Match lost<em>.</em>'):(youWon?'You win<em>!</em>':'Bot wins<em>.</em>');
+      var sub=names[wi.pts]+' · +'+wi.pts+' pt'+(wi.pts>1?'s':'')+'<br>Match to '+TARGET+': You '+matchYou+' – '+matchBot+' Bot';
+      return '<div class="overlay '+(youWon?'win':'')+'"><div><div class="ot">'+title+'</div><div class="os">'+sub+'</div>'
+        +'<button class="osmall" data-bgaction="new">'+(matchOver?'New match':'Next game')+'</button></div></div>';}
     function clickH(e){var act=e.target.closest('[data-bgaction]');if(act){var a=act.dataset.bgaction;
-        if(a==='roll')humanRoll();else if(a==='endturn')toAI();else if(a==='new'){if(aiT)clearTimeout(aiT);setup();render();}return;}
+        if(a==='roll')humanRoll();else if(a==='endturn')toAI();else if(a==='new'){if(aiT)clearTimeout(aiT);if(matchYou>=TARGET||matchBot>=TARGET){matchYou=0;matchBot=0;}setup();render();}return;}
       var pt=e.target.closest('[data-pt]');if(pt){tapPt(pt.dataset.pt);return;}}
     return {mount:function(root){app=root;app.addEventListener('click',clickH);setup();render();},
       unmount:function(){if(aiT)clearTimeout(aiT);}};
