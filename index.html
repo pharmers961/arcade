@@ -107,8 +107,8 @@ html,body{margin:0;padding:0;}
   max-width:min(100%,calc(100vh - 288px));
   max-width:min(100%,calc(100svh - 288px));}
 .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
-.back{background:none;border:none;cursor:pointer;font-family:'Bungee';font-size:11px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--purple);display:flex;align-items:center;gap:6px;padding:4px 0;}
+.back{background:none;border:none;cursor:pointer;font-family:'Bungee';font-size:14px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--purple);display:flex;align-items:center;gap:8px;padding:8px 4px;margin-left:-4px;}
 .back:hover{color:var(--pink);}
 .stats{display:flex;gap:10px;align-items:center;}
 .chip{border:2.5px solid var(--black);border-radius:9px;padding:7px 13px;text-align:center;background:#fff;
@@ -435,7 +435,10 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   .toggle{ color:#f4ead9; border-color:rgba(244,234,217,.5); }
   /* light panels keep their dark ink so inner text stays readable */
   .gcard,.chip,.board,.cell,.num,.tool,.diff,.card,.mj-tile,
-  .my-grid,.myc,.myh,.pick,.accbox,.ms-cell,.zip-cell{ color:var(--ink); }
+  .my-grid,.myc,.myh,.pick,.accbox,.zip-cell{ color:var(--ink); }
+  /* Minesweeper: revealed cells use --cream which goes near-black in dark mode,
+     hiding the number clues. Pin them light so the colored numbers stay readable. */
+  .ms-cell.show{ background:#f3e9d7; }
   .accbox{ background:#fff; }
   .overlay{ background:rgba(21,16,29,.88); }
 }
