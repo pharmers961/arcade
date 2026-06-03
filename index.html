@@ -1105,13 +1105,14 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 
   /* =================================================== BACKGAMMON */
   function createBackgammon(){
-    var app, aiT=null, matchYou=0, matchBot=0, TARGET=7;
+    var app, aiT=null, matchYou=0, matchBot=0, TARGET=7, difficulty='Medium';
+    var LEVELS=[{k:'Easy',d:'plays casually'},{k:'Medium',d:'solid, tactical'},{k:'Hard',d:'thinks ahead'}];
     /* pts[0..23]: +n = n White checkers, -n = n Black. White (you) moves high->low,
        bears off past index 0. Black (bot) moves low->high, bears off past 23. */
-    var B={pts:[],barW:0,barB:0,offW:0,offB:0,turn:'W',dice:[],rolled:false,sel:null,selDests:{},allowed:[],over:false,winInfo:null,msg:''};
+    var B={pts:[],barW:0,barB:0,offW:0,offB:0,turn:'W',dice:[],rolled:false,sel:null,selDests:{},allowed:[],over:false,winInfo:null,aiPlan:null,screen:'start',msg:''};
     function setup(){var p=[];for(var i=0;i<24;i++)p.push(0);
       p[23]=2;p[12]=5;p[7]=3;p[5]=5; p[0]=-2;p[11]=-5;p[16]=-3;p[18]=-5;
-      B.pts=p;B.barW=0;B.barB=0;B.offW=0;B.offB=0;B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.over=false;B.winInfo=null;B.msg='Tap Roll to begin.';}
+      B.pts=p;B.barW=0;B.barB=0;B.offW=0;B.offB=0;B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.over=false;B.winInfo=null;B.aiPlan=null;B.msg='Vs '+difficulty+' bot · tap Roll.';}
     function dir(pl){return pl==='W'?-1:1;}
     function homeAll(pl){var i;if(pl==='W'){if(B.barW)return false;for(i=6;i<24;i++)if(B.pts[i]>0)return false;return true;}
       if(B.barB)return false;for(i=0;i<18;i++)if(B.pts[i]<0)return false;return true;}
@@ -1157,6 +1158,27 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       if(mx===1){var u=distinct(B.dice);if(u.length===2){var hi=Math.max(u[0],u[1]);var hiM=res.filter(function(m){return m.d===hi;});if(hiM.length)res=hiM;}}
       return res;}
     function refreshAllowed(){B.allowed=(B.turn==='W'&&B.rolled&&!B.over)?allowedMoves('W'):[];}
+    /* --- Position evaluation + full-turn lookahead for the Hard bot --- */
+    function pip(S,pl){var t=0,i;if(pl==='W'){t+=S.barW*25;for(i=0;i<24;i++)if(S.pts[i]>0)t+=S.pts[i]*(i+1);}else{t+=S.barB*25;for(i=0;i<24;i++)if(S.pts[i]<0)t+=(-S.pts[i])*(24-i);}return t;}
+    function blotRisk(S,pl,i){var opp=pl==='W'?'B':'W',shots=0,d;for(d=1;d<=6;d++){var j=pl==='W'?i-d:i+d;
+      if(j>=0&&j<24){if(opp==='B'&&S.pts[j]<0)shots++;if(opp==='W'&&S.pts[j]>0)shots++;}
+      if(opp==='B'&&S.barB>0&&pl==='W'&&i===d-1)shots++;if(opp==='W'&&S.barW>0&&pl==='B'&&i===24-d)shots++;}
+      return shots*shots*0.6+shots*1.5;}
+    function madePoints(S,pl){var n=0,i;for(i=0;i<24;i++){if(pl==='W'&&S.pts[i]>=2)n++;if(pl==='B'&&S.pts[i]<=-2)n++;}return n;}
+    function evalPos(S,pl){var opp=pl==='W'?'B':'W',v=0,i;
+      v+=pip(S,opp)-pip(S,pl);
+      v+=(pl==='W'?S.offW:S.offB)*12; v-=(pl==='W'?S.offB:S.offW)*12;
+      v-=(pl==='W'?S.barW:S.barB)*8;
+      for(i=0;i<24;i++){var c=S.pts[i];if(pl==='W'&&c===1)v-=blotRisk(S,'W',i);if(pl==='B'&&c===-1)v-=blotRisk(S,'B',i);}
+      v+=madePoints(S,pl)*2; return v;}
+    function bestSequenceHard(pl){var mxAll=maxPlays(snap(),pl,B.dice);if(mxAll===0)return [];
+      if(mxAll===1){var am=allowedMoves(pl),b=null,bv=-1e9;am.forEach(function(m){var S=snap();sApply(S,pl,m.from,m.d,m.to);var v=evalPos(S,pl)+Math.random()*0.01;if(v>bv){bv=v;b=[m];}});return b||[];}
+      var best=null,bestVal=-1e9,nodes={n:0};
+      function rec(S,dice,moves){if(nodes.n++>20000)return;var child=0;
+        distinct(dice).forEach(function(d){sFroms(S,pl).forEach(function(f){if(!sHas(S,pl,f))return;var to=sDest(S,pl,f,d);if(to===null)return;child++;var S2=cloneS(S);sApply(S2,pl,f,d,to);var dd=dice.slice();dd.splice(dd.indexOf(d),1);rec(S2,dd,moves.concat([{from:f,d:d,to:to}]));});});
+        if(child===0&&moves.length===mxAll){var v=evalPos(S,pl)+Math.random()*0.01;if(v>bestVal){bestVal=v;best=moves;}}}
+      rec(snap(),B.dice.slice(),[]);
+      if(best)return best;var am=allowedMoves(pl);return am.length?am.slice(0,1):[];}
     function applyMove(pl,from,d){var to=dest(pl,from,d);if(to===null)return false;
       if(from==='bar'){if(pl==='W')B.barW--;else B.barB--;}else{B.pts[from]+=pl==='W'?-1:1;}
       if(to==='off'){if(pl==='W')B.offW++;else B.offB++;}
@@ -1174,13 +1196,18 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       if(B.dice.length===0){toAI();return;}
       refreshAllowed();if(!B.allowed.length)B.msg='No more moves — tap End turn.';render();}
     function toAI(){B.turn='B';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.msg='Bot is thinking…';render();aiT=setTimeout(aiStart,650);}
-    function aiStart(){rollDice();B.msg='Bot rolled '+B.dice.slice(0,2).join(' & ')+'.';render();aiT=setTimeout(aiStep,700);}
+    function aiStart(){rollDice();B.msg='Bot rolled '+B.dice.slice(0,2).join(' & ')+'.';
+      B.aiPlan=(difficulty==='Hard')?bestSequenceHard('B'):null;render();aiT=setTimeout(aiStep,700);}
     function aiStep(){if(B.over){endGame();return;}
-      var ms=allowedMoves('B');if(!ms.length||B.dice.length===0){toHuman();return;}
-      var best=ms[0],bestS=-1e9;ms.forEach(function(m){var s=scoreAI(m);if(s>bestS){bestS=s;best=m;}});
-      applyMove('B',best.from,best.d);render();
+      var mv=null;
+      if(B.aiPlan){if(!B.aiPlan.length){toHuman();return;}mv=B.aiPlan.shift();}
+      else{var ms=allowedMoves('B');if(!ms.length||B.dice.length===0){toHuman();return;}
+        if(difficulty==='Easy'){mv=ms[(Math.random()*ms.length)|0];}
+        else{var best=ms[0],bestS=-1e9;ms.forEach(function(m){var s=scoreAI(m);if(s>bestS){bestS=s;best=m;}});mv=best;}}
+      if(!mv){toHuman();return;}
+      applyMove('B',mv.from,mv.d);render();
       if(B.over){endGame();return;}
-      aiT=setTimeout(aiStep,650);}
+      aiT=setTimeout(aiStep,600);}
     function toHuman(){B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.allowed=[];B.msg='Your roll.';render();}
     function winType(winner){var loserOff=winner==='W'?B.offB:B.offW;if(loserOff>0)return 1;var i,bg=false;
       if(winner==='W'){if(B.barB>0)bg=true;else for(i=0;i<6;i++)if(B.pts[i]<0){bg=true;break;}}
@@ -1237,11 +1264,24 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var title=matchOver?(matchYou>=TARGET?'Match won<em>!</em>':'Match lost<em>.</em>'):(youWon?'You win<em>!</em>':'Bot wins<em>.</em>');
       var sub=names[wi.pts]+' · +'+wi.pts+' pt'+(wi.pts>1?'s':'')+'<br>Match to '+TARGET+': You '+matchYou+' – '+matchBot+' Bot';
       return '<div class="overlay '+(youWon?'win':'')+'"><div><div class="ot">'+title+'</div><div class="os">'+sub+'</div>'
-        +'<button class="osmall" data-bgaction="new">'+(matchOver?'New match':'Next game')+'</button></div></div>';}
-    function clickH(e){var act=e.target.closest('[data-bgaction]');if(act){var a=act.dataset.bgaction;
-        if(a==='roll')humanRoll();else if(a==='endturn')toAI();else if(a==='new'){if(aiT)clearTimeout(aiT);if(matchYou>=TARGET||matchBot>=TARGET){matchYou=0;matchBot=0;}setup();render();}return;}
+        +'<button class="osmall" data-bgaction="'+(matchOver?'strength':'new')+'">'+(matchOver?'New match':'Next game')+'</button>'
+        +(matchOver?'':'<button class="osmall ghost" data-bgaction="strength">Change strength</button>')+'</div></div>';}
+    function mountStart(){B.screen='start';if(aiT){clearTimeout(aiT);aiT=null;}
+      app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">← Menu</button><span></span></div>'
+        +'<div class="kicker">Roll & Bear Off</div><h1 class="title" style="font-size:clamp(34px,9vw,60px)">Back<em>gam</em>mon</h1>'
+        +'<p class="subtitle">Play a match to '+TARGET+' against the bot.</p>'
+        +'<div class="label">Opponent strength</div><div class="diffs">'
+        +LEVELS.map(function(L,idx){var dot='';for(var i=0;i<4;i++)dot+='<i class="'+(i<=idx+1?'f':'')+'"></i>';
+          return '<button class="diff'+(difficulty===L.k?' on':'')+'" data-bglevel="'+L.k+'"><span class="dot">'+dot+'</span><span class="dn">'+L.k+'</span><span class="dd">'+L.d+'</span></button>';}).join('')
+        +'</div></div>';}
+    function clickH(e){
+      var lv=e.target.closest('[data-bglevel]');if(lv){difficulty=lv.dataset.bglevel;matchYou=0;matchBot=0;B.screen='play';setup();render();return;}
+      var act=e.target.closest('[data-bgaction]');if(act){var a=act.dataset.bgaction;
+        if(a==='roll')humanRoll();else if(a==='endturn')toAI();
+        else if(a==='strength'){mountStart();}
+        else if(a==='new'){if(aiT)clearTimeout(aiT);if(matchYou>=TARGET||matchBot>=TARGET){matchYou=0;matchBot=0;}setup();render();}return;}
       var pt=e.target.closest('[data-pt]');if(pt){tapPt(pt.dataset.pt);return;}}
-    return {mount:function(root){app=root;app.addEventListener('click',clickH);setup();render();},
+    return {mount:function(root){app=root;app.addEventListener('click',clickH);mountStart();},
       unmount:function(){if(aiT)clearTimeout(aiT);}};
   }
 
