@@ -1,6 +1,6 @@
 # Pocket Arcade
 
-A tiny offline arcade of five classic puzzle games in one installable web app
+A tiny offline arcade of eight little games in one installable web app
 (PWA), built as a single self-contained `index.html` — no servers, no build
 step, no internet required after the first load.
 
@@ -8,7 +8,10 @@ step, no internet required after the first load.
 - **Sudoku** — difficulty levels, optional timer, hints, pencil notes
 - **Minesweeper** — flag mode, chording, three field sizes
 - **Solitaire** — Klondike, tap-to-move, double-tap to a foundation
-- **Mahjong** — shape-tile matching with undo, hint, and shuffle
+- **Zip** — trace one line through the numbered dots, filling every cell
+- **Mahjong** — colourful shape-tile matching with undo, hint, and shuffle
+- **Wordle** — guess the five-letter word in six tries (1200+ word list)
+- **Backgammon** — full rules vs a bot: hitting, the bar, and bearing off
 - **Mystery** — a logic-grid murder deduction puzzle (original cases)
 
 ## Run it
