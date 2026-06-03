@@ -283,6 +283,76 @@ html,body{margin:0;padding:0;}
 .mj-note{text-align:center;font-family:'Fredoka';font-weight:500;color:var(--purple);margin-top:12px;min-height:18px;font-size:14px;}
 .g-ma .gglyph{background:var(--purple);color:#fff;}
 
+/* ---- Wordle ---- */
+.g-wd .gglyph{background:var(--green);color:#fff;}
+.wd{position:relative;max-width:400px;margin:0 auto;display:flex;flex-direction:column;}
+.wd-grid{display:grid;grid-template-rows:repeat(6,1fr);gap:7px;width:100%;max-width:330px;margin:0 auto;}
+.wd-row{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
+.wd-tile{aspect-ratio:1;border:2.5px solid var(--black);border-radius:8px;background:#fff;color:var(--black);
+  display:flex;align-items:center;justify-content:center;font-family:'Fredoka';font-weight:800;
+  font-size:clamp(22px,7vw,30px);text-transform:uppercase;box-shadow:2px 2px 0 rgba(36,26,46,.22);}
+.wd-tile.fill{border-color:var(--purple);}
+.wd-tile.c{background:#3aa657;color:#fff;border-color:#28733d;box-shadow:2px 2px 0 #28733d;}
+.wd-tile.p{background:#e0a200;color:#fff;border-color:#b08000;box-shadow:2px 2px 0 #b08000;}
+.wd-tile.a{background:#867a90;color:#fff;border-color:#5f5468;box-shadow:2px 2px 0 #5f5468;}
+.wd-msg{text-align:center;min-height:20px;font-family:'Bungee';font-size:12px;letter-spacing:.04em;
+  color:var(--err);margin:14px 0;text-transform:uppercase;}
+.wd-kb{display:flex;flex-direction:column;gap:7px;}
+.wd-krow{display:flex;gap:5px;justify-content:center;}
+.wd-key{flex:1;min-width:0;height:50px;border:2px solid var(--black);border-radius:7px;background:#fff;color:var(--black);
+  font-family:'Fredoka';font-weight:700;font-size:16px;text-transform:uppercase;cursor:pointer;padding:0;
+  box-shadow:2px 2px 0 var(--black);display:flex;align-items:center;justify-content:center;transition:transform .1s,box-shadow .1s;}
+.wd-key.wide{flex:1.6;font-size:11px;font-family:'Bungee';letter-spacing:.02em;}
+.wd-key:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--black);}
+.wd-key.c{background:#3aa657;color:#fff;border-color:#28733d;}
+.wd-key.p{background:#e0a200;color:#fff;border-color:#b08000;}
+.wd-key.a{background:#5f5468;color:#fff;border-color:#3f3747;}
+
+/* ---- Backgammon ---- */
+.g-bg .gglyph{background:#b5651d;color:#fff;}
+.bg{position:relative;max-width:560px;margin:0 auto;}
+.bg-status{text-align:center;font-family:'Fredoka';font-weight:600;color:var(--purple);min-height:30px;
+  margin-bottom:10px;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.bg-dice{display:inline-flex;gap:8px;}
+.bg-die{width:28px;height:28px;border:2.5px solid var(--black);border-radius:6px;background:#fff;color:var(--black);
+  display:inline-grid;place-items:center;font-family:'Bungee';font-size:14px;box-shadow:2px 2px 0 var(--black);}
+.bg-roll{border:2.5px solid var(--black);background:var(--yellow);color:var(--black);font-family:'Bungee';font-size:12px;
+  padding:8px 16px;border-radius:8px;cursor:pointer;box-shadow:3px 3px 0 var(--black);text-transform:uppercase;letter-spacing:.04em;}
+.bg-roll:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--black);}
+.bg-board{display:flex;gap:5px;border:3px solid var(--black);border-radius:10px;background:#3f8f86;
+  padding:6px;box-shadow:6px 6px 0 var(--purple);}
+.bg-main{flex:1;display:flex;flex-direction:column;}
+.bg-half{flex:1;display:flex;align-items:stretch;min-height:165px;}
+.bg-quad{flex:1;display:flex;gap:2px;}
+.bg-point{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:pointer;padding:3px 0;}
+.bg-point.bottom{justify-content:flex-end;}
+.bg-point::before{content:'';position:absolute;left:5%;right:5%;top:0;bottom:0;z-index:0;}
+.bg-point.top:nth-child(odd)::before{background:#f4e3c6;clip-path:polygon(0 0,100% 0,50% 94%);}
+.bg-point.top:nth-child(even)::before{background:#c07b3e;clip-path:polygon(0 0,100% 0,50% 94%);}
+.bg-point.bottom:nth-child(odd)::before{background:#f4e3c6;clip-path:polygon(50% 6%,0 100%,100% 100%);}
+.bg-point.bottom:nth-child(even)::before{background:#c07b3e;clip-path:polygon(50% 6%,0 100%,100% 100%);}
+.bg-point.src::after,.bg-point.dst::after,.bg-point.selp::after{content:'';position:absolute;left:5%;right:5%;top:0;bottom:0;z-index:1;border-radius:5px;}
+.bg-point.src::after{box-shadow:inset 0 0 0 3.5px var(--teal);background:rgba(35,196,196,.22);}
+.bg-point.dst::after{box-shadow:inset 0 0 0 3.5px var(--pink);background:rgba(255,77,151,.28);}
+.bg-point.selp::after{box-shadow:inset 0 0 0 3.5px var(--pink);background:rgba(255,77,151,.3);}
+.bg-chk{width:84%;max-width:30px;aspect-ratio:1;border-radius:50%;border:2px solid var(--black);position:relative;z-index:2;
+  margin:1px 0;display:flex;align-items:center;justify-content:center;flex:none;}
+.bg-chk.w{background:radial-gradient(circle at 35% 30%,#fff,#efe1ce);}
+.bg-chk.b{background:radial-gradient(circle at 35% 30%,#6a5a80,#352b46);}
+.bg-cnt{font-family:'Bungee';font-size:10px;color:var(--black);}
+.bg-chk.b .bg-cnt{color:#fff;}
+.bg-barslot{width:30px;background:rgba(36,26,46,.22);border-radius:5px;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;padding:3px 0;}
+.bg-barslot.bottom{justify-content:flex-end;}
+.bg-barslot.src{box-shadow:inset 0 0 0 3px var(--teal);}
+.bg-barslot.selp{box-shadow:inset 0 0 0 3px var(--pink);}
+.bg-offcol{width:40px;display:flex;flex-direction:column;gap:5px;flex:none;}
+.bg-off{flex:1;border:2px dashed rgba(244,234,217,.55);border-radius:6px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:#f4ead9;font-family:'Bungee';gap:2px;}
+.bg-off .bg-offnum{font-size:18px;}
+.bg-off .bg-offlabel{font-size:8px;letter-spacing:.05em;opacity:.85;}
+.bg-off.dst{border-color:var(--pink);border-style:solid;background:rgba(255,77,151,.18);}
+
 /* ---- Mystery (deduction) ---- */
 .my{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;}
 .my-intro{border:3px solid var(--black);border-radius:12px;background:#fff;padding:14px;box-shadow:5px 5px 0 var(--black);
@@ -355,7 +425,7 @@ html,body{margin:0;padding:0;}
      and the height budget, so square games grow to fill the screen and the
      number pad / tools stay flush with the board instead of overhanging it. */
   .game{ max-width:min(var(--play-max), calc(100svh - 300px)); margin-inline:auto; }
-  .sol,.mj{ max-width:var(--play-wide); margin-inline:auto; }
+  .sol,.mj,.bg{ max-width:var(--play-wide); margin-inline:auto; }
   /* Mystery is a content-driven deduction page (intro + clues + grid), not a
      square board — keep it at its original fixed width; it scrolls naturally. */
   .my{ max-width:480px; margin-inline:auto; }
@@ -484,13 +554,15 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   function renderHome(){
     app.innerHTML='<div class="home"><div class="kicker">Pocket</div>'
       +'<h1 class="title">Ar<em>ca</em>de</h1>'
-      +'<p class="subtitle">Six little games \u00B7 no internet needed</p>'
+      +'<p class="subtitle">Eight little games \u00B7 no internet needed</p>'
       +'<div class="gamegrid">'
         +gcard('sudoku','Sudoku','Logic & numbers','g-su','9')
         +gcard('mines','Minesweeper','Flags & nerve','g-mi','\u273A')
         +gcard('solitaire','Solitaire','Klondike','g-so','\u2660')
         +gcard('zip','Zip','Trace one line','g-zi','Z')
         +gcard('mahjong','Mahjong','Match the tiles','g-ma','\u25A6')
+        +gcard('wordle','Wordle','Guess the word','g-wd','W')
+        +gcard('backgammon','Backgammon','Roll & bear off','g-bg','⚅')
         +gcard('mystery','Mystery','Catch the killer','g-my','?')
       +'</div></div>';
   }
@@ -498,7 +570,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     if(active&&active.unmount)active.unmount();
     app.innerHTML='<div id="screen"></div>';
     var el=document.getElementById('screen');
-    active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():createMystery();
+    active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():(key==='wordle')?createWordle():(key==='backgammon')?createBackgammon():createMystery();
     active.mount(el);
   }
   function goHome(){ if(active&&active.unmount)active.unmount(); active=null; renderHome(); }
@@ -976,6 +1048,162 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     }
     return {mount:function(root){app=root;app.addEventListener('click',clickH);mountStart();},
       unmount:function(){stopTimer();}};
+  }
+
+  /* =================================================== WORDLE */
+  function createWordle(){
+    var app, keyH=null;
+    var WORDS='about above abuse actor acute admit adopt adult after again agent agree ahead alarm album alert alien alike alive allow alone along aloud alter amber angel anger angle angry ankle apart apple apply arena argue arise armor aroma array arrow aside asset audio audit avoid awake award aware bacon badge baker basic basil batch beach beard beast began begin begun being belly bench berry birth black blade blame blank blast blaze bleak blend bless blind block blond blood bloom blown blues blunt board boast bonus boost booth bound brace brain brake brand brave bread break breed brick bride brief bring broad broke brook broom brown brush buddy build built bunch burst cabin cable camel candy canon cargo carol carry catch cause cedar chain chair chalk charm chart chase cheap cheat check cheek cheer chess chest chief child chili chill china chirp choir chose chunk civic civil claim clamp clash clasp class clean clear clerk click cliff climb cling cloak clock clone close cloth cloud clown coach coast cobra cocoa colon color comet comic coral couch could count court cover crack craft crane crash crate crawl crazy cream creek crepe crest crime crisp crook cross crowd crown crumb crush crust cubic curly curry curve cycle daddy daily dairy daisy dance dated dealt death debut decay delay delta dense depth diary diner dingo dirty ditch dizzy dodge doing donor doubt dough dozen drain drama drank dream dress dried drift drill drink drive drone drove drown dryer eagle early earth easel eaten ebony eight elbow elder elect elite ember empty enemy enjoy enter entry equal equip erase error essay event every evict evoke exact exalt excel exist extra fable faint fairy faith false fancy fault favor feast fence ferry fetch fever fiber field fiery fifth fifty fight final finch flame flash flask fleet flesh flick fling flint float flock flood floor flora flour flown fluid flush flute foamy focus force forge forgo forty forum found frame frank fraud freak fresh fried frill frock front frost frown fruit fudge funny furry fuzzy ghost giant giddy given giver glade gland glare glass gleam glide globe gloom glory gloss glove going goose grace grade grain grand grant grape graph grasp grass grave gravy graze great greed green greet grief grill grime grind groan groin groom gross group grove growl grown grunt guard guava guess guest guide guild gully gummy habit hairy halve handy happy hardy harsh haste hatch haunt haven havoc hazel heart heavy hedge hefty hello hippo hobby honey honor horde horse hotel hound house hover human humid humor hurry husky ideal idiot igloo image imply inbox index inert infer inlet inner input intro irony issue ivory jelly jewel joint joker jolly joust judge juice juicy jumbo jumpy kayak kebab khaki kiosk kitty knack kneel knelt knife knock known koala label labor lance lapse large laser latch later layer leafy leaky learn lease leash least leave ledge lemon level lever light lilac limbo limit linen liner lingo lived liver llama loath lobby local lodge logic loose lorry loser lover lower loyal lucky lunar lunch lunge lyric macro madam magic major maker mango manor maple march marsh match mayor meant medal media melon mercy merge merit metal meter midst might mimic mince miner minor minus mirth mixed mocha modal model moist molar money month moral motor motto mound mount mourn mouse mouth mover movie mower mucky muddy mulch mummy mural music musty nacho naive nanny nasty naval needy nerve never newly niche niece night noble noise nomad north nosey notch noted novel nudge nurse nutty oasis ocean offer often olive onion onset opera optic orbit organ otter ought ounce outer ovary owner ozone paint panda panel panic paper party pasta paste patch patio pause peace peach pearl pedal penny perch peril pesky petal petty phase phone photo piano picky piece piety pilot pinch pixel pizza place plaid plain plane plank plant plate plaza plead pluck plumb plume plump plush poach point polar porch pouch pound power prank press price pride prime print prior prism prize probe prone proof prose proud prove prowl prune psalm pulse punch pupil puppy purge purse pushy quack quail quake quart queen query quest queue quick quiet quill quilt quirk quite quota quote rabid radar radio rainy raise rally ranch range rapid raven reach react ready realm rebel refer reign relax relay remit renew repay reply rerun reset resin retro rhino rhyme rider ridge rifle right rigid rinse risen risky rival river roach roast robin robot rocky rogue roomy roost rotor rouge rough round route rover royal ruddy ruler rumor rural rusty saint salad salon salsa salty sandy satin sauce sauna saved savor scald scale scalp scaly scamp scant scare scarf scary scene scent scoff scold scoop scope score scorn scout scowl scram scrap scrub scuba seedy serve setup seven sever shade shady shaft shake shaky shall shame shape share shark sharp shawl shear sheen sheep sheet shelf shell shine shiny shire shirt shoal shock shone shore short shout shove shown showy shrub shrug siege sieve sight sigma silky silly since siren sixth sixty skate skier skill skirt skull skunk slang slant slate sleek sleep sleet slept slice slick slide slime slimy sling slope sloth slump small smart smash smear smell smile smirk smith smoke smoky snack snail snake snaky snare sneak sniff snore snort snout snowy snuck soapy sober soggy solar solid solve sonar sonic sooty sorry sound south space spade spank spare spark spasm spawn speak spear speck speed spell spend spent spice spicy spike spill spine spiny spire spite splat split spoil spoke spook spool spoon sport spout spray spree sprig spurt squad squat squid stack staff stage stain stair stake stale stalk stall stamp stand stare stark start stash state stave steak steal steam steed steel steep steer stern stick stiff still sting stink stock stoic stoke stole stomp stone stony stood stool stoop store stork storm story stout stove strap straw stray strip strut stuck study stuff stump stung stunt style suave sugar suite sulky sunny super surge surly swamp swarm swear sweat sweep sweet swell swept swift swine swing swirl swish sword sworn synod syrup table taboo tacit tacky taffy taken tally tango tangy taper tardy tarot taste tasty taunt teach tease teddy tempo tempt tenor tense tenth tepid terse thank theft their theme there these thick thief thigh thing think third thong thorn those three threw throb throw thumb thump tidal tiger tight tilde timer timid tipsy title toast today token tonal tonic tooth topaz topic torch total touch tough towel tower toxic toxin trace track tract trade trail train trait tramp trash tread treat trend trial tribe trice trick tried tripe trite troll troop trout truce truck truly trump trunk trust truth tulip tumor tunic turbo tutor twang tweak tweed tweet twice twine twirl twist tying udder ulcer ultra uncle under undid undue unfit unify union unite unity unlit until unwed unzip upper upset urban urine usage usher using usual usurp utter vague valet valid valor value valve vapor vault vegan venom venue verge verse video vigil villa vinyl viola viper viral virus visit vital vivid vocal vodka vogue voice vouch vowel wafer wager wagon waist waltz waste watch water weary weave wedge weedy weigh weird whale wharf wheat wheel where which whiff while whine whirl whisk white whole whoop whose widen wider width wield wimpy wince winch windy wiser witch witty woman world worry worse worst worth would wound woven wrath wreck wrist write wrong wrote wrung yacht yearn yeast yield young youth zebra zesty'.split(' ');
+    var WSET={}; WORDS.forEach(function(w){WSET[w]=1;});
+    var W={target:'',rows:[],cur:'',over:false,won:false,msg:'',key:{}};
+    function newGame(){W.target=WORDS[(Math.random()*WORDS.length)|0];W.rows=[];W.cur='';W.over=false;W.won=false;W.msg='';W.key={};render();}
+    function score(guess){var res=['a','a','a','a','a'];var t=W.target.split('');var i,j;
+      for(i=0;i<5;i++){if(guess[i]===t[i]){res[i]='c';t[i]=null;}}
+      for(i=0;i<5;i++){if(res[i]==='c')continue;j=t.indexOf(guess[i]);if(j>=0){res[i]='p';t[j]=null;}}
+      return res;}
+    function flash(m){W.msg=m;var e=document.getElementById('wd-msg');if(e)e.textContent=m;setTimeout(function(){if(W.msg===m){W.msg='';var el=document.getElementById('wd-msg');if(el)el.textContent='';}},1200);}
+    function submit(){if(W.over)return;if(W.cur.length<5){flash('Not enough letters');return;}
+      if(!WSET[W.cur]){flash('Not in word list');return;}
+      var res=score(W.cur);W.rows.push({word:W.cur,res:res});
+      var pri={a:0,p:1,c:2};for(var i=0;i<5;i++){var ch=W.cur[i],s=res[i];if(!W.key[ch]||pri[s]>pri[W.key[ch]])W.key[ch]=s;}
+      if(W.cur===W.target){W.won=true;W.over=true;}else if(W.rows.length>=6){W.over=true;}
+      W.cur='';render();}
+    function type(ch){if(W.over||W.cur.length>=5)return;W.cur+=ch;render();}
+    function del(){if(W.over)return;W.cur=W.cur.slice(0,-1);render();}
+    function render(){
+      var grid='';
+      for(var r=0;r<6;r++){grid+='<div class="wd-row">';var row=W.rows[r];
+        for(var c=0;c<5;c++){
+          if(row)grid+='<div class="wd-tile '+row.res[c]+'">'+row.word[c]+'</div>';
+          else if(r===W.rows.length){var ch=W.cur[c]||'';grid+='<div class="wd-tile'+(ch?' fill':'')+'">'+ch+'</div>';}
+          else grid+='<div class="wd-tile"></div>';
+        }grid+='</div>';}
+      var KB=[['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['enter','z','x','c','v','b','n','m','back']];
+      var kb='';KB.forEach(function(rowk){kb+='<div class="wd-krow">';rowk.forEach(function(k){
+        if(k==='enter')kb+='<button class="wd-key wide" data-wkey="enter">Enter</button>';
+        else if(k==='back')kb+='<button class="wd-key wide" data-wkey="back">⌫</button>';
+        else kb+='<button class="wd-key '+(W.key[k]||'')+'" data-wkey="'+k+'">'+k+'</button>';
+      });kb+='</div>';});
+      app.innerHTML='<div class="wd"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
+        +'<div class="stats"><div class="chip"><div class="cv">'+W.rows.length+'/6</div><div class="cl">Guesses</div></div></div>'
+        +'<button class="pausebtn" data-waction="new" title="New word">↻</button></div>'
+        +'<div class="wd-grid">'+grid+'</div>'
+        +'<div class="wd-msg" id="wd-msg">'+W.msg+'</div>'
+        +'<div class="wd-kb">'+kb+'</div>'
+        +(W.over?'<div class="overlay '+(W.won?'win':'')+'"><div><div class="ot">'+(W.won?'Got it<em>!</em>':'So close<em>.</em>')+'</div><div class="os">'+(W.won?('Solved in '+W.rows.length+'/6'):('The word was '+W.target.toUpperCase()))+'</div><button class="osmall" data-waction="new">New word</button></div></div>':'')
+        +'</div>';}
+    function clickH(e){
+      var act=e.target.closest('[data-waction]');if(act){if(act.dataset.waction==='new')newGame();return;}
+      var key=e.target.closest('[data-wkey]');if(key){var k=key.dataset.wkey;if(k==='enter')submit();else if(k==='back')del();else type(k);return;}}
+    return {mount:function(root){app=root;app.addEventListener('click',clickH);
+        keyH=function(e){if(W.over){if(e.key==='Enter')newGame();return;}
+          if(e.key==='Enter')submit();else if(e.key==='Backspace')del();
+          else{var k=(e.key||'').toLowerCase();if(k.length===1&&k>='a'&&k<='z')type(k);}};
+        window.addEventListener('keydown',keyH);newGame();},
+      unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
+  }
+
+  /* =================================================== BACKGAMMON */
+  function createBackgammon(){
+    var app, aiT=null;
+    /* pts[0..23]: +n = n White checkers, -n = n Black. White (you) moves high->low,
+       bears off past index 0. Black (bot) moves low->high, bears off past 23. */
+    var B={pts:[],barW:0,barB:0,offW:0,offB:0,turn:'W',dice:[],rolled:false,sel:null,selDests:{},over:false,msg:''};
+    function setup(){var p=[];for(var i=0;i<24;i++)p.push(0);
+      p[23]=2;p[12]=5;p[7]=3;p[5]=5; p[0]=-2;p[11]=-5;p[16]=-3;p[18]=-5;
+      B.pts=p;B.barW=0;B.barB=0;B.offW=0;B.offB=0;B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.over=false;B.msg='Tap Roll to begin.';}
+    function dir(pl){return pl==='W'?-1:1;}
+    function homeAll(pl){var i;if(pl==='W'){if(B.barW)return false;for(i=6;i<24;i++)if(B.pts[i]>0)return false;return true;}
+      if(B.barB)return false;for(i=0;i<18;i++)if(B.pts[i]<0)return false;return true;}
+    function blocked(i,pl){return pl==='W'?B.pts[i]<=-2:B.pts[i]>=2;}
+    function dest(pl,from,d){
+      if(from==='bar'){var di=pl==='W'?(24-d):(d-1);return blocked(di,pl)?null:di;}
+      if(pl==='W'&&B.barW)return null;if(pl==='B'&&B.barB)return null;
+      var i=from,to=i+dir(pl)*d,k;
+      if(pl==='W'){if(to>=0)return blocked(to,pl)?null:to;
+        if(!homeAll('W'))return null;if(to===-1)return 'off';
+        for(k=i+1;k<=5;k++)if(B.pts[k]>0)return null;return 'off';}
+      if(to<=23)return blocked(to,pl)?null:to;
+      if(!homeAll('B'))return null;if(to===24)return 'off';
+      for(k=i-1;k>=18;k--)if(B.pts[k]<0)return null;return 'off';}
+    function hasC(pl,from){if(from==='bar')return pl==='W'?B.barW>0:B.barB>0;return pl==='W'?B.pts[from]>0:B.pts[from]<0;}
+    function froms(pl){var a=[],i;if(pl==='W'){if(B.barW)return ['bar'];for(i=0;i<24;i++)if(B.pts[i]>0)a.push(i);}else{if(B.barB)return ['bar'];for(i=0;i<24;i++)if(B.pts[i]<0)a.push(i);}return a;}
+    function diceUniq(){var u={};B.dice.forEach(function(d){u[d]=1;});return Object.keys(u).map(Number);}
+    function legalMoves(pl){var ms=[];froms(pl).forEach(function(f){diceUniq().forEach(function(d){if(!hasC(pl,f))return;var t=dest(pl,f,d);if(t!==null)ms.push({from:f,d:d,to:t});});});return ms;}
+    function applyMove(pl,from,d){var to=dest(pl,from,d);if(to===null)return false;
+      if(from==='bar'){if(pl==='W')B.barW--;else B.barB--;}else{B.pts[from]+=pl==='W'?-1:1;}
+      if(to==='off'){if(pl==='W')B.offW++;else B.offB++;}
+      else{if(pl==='W'){if(B.pts[to]===-1){B.pts[to]=0;B.barB++;}B.pts[to]+=1;}else{if(B.pts[to]===1){B.pts[to]=0;B.barW++;}B.pts[to]-=1;}}
+      var k=B.dice.indexOf(d);if(k>=0)B.dice.splice(k,1);
+      if(B.offW===15){B.over=true;}if(B.offB===15){B.over=true;}
+      return true;}
+    function rollDice(){var a=1+(Math.random()*6|0),b=1+(Math.random()*6|0);B.dice=a===b?[a,a,a,a]:[a,b];B.rolled=true;}
+    function computeSelDests(){B.selDests={};if(B.sel===null)return;
+      diceUniq().forEach(function(d){var t=dest('W',B.sel,d);if(t===null)return;var key=(t==='off')?'off':String(t);
+        if(B.selDests[key]===undefined||(key==='off'&&d===(B.sel+1)))B.selDests[key]=d;});}
+    function humanRoll(){if(B.turn!=='W'||B.rolled||B.over)return;rollDice();
+      B.msg=legalMoves('W').length?'Your move.':'No moves — tap End turn.';render();}
+    function afterWhiteMove(){B.sel=null;B.selDests={};if(B.over){B.msg='You win!';render();return;}
+      if(B.dice.length===0){toAI();return;}render();}
+    function toAI(){B.turn='B';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.msg='Bot is thinking…';render();aiT=setTimeout(aiStart,650);}
+    function aiStart(){rollDice();B.msg='Bot rolled '+B.dice.slice(0,2).join(' & ')+'.';render();aiT=setTimeout(aiStep,700);}
+    function aiStep(){if(B.over){B.msg='Bot wins.';render();return;}
+      var ms=legalMoves('B');if(!ms.length||B.dice.length===0){toHuman();return;}
+      var best=ms[0],bestS=-1e9;ms.forEach(function(m){var s=scoreAI(m);if(s>bestS){bestS=s;best=m;}});
+      applyMove('B',best.from,best.d);render();
+      if(B.over){B.msg='Bot wins.';render();return;}
+      aiT=setTimeout(aiStep,650);}
+    function toHuman(){B.turn='W';B.dice=[];B.rolled=false;B.sel=null;B.selDests={};B.msg='Your roll.';render();}
+    function scoreAI(m){var s=Math.random()*0.5;
+      if(m.to==='off')return 120+s;var to=m.to;
+      if(B.pts[to]===1)s+=60; if(B.pts[to]===-1)s+=22; if(B.pts[to]<=-2)s+=8;
+      s+=to*0.5; if(typeof m.from==='number'&&m.from<=5)s+=10; if(m.from==='bar')s+=15; return s;}
+    function tapPt(ptStr){if(B.over||B.turn!=='W'||!B.rolled)return;
+      var isNum=(ptStr!=='bar'&&ptStr!=='off');
+      if(B.sel===null){
+        var src=(ptStr==='bar')?'bar':(isNum?parseInt(ptStr,10):null);if(src===null)return;
+        if(B.barW&&src!=='bar')return; if(!hasC('W',src))return;
+        if(!diceUniq().some(function(d){return dest('W',src,d)!==null;}))return;
+        B.sel=src;computeSelDests();render();return;}
+      var key=isNum?String(parseInt(ptStr,10)):ptStr;
+      if(B.selDests[key]!==undefined){applyMove('W',B.sel,B.selDests[key]);afterWhiteMove();return;}
+      if(isNum){var s2=parseInt(ptStr,10);if(!B.barW&&hasC('W',s2)&&diceUniq().some(function(d){return dest('W',s2,d)!==null;})){B.sel=s2;computeSelDests();render();return;}}
+      if(ptStr==='bar'&&B.barW){B.sel='bar';computeSelDests();render();return;}
+      B.sel=null;B.selDests={};render();}
+    function checkersHTML(n,pl){var h='',show=Math.min(n,5);for(var k=0;k<show;k++){var lbl=(k===show-1&&n>5)?'<span class="bg-cnt">'+n+'</span>':'';h+='<div class="bg-chk '+pl+'">'+lbl+'</div>';}return h;}
+    function srcOK(idx){return B.sel===null&&B.turn==='W'&&B.rolled&&!B.over&&!B.barW&&B.pts[idx]>0&&diceUniq().some(function(d){return dest('W',idx,d)!==null;});}
+    function pointHTML(idx,isTop){var v=B.pts[idx],pl=v>0?'w':(v<0?'b':''),n=Math.abs(v);
+      var cls='bg-point '+(isTop?'top':'bottom');
+      if(B.sel!==null&&B.selDests[String(idx)]!==undefined)cls+=' dst';
+      if(B.sel===idx)cls+=' selp'; if(srcOK(idx))cls+=' src';
+      return '<div class="'+cls+'" data-pt="'+idx+'">'+checkersHTML(n,pl)+'</div>';}
+    function quadHTML(list,isTop){return list.map(function(i){return pointHTML(i,isTop);}).join('');}
+    function barHTML(isTop){var n=isTop?B.barB:B.barW,pl=isTop?'b':'w',cls='bg-barslot '+(isTop?'top':'bottom');
+      if(!isTop){if(B.sel==='bar')cls+=' selp';
+        if(B.sel===null&&B.turn==='W'&&B.rolled&&!B.over&&B.barW&&diceUniq().some(function(d){return dest('W','bar',d)!==null;}))cls+=' src';}
+      return '<div class="'+cls+'" data-pt="bar">'+checkersHTML(n,pl)+'</div>';}
+    function diceHTML(){if(!B.rolled||!B.dice.length)return '';var h='<span class="bg-dice">';B.dice.forEach(function(d){h+='<span class="bg-die">'+d+'</span>';});return h+'</span>';}
+    function rollBtn(){if(B.over||B.turn!=='W')return '';if(!B.rolled)return ' <button class="bg-roll" data-bgaction="roll">Roll</button>';
+      if(!legalMoves('W').length)return ' <button class="bg-roll" data-bgaction="endturn">End turn</button>';return '';}
+    function render(){
+      var top='<div class="bg-half top">'+quadHTML([12,13,14,15,16,17],true)+barHTML(true)+quadHTML([18,19,20,21,22,23],true)+'</div>';
+      var bot='<div class="bg-half bottom">'+quadHTML([11,10,9,8,7,6],false)+barHTML(false)+quadHTML([5,4,3,2,1,0],false)+'</div>';
+      var offB='<div class="bg-off top"><div class="bg-offnum">'+B.offB+'</div><div class="bg-offlabel">Bot</div></div>';
+      var offW='<div class="bg-off bottom'+(B.selDests['off']!==undefined?' dst':'')+'" data-pt="off"><div class="bg-offlabel">You</div><div class="bg-offnum">'+B.offW+'</div></div>';
+      var board='<div class="bg-board"><div class="bg-main">'+top+bot+'</div><div class="bg-offcol">'+offB+offW+'</div></div>';
+      app.innerHTML='<div class="bg"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
+        +'<div class="stats"><div class="chip"><div class="cv">'+B.offW+'</div><div class="cl">You off</div></div>'
+        +'<div class="chip"><div class="cv">'+B.offB+'</div><div class="cl">Bot off</div></div></div>'
+        +'<button class="pausebtn" data-bgaction="new" title="New game">↻</button></div>'
+        +'<div class="bg-status">'+B.msg+diceHTML()+rollBtn()+'</div>'
+        +board
+        +(B.over?'<div class="overlay '+(B.offW===15?'win':'')+'"><div><div class="ot">'+(B.offW===15?'You win<em>!</em>':'Bot wins<em>.</em>')+'</div><div class="os">'+(B.offW===15?'All 15 borne off':'The bot bore off first')+'</div><button class="osmall" data-bgaction="new">New game</button></div></div>':'')
+        +'</div>';}
+    function clickH(e){var act=e.target.closest('[data-bgaction]');if(act){var a=act.dataset.bgaction;
+        if(a==='roll')humanRoll();else if(a==='endturn')toAI();else if(a==='new'){if(aiT)clearTimeout(aiT);setup();render();}return;}
+      var pt=e.target.closest('[data-pt]');if(pt){tapPt(pt.dataset.pt);return;}}
+    return {mount:function(root){app=root;app.addEventListener('click',clickH);setup();render();},
+      unmount:function(){if(aiT)clearTimeout(aiT);}};
   }
 
   renderHome();
