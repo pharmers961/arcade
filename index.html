@@ -536,6 +536,52 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   .overlay{ background:rgba(21,16,29,.88); }
 }
 
+/* =====================================================================
+   POLISH PASS — uniform spacing & styling across every game.
+   Appended last so it wins on equal specificity. The hand-tuned phone
+   layout (<=430px) is preserved; these rules only re-align values that
+   drifted from game to game: border weight, corner radius, the board
+   "drop shadow", and the control rhythm under the board.
+   ===================================================================== */
+:root{
+  --r-sm:8px;     /* small game pieces (tiles, cards)        */
+  --r-md:10px;    /* chips, number pad, tools, buttons       */
+  --r-lg:12px;    /* boards & full-width panels              */
+  --bd:3px;       /* the one chunky board border weight      */
+  --board-sh:8px 8px 0 var(--purple);  /* one shadow for every board */
+}
+
+/* (1) Every main board now shares the SAME border, radius, shadow and
+   accent. Before: sudoku 4px/12px/10px-purple, minesweeper 3px/10px/6px,
+   ZIP 3px/10px/6px-TEAL (the odd one out), backgammon 6px, mystery 5px. */
+.board,.ms-board,.zip-board,.bg-board,.my-grid{
+  border-width:var(--bd); border-radius:var(--r-lg);
+  box-shadow:var(--board-sh);
+}
+
+/* (2) Snap the mid-size controls onto one corner radius (were 9 vs 10px). */
+.chip,.num,.tool,.pausebtn,.osmall{ border-radius:var(--r-md); }
+
+/* (3) Identical control rhythm beneath the board in every game
+   (margin-top was 16px in some games, 18px in others; gap now uniform). */
+.tools,.ms-tools,.mj-tools,.zip-tools,.my-tools{ margin-top:var(--s4); gap:var(--s3); }
+@media(min-width:768px){
+  /* match the desktop compaction already applied to sudoku's .tools (#21) */
+  .ms-tools,.mj-tools,.zip-tools,.my-tools{ margin-top:var(--s3); }
+}
+
+/* (4) Consistent breathing room above the Mahjong board so it lines up
+   with the ~bar gap the other games use, rather than its ad-hoc 18px. */
+.mj-board{ margin-top:var(--s5); }
+
+/* (5) Kill the blue tap-flash on mobile for a cleaner, app-like feel. */
+*{ -webkit-tap-highlight-color:transparent; }
+
+/* (6) Even vertical margins on the status/message lines (were 14/12/10px
+   and lopsided), to match the rest of the spacing scale. They already
+   reserve a min-height, so this just regularises the gap. */
+.wd-msg,.mj-note,.bg-status{ margin-block:var(--s3); }
+
 </style>
 </head>
 <body>
@@ -616,7 +662,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var h=S.timerOn?'<div class="chip"><div class="cv" id="s_time">'+fmt(S.seconds)+'</div><div class="cl">'+S.difficulty+'</div></div>'
         :'<div class="chip"><div class="cv" style="font-size:15px">'+S.difficulty+'</div><div class="cl">Mode</div></div>';
       h+='<div class="chip '+(e?'err':'')+'"><div class="cv">'+e+'</div><div class="cl">Errors</div></div>';
-      if(S.timerOn)h+='<button class="pausebtn" data-action="pause">'+(S.paused?'\u25B6':'\u275A\u275A')+'</button>';return h;}
+      if(S.timerOn)h+='<button class="pausebtn" data-action="pause" aria-label="'+(S.paused?'Resume':'Pause')+'">'+(S.paused?'\u25B6':'\u275A\u275A')+'</button>';return h;}
     function buildPad(){var rem=Array(10).fill(0);for(var r=0;r<9;r++)for(var c=0;c<9;c++)if(S.grid[r][c])rem[S.grid[r][c]]++;var h='';for(var n=1;n<=9;n++)h+='<button class="num '+(rem[n]>=9?'done':'')+'" data-n="'+n+'">'+n+'<span class="rem">'+Math.max(0,9-rem[n])+'</span></button>';return h;}
     function buildTools(){return '<button class="tool '+(S.noteMode?'on':'')+'" data-action="notes"><span class="ic">\u270E</span>Notes<span class="badge">'+(S.noteMode?'on':'off')+'</span></button>'
       +'<button class="tool" data-action="erase"><span class="ic">\u232B</span>Erase<span class="badge">clear cell</span></button>'
@@ -764,7 +810,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       app.innerHTML='<div class="sol"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'
         +'<div class="stats"><div class="chip"><div class="cv" id="o_time">'+fmt(So.seconds)+'</div><div class="cl">Time</div></div>'
         +'<div class="chip"><div class="cv">'+So.moves+'</div><div class="cl">Moves</div></div></div>'
-        +'<button class="pausebtn" data-solaction="new" title="New deal">\u21BB</button></div>'
+        +'<button class="pausebtn" data-solaction="new" title="New deal" aria-label="New deal">\u21BB</button></div>'
         +'<div class="sol-top">'+stock+waste+'<div class="sol-slot spacer"></div>'+found+'</div>'
         +'<div class="sol-tableau">'+tab+'</div>'
         +(So.won?'<div class="overlay win"><div><div class="ot">You win<em>!</em></div><div class="os">'+So.moves+' moves \u00B7 '+fmt(So.seconds)+'</div><button class="osmall" data-solaction="new">Deal again</button></div></div>':'')
@@ -832,7 +878,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function render(){var tiles='';for(var i=0;i<pos.length;i++)tiles+=tileHTML(i);
       app.innerHTML='<div class="mj"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+remaining()+'</div><div class="cl">Tiles</div></div></div>'
-        +'<button class="pausebtn" data-mjaction="new" title="New board">\u21BB</button></div>'
+        +'<button class="pausebtn" data-mjaction="new" title="New board" aria-label="New board">\u21BB</button></div>'
         +'<div class="boardwrap" style="max-width:none"><div class="mj-board">'+tiles+'</div>'
         +(M.won?'<div class="overlay win"><div><div class="ot">Cleared<em>!</em></div><div class="os">Every tile matched</div><button class="osmall" data-mjaction="new">New board</button></div></div>':'')+'</div>'
         +'<div class="mj-note">'+M.note+'</div>'
@@ -899,7 +945,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function buildClues(){return clues.map(function(c){return '<li>'+clueText(c)+'</li>';}).join('');}
     function mountPlay(){app.innerHTML='<div class="my"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'
       +'<div class="stats"><div class="chip"><div class="cv" style="font-size:15px">'+diff+'</div><div class="cl">Case</div></div></div>'
-      +'<button class="pausebtn" data-myaction="new" title="New case">\u21BB</button></div>'
+      +'<button class="pausebtn" data-myaction="new" title="New case" aria-label="New case">\u21BB</button></div>'
       +'<div class="my-intro">\uD83D\uDC80 <b>'+victim+'</b> was found dead at <b>'+L[murderLoc].n+' '+L[murderLoc].e+'</b>.<br>Find the <b>killer</b> and the <b>weapon</b>.</div>'
       +'<div class="my-cluehead">The Clues</div><ol class="my-clues">'+buildClues()+'</ol>'
       +'<div class="my-gridhead">Deduction Grid <span>tap a cell: \u2715 \u2192 \u2713</span></div>'
@@ -1086,7 +1132,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       });kb+='</div>';});
       app.innerHTML='<div class="wd"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+W.rows.length+'/6</div><div class="cl">Guesses</div></div></div>'
-        +'<button class="pausebtn" data-waction="new" title="New word">↻</button></div>'
+        +'<button class="pausebtn" data-waction="new" title="New word" aria-label="New word">↻</button></div>'
         +'<div class="wd-grid">'+grid+'</div>'
         +'<div class="wd-msg" id="wd-msg">'+W.msg+'</div>'
         +'<div class="wd-kb">'+kb+'</div>'
@@ -1254,7 +1300,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       app.innerHTML='<div class="bg"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+matchYou+'</div><div class="cl">You</div></div>'
         +'<div class="chip"><div class="cv">'+matchBot+'</div><div class="cl">Bot</div></div></div>'
-        +'<button class="pausebtn" data-bgaction="new" title="New game">↻</button></div>'
+        +'<button class="pausebtn" data-bgaction="new" title="New game" aria-label="New game">↻</button></div>'
         +'<div class="bg-status">'+B.msg+diceHTML()+rollBtn()+'</div>'
         +board+overlayHTML()
         +'</div>';}
