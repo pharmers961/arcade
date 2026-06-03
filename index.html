@@ -106,7 +106,7 @@ html,body{margin:0;padding:0;}
 .boardwrap{position:relative;width:100%;margin:0 auto;
   max-width:min(100%,calc(100vh - 288px));
   max-width:min(100%,calc(100svh - 288px));}
-.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 28px;}
 .back{background:none;border:none;cursor:pointer;font-family:'Bungee';font-size:14px;letter-spacing:.1em;
   text-transform:uppercase;color:var(--purple);display:flex;align-items:center;gap:8px;padding:8px 4px;margin-left:-4px;}
 .back:hover{color:var(--pink);}
@@ -186,7 +186,7 @@ html,body{margin:0;padding:0;}
 @keyframes hintp{0%,100%{box-shadow:inset 0 0 0 0 var(--orange);}50%{box-shadow:inset 0 0 0 4px var(--orange);}}
 @keyframes bob{0%,100%{transform:rotate(-2deg);}50%{transform:rotate(1.5deg);}}
 @keyframes drift{from{background-position:0 0;}to{background-position:140px 90px;}}
-@media(max-width:430px){.tools{grid-template-columns:repeat(3,1fr);gap:9px;}.tool{padding:12px 4px;letter-spacing:.04em;}.pad{gap:6px;margin-top:18px;}.bar{margin-bottom:16px;}.diffs{gap:12px;}}
+@media(max-width:430px){.tools{grid-template-columns:repeat(3,1fr);gap:9px;}.tool{padding:12px 4px;letter-spacing:.04em;}.pad{gap:6px;margin-top:18px;}.diffs{gap:12px;}}
 
 /* ---- Home menu ---- */
 .home{text-align:center;animation:rise .6s cubic-bezier(.2,.8,.2,1) both;}
@@ -354,7 +354,7 @@ html,body{margin:0;padding:0;}
   /* Size the whole game (board + controls together) to the smaller of the cap
      and the height budget, so square games grow to fill the screen and the
      number pad / tools stay flush with the board instead of overhanging it. */
-  .game{ max-width:min(var(--play-max), calc(100svh - 288px)); margin-inline:auto; }
+  .game{ max-width:min(var(--play-max), calc(100svh - 300px)); margin-inline:auto; }
   .sol,.mj{ max-width:var(--play-wide); margin-inline:auto; }
   /* Mystery is a content-driven deduction page (intro + clues + grid), not a
      square board — keep it at its original fixed width; it scrolls naturally. */
@@ -395,7 +395,6 @@ html,body{margin:0;padding:0;}
 /* #9,#10  Snap clearly off-scale desktop spacing onto the scale.
            Scoped to >=431px so the tuned phone layout is preserved. */
 @media(min-width:431px){
-  .bar{ margin-bottom:var(--s5); }                 /* 22 -> 24 */
   .pad{ margin-top:var(--s5); }                    /* 22 -> 24 */
   .diffs{ gap:var(--s4); }                         /* 14 -> 16 */
   .gamegrid{ gap:var(--s4); margin-top:var(--s5); }/* 16/28 -> 16/24 */
@@ -443,7 +442,6 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 /* #21  Compact the game controls on desktop so the board fills more height.
         Placed last so it wins over #9 (bar/pad margins) and #20 (tool padding). */
 @media(min-width:768px){
-  .bar{ margin-bottom:16px; }
   .pad{ margin-top:16px; }
   .tools{ margin-top:12px; }
   .tool{ padding:9px 8px; gap:4px; }
