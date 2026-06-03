@@ -659,7 +659,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
    stretch edge-to-edge instead of floating in the middle. Start menus (.start)
    are deliberately excluded so they stay centred. ---- */
 @media(max-width:767px){
-  #screen:has(.game),#screen:has(.mj),#screen:has(.bg){
+  #screen:has(.game),#screen:has(.mj),#screen:has(.bg),#screen:has(.wd){
     display:flex; flex-direction:column; min-height:calc(100svh - 28px); }
   .game{ flex:1; display:flex; flex-direction:column; }
   /* push the bottom control cluster to the floor of the screen */
@@ -668,6 +668,9 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   .mj .boardwrap{ margin-top:auto; }   /* centre the board… */
   .mj .mj-note{ margin-top:auto; }      /* …and pin note + tools to the bottom */
   .bg{ flex:1; display:flex; flex-direction:column; justify-content:center; }
+  /* Wordle fills the screen too; the keyboard sizing/pinning lives in the
+     WORDLE FIXES block below so it wins the cascade. */
+  .wd{ flex:1; display:flex; flex-direction:column; }
 }
 
 /* =====================================================================
@@ -682,13 +685,15 @@ html,body{ background:var(--cream); }
 .wd-grid{ max-width:340px; }
 .wd-kb{ width:100%; gap:8px; }
 .wd-krow{ gap:6px; }
-.wd-key{ flex:1 1 0; min-width:0; height:54px; font-size:18px; }
-.wd-key.wide{ flex:1.5 1 0; font-size:12px; }
+.wd-key{ flex:1 1 0; min-width:0; height:58px; font-size:18px; }
+.wd-key.wide{ flex:1.5 1 0; font-size:13px; }
 @media(max-width:560px){
-  /* break the keyboard out to the full viewport width for a native feel */
-  .wd-kb{ width:100vw; margin-left:calc(50% - 50vw); padding:0 8px; }
-  .wd-key{ height:52px; font-size:17px; }
-  .wd-krow{ gap:5px; }
+  /* Full-bleed keyboard pinned to the very bottom of the screen, with tall
+     finger-sized keys so it spans the whole foot of the page. */
+  .wd-kb{ width:100vw; margin-left:calc(50% - 50vw); margin-top:auto;
+    padding:0 8px max(6px,env(safe-area-inset-bottom)); gap:8px; }
+  .wd-krow{ gap:6px; }
+  .wd-key{ height:64px; font-size:20px; }
 }
 
 /* Guess-distribution / history panel (shown on game-over + the Stats button). */
