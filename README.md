@@ -4,6 +4,10 @@ A tiny offline arcade of eight little games in one installable web app
 (PWA), built as a single self-contained `index.html` — no servers, no build
 step, no internet required after the first load.
 
+Every game remembers your progress, settings, and win streaks between
+visits (saved locally on your device), works fully offline, and is
+keyboard- and screen-reader-friendly.
+
 ## Games
 - **Sudoku** — difficulty levels, optional timer, hints, pencil notes
 - **Minesweeper** — flag mode, chording, three field sizes
