@@ -531,6 +531,9 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   body{ color:#f4ead9; }                 /* on-page default text -> light   */
   .label{ color:#f4ead9; }               /* explicit dark on-page label      */
   .toggle{ color:#f4ead9; border-color:rgba(244,234,217,.5); }
+  /* Mystery clue headings + clue list sit on the dark page background (not a
+     white panel), so their dark ink vanishes — light them like other on-page text. */
+  .my-cluehead,.my-gridhead,.my-clues{ color:#f4ead9; }
   /* light panels keep their dark ink so inner text stays readable */
   .gcard,.chip,.board,.cell,.num,.tool,.diff,.card,.mj-tile,
   .my-grid,.myc,.myh,.pick,.accbox,.zip-cell{ color:var(--ink); }
@@ -617,7 +620,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
    global muted-grey text must go DARK again inside them or it vanishes. */
 @media(prefers-color-scheme:dark){
   .gdesc,.chip .cl,.num .rem,.notes span,.diff .dd,.toggle .ts,
-  .my-gridhead span,.accwhere,.bg-cnt{ color:#6b5d77; }
+  .accwhere,.bg-cnt{ color:#6b5d77; }
   .ready-note{ color:#c3b2cf; }
 }
 
