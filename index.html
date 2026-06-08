@@ -766,9 +766,11 @@ html,body{ background:var(--cream); }
 .mm-secret{ display:flex; gap:9px; justify-content:center; margin-top:14px; }
 
 /* ---- Crossword Mini ---- */
-.cw-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:0; width:100%; aspect-ratio:1;
+.cw-grid{ display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(5,1fr);
+  gap:0; width:100%; aspect-ratio:1;
   background:#fff; border:var(--bd) solid var(--black); border-radius:var(--r-lg);
   overflow:hidden; box-shadow:var(--board-sh); }
+.cw-cell{ min-width:0; min-height:0; }
 .cw-cell{ position:relative; display:flex; align-items:center; justify-content:center;
   border:1px solid var(--line); background:#fff; cursor:pointer; user-select:none;
   font-family:'Fredoka'; font-weight:700; font-size:clamp(20px,7vw,32px); color:var(--pink); }
