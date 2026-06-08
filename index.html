@@ -716,8 +716,7 @@ html,body{ background:var(--cream); }
 @media(prefers-color-scheme:dark){ .wd-disthead{ color:#f4ead9; } }
 
 /* =====================================================================
-   NEW GAMES — Dots & Boxes, Nim/21, Mastermind, Crossword, Cryptogram,
-   Pong, Yahtzee. Reuse the shared chrome (.bar/.chip/.overlay/.osmall/
+   NEW GAMES — Mastermind, Crossword, Cryptogram, Pong, Yahtzee. Reuse the shared chrome (.bar/.chip/.overlay/.osmall/
    .tool/.start/.diff/.wd-kb) and the spacing/colour tokens. On-page text
    uses --txt-soft / accent colours so it stays legible in dark mode (the
    shell forces dark ink, so neutral text on the page must be light there);
@@ -725,8 +724,6 @@ html,body{ background:var(--cream); }
    ===================================================================== */
 
 /* Home-card glyph colours */
-.g-dab .gglyph{background:var(--teal);color:#fff;}
-.g-nim .gglyph{background:var(--purple);color:#fff;}
 .g-mind .gglyph{background:var(--pink);color:#fff;}
 .g-cross .gglyph{background:var(--yellow);color:var(--black);}
 .g-crypt .gglyph{background:var(--orange);color:#fff;}
@@ -736,55 +733,9 @@ html,body{ background:var(--cream); }
 /* Keep non-square new games at a comfortable cap on desktop instead of the
    height-based square-board constraint, so they use the available width. */
 @media(min-width:768px){
-  .game.cross,.game.crypt,.game.mind,.game.nim,.game.yz{ max-width:var(--play-max); }
+  .game.cross,.game.crypt,.game.mind,.game.yz{ max-width:var(--play-max); }
   .game.pong{ max-width:var(--play-wide); }
 }
-
-/* ---- Dots & Boxes ---- */
-.dab-board{ display:grid; gap:0; width:100%; aspect-ratio:1; background:#fff;
-  border:var(--bd) solid var(--black); border-radius:var(--r-lg);
-  box-shadow:var(--board-sh); padding:12px; }
-.dab-dot{ width:9px; height:9px; border-radius:50%; background:var(--black);
-  align-self:center; justify-self:center; }
-.dab-edge{ position:relative; display:flex; align-items:center; justify-content:center;
-  width:100%; height:100%; cursor:pointer; }
-.dab-edge i{ display:block; background:var(--line); border-radius:4px; transition:background .15s; }
-.dab-h i{ width:82%; height:5px; }
-.dab-v i{ height:82%; width:5px; }
-.dab-edge:hover i{ background:rgba(36,26,46,.42); }
-.dab-edge.on{ cursor:default; }
-.dab-edge.on.w1 i{ background:var(--pink); }
-.dab-edge.on.w2 i{ background:var(--teal); }
-.dab-box{ display:flex; align-items:center; justify-content:center; width:100%; height:100%;
-  border-radius:6px; font-size:clamp(13px,3.6vw,20px); color:transparent; transition:background .25s; }
-.dab-box.o1{ background:rgba(255,77,151,.18); color:var(--pink); }
-.dab-box.o2{ background:rgba(35,196,196,.2); color:var(--teal); }
-.dab-msg{ text-align:center; font-family:'Fredoka'; font-weight:600; font-size:15px;
-  color:var(--purple); min-height:22px; margin:var(--s4) 0 0; }
-.chip.me{ background:var(--yellow); }
-
-/* ---- Nim / 21 ---- */
-.nim-status{ text-align:center; font-family:'Fredoka'; font-weight:700; font-size:18px;
-  color:var(--purple); min-height:24px; }
-.nim-board{ display:flex; flex-direction:column; gap:var(--s4); align-items:center; margin:var(--s5) 0; }
-.nim-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; min-height:34px; }
-.nim-tok{ width:30px; height:30px; padding:0; border-radius:50%; border:3px solid var(--black);
-  background:var(--yellow); box-shadow:2px 2px 0 var(--black); cursor:pointer;
-  transition:transform .12s, box-shadow .12s, opacity .2s; }
-.nim-tok:nth-child(3n+1){ background:var(--pink); }
-.nim-tok:nth-child(3n+2){ background:var(--teal); }
-.nim-tok:hover:not(:disabled){ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--black); }
-.nim-tok:active:not(:disabled){ transform:translate(1px,1px); box-shadow:1px 1px 0 var(--black); }
-.nim-tok:disabled{ cursor:default; opacity:.85; }
-.nim-empty{ font-family:'Fredoka'; font-weight:500; font-size:13px; color:var(--txt-soft); }
-.nim-take{ display:flex; align-items:center; justify-content:center; gap:12px; margin-top:var(--s4); }
-.nim-btn{ min-width:54px; }
-.nim-hint{ font-family:'Bungee'; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--txt-soft); }
-.nim-tip{ display:block; text-align:center; margin-top:var(--s4); text-transform:none;
-  font-family:'Fredoka'; font-weight:500; font-size:13px; }
-.nim-rules{ text-align:center; font-family:'Fredoka'; font-weight:500; font-size:13px;
-  color:var(--txt-soft); margin-top:var(--s5); }
-.nim-rules b{ color:var(--pink); }
 
 /* ---- Mastermind ---- */
 .mm-board{ display:flex; flex-direction:column; gap:8px; max-width:340px; margin:0 auto; }
@@ -972,7 +923,7 @@ html,body{ background:var(--cream); }
   function renderHome(){
     app.innerHTML='<div class="home"><div class="kicker">Pocket</div>'
       +'<h1 class="title">Ar<em>ca</em>de</h1>'
-      +'<p class="subtitle">Fifteen little games \u00B7 no internet needed</p>'
+      +'<p class="subtitle">Thirteen little games \u00B7 no internet needed</p>'
       +'<div class="gamegrid">'
         +gcard('sudoku','Sudoku','Logic & numbers','g-su','9')
         +gcard('mines','Minesweeper','Flags & nerve','g-mi','\u273A')
@@ -982,8 +933,6 @@ html,body{ background:var(--cream); }
         +gcard('wordle','Wordle','Guess the word','g-wd','W')
         +gcard('backgammon','Backgammon','Roll & bear off','g-bg','⚅')
         +gcard('mystery','Mystery','Catch the killer','g-my','?')
-        +gcard('dots','Dots & Boxes','Close more squares','g-dab','▦')
-        +gcard('nim','Nim · 21','Don’t take the last','g-nim','♟')
         +gcard('mind','Mastermind','Crack the colour code','g-mind','◉')
         +gcard('cross','Mini Crossword','Clues across & down','g-cross','田')
         +gcard('crypt','Cryptogram','Decode the quote','g-crypt','⚿')
@@ -1005,7 +954,7 @@ html,body{ background:var(--cream); }
     if(active&&active.unmount)active.unmount();
     app.innerHTML='<div id="screen"></div>';
     var el=document.getElementById('screen');
-    active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():(key==='wordle')?createWordle():(key==='backgammon')?createBackgammon():(key==='mystery')?createMystery():(key==='dots')?createDots():(key==='nim')?createNim():(key==='mind')?createMastermind():(key==='cross')?createCrossword():(key==='crypt')?createCryptogram():(key==='pong')?createPong():createYahtzee();
+    active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():(key==='wordle')?createWordle():(key==='backgammon')?createBackgammon():(key==='mystery')?createMystery():(key==='mind')?createMastermind():(key==='cross')?createCrossword():(key==='crypt')?createCryptogram():(key==='pong')?createPong():createYahtzee();
     active.mount(el);
   }
   function goHome(){ if(active&&active.unmount)active.unmount(); active=null; renderHome(); }
@@ -1868,140 +1817,6 @@ html,body{ background:var(--cream); }
           B.pts=sv.pts;B.barW=sv.barW;B.barB=sv.barB;B.offW=sv.offW;B.offB=sv.offB;B.dice=sv.dice||[];B.rolled=!!sv.rolled;B.turn='W';B.over=false;B.winInfo=null;B.aiPlan=null;B.sel=null;B.selDests={};B.turnStart=B.rolled?snap2():null;B.screen='play';
           refreshAllowed();B.msg=B.rolled?(B.allowed.length?'Your move.':'No legal moves — tap End turn.'):'Vs '+difficulty+' bot · tap Roll.';render();}
         else mountStart();},
-      unmount:function(){if(aiT)clearTimeout(aiT);}};
-  }
-
-  /* =================================================== DOTS & BOXES */
-  function createDots(){
-    var app, aiT=null, lock=false;
-    var D=5, B=D-1;            /* 5 dots per side -> 4x4 boxes */
-    var st=null;
-    function fresh(){var s={h:[],v:[],owner:[],turn:'you',you:0,bot:0,over:false},r,c;
-      for(r=0;r<D;r++){s.h[r]=[];for(c=0;c<B;c++)s.h[r][c]=0;}
-      for(r=0;r<B;r++){s.v[r]=[];for(c=0;c<D;c++)s.v[r][c]=0;}
-      for(r=0;r<B;r++){s.owner[r]=[];for(c=0;c<B;c++)s.owner[r][c]=0;}
-      return s;}
-    function newGame(){st=fresh();lock=false;if(aiT){clearTimeout(aiT);aiT=null;}save();render();}
-    function save(){if(st&&!st.over)Store.set('save.dots',st);else Store.del('save.dots');}
-    function bs(r,c){return (st.h[r][c]?1:0)+(st.h[r+1][c]?1:0)+(st.v[r][c]?1:0)+(st.v[r][c+1]?1:0);}
-    function adj(t,r,c){var a=[];if(t==='h'){if(r>0)a.push([r-1,c]);if(r<B)a.push([r,c]);}
-      else{if(c>0)a.push([r,c-1]);if(c<B)a.push([r,c]);}return a;}
-    function setEdge(t,r,c,who){if(t==='h')st.h[r][c]=who;else st.v[r][c]=who;
-      var made=0;adj(t,r,c).forEach(function(b){if(bs(b[0],b[1])===4&&!st.owner[b[0]][b[1]]){st.owner[b[0]][b[1]]=who;made++;}});
-      if(who===1)st.you+=made;else st.bot+=made;return made;}
-    function emptyEdges(){var e=[],r,c;for(r=0;r<D;r++)for(c=0;c<B;c++)if(!st.h[r][c])e.push(['h',r,c]);
-      for(r=0;r<B;r++)for(c=0;c<D;c++)if(!st.v[r][c])e.push(['v',r,c]);return e;}
-    function completes(t,r,c){var n=0;adj(t,r,c).forEach(function(b){if(bs(b[0],b[1])===3)n++;});return n;}
-    function makesThree(t,r,c){return adj(t,r,c).some(function(b){return bs(b[0],b[1])===2;});}
-    function finish(){st.over=true;lock=true;save();
-      var win=st.you>st.bot,tie=st.you===st.bot;
-      Stats.rec('dots',{win:win&&!tie});
-      haptic(win&&!tie?winBuzz:loseBuzz);
-      announce(tie?('Tied '+st.you+' to '+st.bot):win?('You win '+st.you+' to '+st.bot):('Bot wins '+st.bot+' to '+st.you));
-      render();}
-    function afterMove(who,made){
-      if(st.you+st.bot===B*B){finish();return;}
-      if(made>0){if(who==='bot'){render();aiT=setTimeout(botMove,520);}else{save();render();}return;}
-      st.turn=(who==='you')?'bot':'you';save();render();
-      if(st.turn==='bot'){lock=true;aiT=setTimeout(botMove,520);}else lock=false;}
-    function botMove(){if(st.over)return;var es=emptyEdges();if(!es.length){finish();return;}
-      var taking=es.filter(function(e){return completes(e[0],e[1],e[2])>0;});
-      var pick;
-      if(taking.length){taking.sort(function(a,b){return completes(b[0],b[1],b[2])-completes(a[0],a[1],a[2]);});pick=taking[0];}
-      else{var safe=es.filter(function(e){return !makesThree(e[0],e[1],e[2]);});
-        var pool=safe.length?safe:es;pick=pool[(Math.random()*pool.length)|0];}
-      var made=setEdge(pick[0],pick[1],pick[2],2);afterMove('bot',made);}
-    function play(t,r,c){if(lock||st.over)return;if(t==='h'?st.h[r][c]:st.v[r][c])return;
-      haptic(tapBuzz);var made=setEdge(t,r,c,1);afterMove('you',made);}
-    function render(){
-      var cells='',gr,gc;
-      for(gr=0;gr<2*D-1;gr++){for(gc=0;gc<2*D-1;gc++){
-        var er=gr%2, ec=gc%2;
-        if(!er&&!ec){cells+='<div class="dab-dot"></div>';}
-        else if(!er&&ec){var r=gr/2,c=(gc-1)/2,w=st.h[r][c];
-          cells+='<div class="dab-edge dab-h'+(w?' on w'+w:'')+'" data-de="h_'+r+'_'+c+'"><i></i></div>';}
-        else if(er&&!ec){var r2=(gr-1)/2,c2=gc/2,w2=st.v[r2][c2];
-          cells+='<div class="dab-edge dab-v'+(w2?' on w'+w2:'')+'" data-de="v_'+r2+'_'+c2+'"><i></i></div>';}
-        else{var br=(gr-1)/2,bc=(gc-1)/2,o=st.owner[br][bc];
-          cells+='<div class="dab-box'+(o?' o'+o:'')+'">'+(o?(o===1?'●':'◆'):'')+'</div>';}
-      }}
-      var your=st.turn==='you'&&!st.over, msg=st.over?(st.you===st.bot?'Tied game':st.you>st.bot?'You win!':'Bot wins'):(your?'Your turn — draw a line':'Bot thinking…');
-      app.innerHTML='<div class="game dab"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
-        +'<div class="stats"><div class="chip'+(your?' me':'')+'"><div class="cv">'+st.you+'</div><div class="cl">You</div></div>'
-        +'<div class="chip'+(!your&&!st.over?' me':'')+'"><div class="cv">'+st.bot+'</div><div class="cl">Bot</div></div>'
-        +'<button class="pausebtn" data-daction="new" title="New game" aria-label="New game">↻</button></div></div>'
-        +'<div class="boardwrap"><div class="dab-board" style="grid-template-columns:repeat('+B+',16px 1fr) 16px;grid-template-rows:repeat('+B+',16px 1fr) 16px">'+cells+'</div></div>'
-        +'<div class="dab-msg" role="status" aria-live="polite">'+msg+'</div>'
-        +(st.over?'<div class="overlay '+(st.you>st.bot?'win':'')+'"><div><div class="ot">'+(st.you===st.bot?'Tie<em>!</em>':st.you>st.bot?'You win<em>!</em>':'Bot wins<em>.</em>')+'</div><div class="os">'+st.you+' – '+st.bot+'</div><button class="osmall" data-daction="new">Play again</button></div></div>':'')
-        +'</div>';}
-    function clickH(e){var a=e.target.closest('[data-daction]');
-      if(a){if(a.dataset.daction==='new'){if(!confirmNew(!st.over&&(st.you+st.bot)>0))return;newGame();}return;}
-      var ed=e.target.closest('[data-de]');if(ed){var p=ed.dataset.de.split('_');play(p[0],+p[1],+p[2]);}}
-    return {mount:function(root){app=root;app.addEventListener('click',clickH);
-        var sv=Store.get('save.dots',null);
-        if(sv&&sv.h&&sv.h.length===D){st=sv;st.over=false;st.turn=st.turn||'you';lock=(st.turn==='bot');render();
-          if(st.turn==='bot')aiT=setTimeout(botMove,520);}
-        else newGame();},
-      unmount:function(){if(aiT)clearTimeout(aiT);}};
-  }
-
-  /* =================================================== NIM / 21 */
-  function createNim(){
-    var app, aiT=null, lock=false, mode='21', piles=[], turn='you', over=false, winner='';
-    function start(m){mode=m;piles=(m==='21')?[21]:[3,5,7];turn='you';over=false;winner='';lock=false;
-      if(aiT){clearTimeout(aiT);aiT=null;}Store.set('settings.nim',{mode:m});mountPlay();}
-    function total(){return piles.reduce(function(a,b){return a+b;},0);}
-    function lastTaken(who){ /* who just emptied the board */
-      over=true;lock=true;
-      /* 21 is misere (taking the last loses); Nim is normal (last wins) */
-      var youWin=(mode==='21')?(who!=='you'):(who==='you');
-      winner=youWin?'you':'bot';Stats.rec('nim',{win:youWin});
-      haptic(youWin?winBuzz:loseBuzz);announce(youWin?'You win!':'Bot wins.');render();}
-    function applyTake(idx,count,who){piles[idx]-=count;
-      if(total()===0){lastTaken(who);return true;}return false;}
-    function afterMove(who){if(over)return;turn=(who==='you')?'bot':'you';
-      if(turn==='bot'){lock=true;render();aiT=setTimeout(botMove,560);}else{lock=false;render();}}
-    function botMove(){if(over)return;var idx,count;
-      if(mode==='21'){var n=piles[0],r,found=-1;for(r=1;r<=Math.min(3,n);r++)if(((n-r)%4)===1){found=r;break;}
-        count=found>0?found:Math.min(1,n);idx=0;}
-      else{var x=0,i;for(i=0;i<piles.length;i++)x^=piles[i];
-        if(x!==0){for(i=0;i<piles.length;i++){var t=piles[i]^x;if(t<piles[i]){idx=i;count=piles[i]-t;break;}}}
-        else{var big=0;for(i=0;i<piles.length;i++)if(piles[i]>piles[big])big=i;idx=big;count=1;}}
-      var done=applyTake(idx,count,'bot');if(!done)afterMove('bot');}
-    function take(idx,count){if(lock||over||turn!=='you')return;if(count<1||count>piles[idx])return;
-      if(mode==='21'&&count>3)return;haptic(tapBuzz);
-      var done=applyTake(idx,count,'you');if(!done)afterMove('you');}
-    function render(){
-      var rows='';piles.forEach(function(n,pi){var toks='';
-        for(var k=0;k<n;k++)toks+='<button class="nim-tok" data-nt="'+pi+'_'+(n-k)+'" '+((lock||over||turn!=='you')?'disabled':'')+' aria-label="take '+(n-k)+'"></button>';
-        rows+='<div class="nim-row">'+(toks||'<span class="nim-empty">empty</span>')+'</div>';});
-      var your=turn==='you'&&!over;
-      var ctrl='';
-      if(mode==='21'&&!over){ctrl='<div class="nim-take"><span class="nim-hint">Take</span>'
-        +[1,2,3].map(function(k){return '<button class="osmall nim-btn" data-take21="'+k+'"'+((!your||piles[0]<k)?' disabled':'')+'>'+k+'</button>';}).join('')+'</div>';}
-      else if(!over){ctrl='<div class="nim-hint nim-tip">Tap a piece to remove it and the rest of its row</div>';}
-      app.innerHTML='<div class="game nim"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
-        +'<div class="stats"><div class="chip" style="min-width:auto"><div class="cv" style="font-size:14px">'+(mode==='21'?'Take 21':'Nim')+'</div><div class="cl">Mode</div></div>'
-        +'<button class="pausebtn" data-naction="new" title="New game" aria-label="New game">↻</button></div></div>'
-        +'<div class="nim-status" role="status" aria-live="polite">'+(over?(winner==='you'?'You win!':'Bot wins'):(your?'Your turn':'Bot thinking…'))+'</div>'
-        +'<div class="nim-board">'+rows+'</div>'
-        +ctrl
-        +'<div class="nim-rules">'+(mode==='21'?'Whoever takes the <b>last</b> piece loses.':'Whoever takes the <b>last</b> piece wins.')+'</div>'
-        +(over?'<div class="overlay '+(winner==='you'?'win':'')+'"><div><div class="ot">'+(winner==='you'?'You win<em>!</em>':'Bot wins<em>.</em>')+'</div><button class="osmall" data-naction="new" style="margin-top:14px">Play again</button></div></div>':'')
-        +'</div>';}
-    function mountPlay(){render();}
-    function startScreen(){app.innerHTML='<div class="start nim-start"><div class="gtop"><button class="back" data-nav="menu">← Menu</button><span></span></div>'
-      +'<div class="kicker">Take-away duel</div><h1 class="title">Nim<em>21</em></h1><p class="subtitle">Take turns. Don’t get stuck with the last piece.</p>'
-      +statsLine('nim',{})
-      +'<div class="label">Choose a mode</div><div class="diffs">'
-      +'<button class="diff" data-nmode="21"><span class="dn">Take 21</span><span class="dd">One row · take 1–3 · last loses</span></button>'
-      +'<button class="diff" data-nmode="nim"><span class="dn">Classic Nim</span><span class="dd">Three rows · take any · last wins</span></button></div></div>';}
-    function clickH(e){var nm=e.target.closest('[data-nmode]');if(nm){start(nm.dataset.nmode);return;}
-      var a=e.target.closest('[data-naction]');if(a){if(a.dataset.naction==='new'){if(!confirmNew(!over))return;startScreen();}return;}
-      var t21=e.target.closest('[data-take21]');if(t21){take(0,+t21.dataset.take21);return;}
-      var tk=e.target.closest('[data-nt]');if(tk){var p=tk.dataset.nt.split('_');take(+p[0],+p[1]);return;}}
-    return {mount:function(root){app=root;app.addEventListener('click',clickH);
-        var pref=Store.get('settings.nim',null);if(pref&&pref.mode)mode=pref.mode;startScreen();},
       unmount:function(){if(aiT)clearTimeout(aiT);}};
   }
 
