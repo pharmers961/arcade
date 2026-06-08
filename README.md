@@ -1,6 +1,6 @@
 # Pocket Arcade
 
-A tiny offline arcade of thirteen little games in one installable web app
+A tiny offline arcade of ten little games in one installable web app
 (PWA), built as a single self-contained `index.html` — no servers, no build
 step, no internet required after the first load.
 
@@ -15,13 +15,10 @@ keyboard- and screen-reader-friendly.
 - **Zip** — trace one line through the numbered dots, filling every cell
 - **Mahjong** — colourful shape-tile matching with undo, hint, and shuffle
 - **Wordle** — guess the five-letter word in six tries (1200+ word list)
-- **Backgammon** — full rules vs a bot: hitting, the bar, and bearing off
 - **Mystery** — a logic-grid murder deduction puzzle (original cases)
 - **Mastermind** — crack the hidden four-colour code in ten tries
 - **Mini Crossword** — hand-made 5×5 grids with across/down clues and hints
 - **Cryptogram** — decode a substitution-ciphered quote, with hints
-- **Pong** — first to seven against a tracking bot (drag or arrow keys)
-- **Yahtzee** — roll, hold, and fill the scorecard for a high score
 
 ## Run it
 Just open `index.html` in any modern browser — it works completely offline
