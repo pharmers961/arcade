@@ -8,6 +8,13 @@ Every game remembers your progress, settings, and win streaks between
 visits (saved locally on your device), works fully offline, and is
 keyboard- and screen-reader-friendly.
 
+The home screen shows what's in progress and your streaks, with a one-tap
+**Continue** card for the last game you played, plus a trophy-shelf **Stats**
+screen. **Settings** offers light/dark/system theme, a colour-blind palette
+(orange/blue tiles, numbered Mastermind pegs), and a vibration toggle. Each
+game has a **?** how-to-play card with its rules, gestures and keyboard
+shortcuts, and wins can be shared (native share sheet or clipboard).
+
 ## Games
 - **Sudoku** — difficulty levels, optional timer, hints, pencil notes
 - **Minesweeper** — flag mode, chording, three field sizes
