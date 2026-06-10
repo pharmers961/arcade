@@ -1846,22 +1846,328 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   /* =================================================== CROSSWORD MINI */
   function createCrossword(){
     var app, keyH=null;
+    /* One shared clue per answer word; puzzles are just grids ('#' = block).
+       Grids were generated so every row and column run is a real word, then
+       hand-clued. The first four are the original hand-made puzzles. */
+    var CLUES={
+      ABUSE:'Mistreat',
+      ACE:'Unreturnable tennis serve',
+      ACT:'Part of a play',
+      ACUTE:'Angle under 90 degrees',
+      ADD:'Do some quick sums',
+      AGE:'What birthday candles count',
+      AGENT:'Spy, e.g.',
+      ALE:'Pub pint',
+      ALIKE:'Like two peas in a pod',
+      ALONE:'Solo',
+      ALONG:'“Sing ____!”',
+      ALTER:'Make changes to',
+      ANGEL:'Halo wearer',
+      ANGER:'Hot-headed emotion',
+      ANGLE:'Corner, measured in degrees',
+      APART:'Separated',
+      APP:'Phone download',
+      APPLE:'Teacher’s gift',
+      ARGUE:'Bicker, debate',
+      ARISE:'Get up; come about',
+      ARMY:'Soldiers en masse',
+      ART:'Gallery hangings',
+      AUNT:'Mum’s sister',
+      AWARE:'In the know',
+      AWE:'Grand-canyon feeling',
+      BEGAN:'Got started',
+      BEGIN:'Start',
+      BELLY:'Tummy',
+      BOLT:'Lightning streak; or dash off',
+      BREED:'Poodle or beagle',
+      CAB:'Taxi',
+      CAMEL:'Ship of the desert',
+      CAP:'Baseball hat',
+      CART:'Horse-drawn hauler',
+      CAT:'Purring pet',
+      CAUSE:'Reason why',
+      CHEF:'Kitchen boss',
+      CHEW:'Work on gum',
+      CLAW:'Crab’s pincer',
+      CLEAR:'Easy to understand',
+      CLIP:'Paper fastener',
+      CLOSE:'Shut; or nearby',
+      CLUE:'What you’re reading right now!',
+      COD:'Fish in fish and chips',
+      COMET:'Tailed sky streaker',
+      COURT:'Where tennis is played',
+      CRY:'Shed tears',
+      DARE:'Truth or ____',
+      DEALT:'Handed out the cards',
+      DEAR:'“____ Sir or Madam”',
+      DECAY:'Tooth trouble',
+      DEN:'Lion’s lair',
+      DENT:'Fender ding',
+      DRAG:'Pull along',
+      DRONE:'Buzzing flyer',
+      DROP:'Single raindrop',
+      DRY:'Like desert air',
+      EACH:'Apiece',
+      EAGLE:'Bald national bird',
+      EASY:'Like pie?',
+      EATEN:'Polished off',
+      EBB:'Tide’s retreat',
+      EBONY:'Piano’s black-key wood',
+      EDGE:'Cliff’s brink',
+      EEL:'Snake-like fish',
+      EIGHT:'Octopus arm count',
+      ELBOW:'Mid-arm joint',
+      ELF:'Santa’s tiny helper',
+      ELM:'Shady street tree',
+      EMU:'Big flightless Aussie bird',
+      END:'Finish',
+      ENTER:'Keyboard’s big key',
+      ESSAY:'Short written piece',
+      EVENT:'Calendar happening',
+      EWE:'Female sheep',
+      EXTRA:'More than needed',
+      EYE:'You see with it',
+      FAN:'Devoted supporter',
+      FARM:'Old MacDonald’s place',
+      FEW:'Not many',
+      FINAL:'Last of all',
+      FLEE:'Run from danger',
+      FLEET:'Group of ships',
+      FLY:'Travel by plane',
+      FREAK:'____ out (panic)',
+      FRUIT:'Apples and pears',
+      GAP:'Space between',
+      GLARE:'Angry stare',
+      GLUE:'Craft-table sticker',
+      GRAY:'Elephant shade',
+      HARM:'Damage',
+      HATE:'Loathe',
+      HEEL:'Back of the foot',
+      HOME:'Where the heart is',
+      HOTEL:'Traveller’s stop',
+      IMAGE:'Picture',
+      INERT:'Unreactive, like neon',
+      IVORY:'Piano-key material of old',
+      KEN:'Barbie’s beau',
+      KNEE:'Leg’s hinge',
+      LANCE:'Jousting knight’s weapon',
+      LANE:'Narrow country road',
+      LAVA:'Volcano outflow',
+      LAY:'Set down',
+      LENS:'Camera glass',
+      LET:'Allow',
+      LINGO:'Insider language',
+      LIVE:'On air right now',
+      LOAD:'Washer-ful of laundry',
+      LORD:'Manor’s master',
+      LOT:'Parking area',
+      LOWER:'Bring down',
+      MADAM:'Polite address that reads the same backwards',
+      MAGIC:'Wand-waver’s craft',
+      MAKE:'Create',
+      MAN:'Adult male',
+      MAR:'Spoil or scratch',
+      MEANT:'Intended',
+      MEAT:'Butcher’s stock',
+      MELT:'Turn to liquid',
+      MEN:'Gentlemen',
+      MERIT:'Deserve',
+      MET:'Came face to face',
+      MINCE:'Chop very fine',
+      MINOR:'Under 18',
+      MIXED:'Like trail mix',
+      MOLE:'Garden tunneller',
+      MOVIE:'Popcorn’s companion',
+      MUCH:'A great deal',
+      NET:'Goal mesh',
+      NOTED:'Famous; or jotted down',
+      OFF:'Light-switch position',
+      OHM:'Unit of resistance',
+      ONE:'Lonely number',
+      ONSET:'The very start',
+      OPT:'Make a choice',
+      ORB:'Sphere',
+      ORE:'Miner’s haul',
+      ORGAN:'Church keyboard; the heart, e.g.',
+      OTTER:'Playful river swimmer',
+      OUNCE:'Tiny bit of weight',
+      OVAL:'Egg shape',
+      OWE:'Be in debt',
+      OWNER:'Deed holder',
+      PAIL:'Beach bucket',
+      PAPER:'Rock’s conqueror',
+      PART:'Piece of the whole',
+      PARTY:'Balloon occasion',
+      PAST:'History',
+      PAW:'Dog’s foot',
+      PEEL:'Banana jacket',
+      PEER:'Look closely',
+      PEG:'Clothesline clip',
+      PEP:'Energy, zip',
+      PERIL:'Grave danger',
+      PIANO:'88-key instrument',
+      PIETY:'Deep devoutness',
+      PILOT:'Cockpit captain',
+      PLEA:'Heartfelt request',
+      POLAR:'Like some bears',
+      PORK:'Pig product',
+      POUND:'British currency',
+      PRO:'Expert; opposite of con',
+      PROOF:'Evidence',
+      PUSH:'Door-sign opposite of “pull”',
+      PUT:'Place',
+      RAISE:'Lift up; a pay bump',
+      RAPID:'Lightning-quick',
+      RAY:'Beam of sunshine',
+      REAL:'Not fake',
+      RED:'Stop-light colour',
+      RENT:'Tenant’s payment',
+      RINSE:'Wash lightly',
+      RISEN:'Gone up, like dough',
+      ROOF:'House topper',
+      ROPE:'Tug-of-war need',
+      ROUGE:'Red cheek makeup',
+      ROUTE:'Path from A to B',
+      RUB:'Massage motion',
+      RYE:'Bread grain',
+      SALT:'Pepper’s partner',
+      SAME:'Identical',
+      SAT:'Took a seat',
+      SAW:'Carpenter’s cutter',
+      SAY:'Utter aloud',
+      SCAN:'Read quickly',
+      SCAR:'Old wound’s mark',
+      SCORE:'Twenty; or a game tally',
+      SCRAM:'“Get outta here!”',
+      SEAM:'Where two fabrics meet',
+      SHAPE:'Circle or square',
+      SHE:'Her pronoun',
+      SHED:'Garden tool house',
+      SHOE:'Sneaker or loafer',
+      SHONE:'Glowed',
+      SIEVE:'Kitchen strainer',
+      SINCE:'From that time on',
+      SIR:'Knight’s title',
+      SLANG:'Street talk',
+      SLEPT:'Sawed logs all night',
+      SLICE:'Piece of pizza',
+      SLOW:'Snail-paced',
+      SOAR:'Fly high',
+      SOBER:'Dead serious',
+      SOLAR:'Sun-powered',
+      SOLID:'Not liquid or gas',
+      SONAR:'Submarine’s echo finder',
+      SONIC:'Speedy blue Sega hedgehog',
+      SPA:'Pamper palace',
+      SPY:'007, for one',
+      STAGE:'Where actors stand',
+      STOVE:'Kitchen cooker',
+      SWIM:'Do laps',
+      TAD:'A little bit',
+      TAKE:'Grab',
+      TALLY:'Keep a running count',
+      TAP:'Faucet',
+      TARDY:'Late for class',
+      TEA:'Afternoon cuppa',
+      TEAR:'Drop from a sad eye',
+      TEN:'A perfect score',
+      TENT:'Camper’s shelter',
+      TERSE:'Short and snippy',
+      THAN:'Comparison word',
+      THEME:'Party’s motif',
+      THIEF:'One caught red-handed',
+      THREE:'Number after two',
+      THROW:'Pitch or toss',
+      TIGHT:'Snug',
+      TIME:'What clocks keep',
+      TIRE:'Car wheel’s rubber',
+      TOE:'This little piggy',
+      TOKEN:'Arcade coin',
+      TONE:'Quality of voice',
+      TOT:'Tiny child',
+      TOTAL:'The whole sum',
+      TOW:'Pull behind a truck',
+      TOXIC:'Poisonous',
+      TREAD:'Tyre’s grip pattern',
+      TREE:'Oak or elm',
+      TRIAL:'Courtroom proceeding',
+      TROUT:'River angler’s catch',
+      TRULY:'“Yours ____” (letter sign-off)',
+      TRUMP:'Bridge suit that beats all',
+      TRY:'Give it a go',
+      TUNA:'Sandwich fish',
+      TWO:'Company, they say',
+      ULTRA:'Beyond extreme',
+      UNDID:'Reversed, as a mistake',
+      UNITE:'Join together',
+      UPPER:'____ case (capital letters)',
+      VALID:'Holding up to scrutiny',
+      VEST:'Sleeveless layer',
+      VILLA:'Fancy holiday house',
+      VIM:'Vigour’s partner',
+      VOW:'Wedding promise',
+      VOWEL:'A, E, I, O or U',
+      WAGON:'Little red puller',
+      WAR:'Peace’s opposite',
+      WAVY:'Like beach hair',
+      WEE:'Tiny, in Scotland',
+      WEEDY:'Like an untended garden',
+      WELL:'Wishing spot',
+      WET:'Soaked through',
+      WHEN:'Question of timing',
+      WHILE:'“Once in a ____”',
+      WHO:'Owl’s question',
+      WHY:'“For what reason?”',
+      WIELD:'Swing, as a sword',
+      WOMAN:'Adult female',
+      WOULD:'“I ___ if I could”',
+      WOUND:'Injury',
+      WRAP:'Tortilla sandwich',
+      WRIST:'Watch’s spot',
+      WROTE:'Penned',
+      YACHT:'Millionaire’s boat',
+      YEN:'Tokyo currency',
+      YET:'Up to now',
+      YIELD:'Give way (road sign)',
+      YOUTH:'A young person'
+    };
     var PUZZLES=[
-      {grid:['#SAT#','SONAR','ANGLE','YIELD','#CRY#'],clues:{
-        SAT:'Took a seat',SONAR:'Submarine’s echo finder',ANGLE:'Corner, measured in degrees',YIELD:'Give way (road sign)',CRY:'Shed tears',
-        SONIC:'Speedy blue Sega hedgehog',ANGER:'Hot-headed emotion',TALLY:'Keep a running count',SAY:'Utter aloud',RED:'Stop-light colour'}},
-      {grid:['#TOW#','THROW','ARGUE','DEALT','#END#'],clues:{
-        TOW:'Pull behind a truck',THROW:'Pitch or toss',ARGUE:'Bicker, debate',DEALT:'Handed out the cards',END:'Finish',
-        TAD:'A little bit',THREE:'Number after two',ORGAN:'Church keyboard; the heart, e.g.',WOULD:'“I ___ if I could”',WET:'Soaked through'}},
-      {grid:['#EYE#','CLOSE','ABUSE','TOTAL','#WHY#'],clues:{
-        EYE:'You see with it',CLOSE:'Shut; or nearby',ABUSE:'Mistreat',TOTAL:'The whole sum',WHY:'“For what reason?”',
-        CAT:'Purring pet',ELBOW:'Mid-arm joint',YOUTH:'A young person',ESSAY:'Short written piece',EEL:'Snake-like fish'}},
-      {grid:['#MAR#','PERIL','RAISE','ONSET','#TEN#'],clues:{
-        MAR:'Spoil or scratch',PERIL:'Grave danger',RAISE:'Lift up; a pay bump',ONSET:'The very start',TEN:'A perfect score',
-        PRO:'Expert; opposite of con',MEANT:'Intended',ARISE:'Get up; come about',RISEN:'Gone up, like dough',LET:'Allow'}}
+      ['#SAT#','SONAR','ANGLE','YIELD','#CRY#'],
+      ['#TOW#','THROW','ARGUE','DEALT','#END#'],
+      ['#EYE#','CLOSE','ABUSE','TOTAL','#WHY#'],
+      ['#MAR#','PERIL','RAISE','ONSET','#TEN#'],
+      ['#SIR#','MOVIE','EBONY','TERSE','#RYE#'],
+      ['##TRY','#SHOE','SLEPT','HOME#','EWE##'],
+      ['#VEST','MINCE','ULTRA','CLEAR','HARM#'],
+      ['ORB##','HEEL#','MAGIC','#LAVA','##NET'],
+      ['#FEW#','MIXED','ENTER','TARDY','#LAY#'],
+      ['##TWO','#THAN','SIEVE','ARMY#','WEE##'],
+      ['#WRAP','DRONE','ROUGE','OTTER','PEEL#'],
+      ['EMU##','LENS#','MADAM','#TIME','##DEN'],
+      ['#LOT#','COURT','OWNER','DECAY','#RED#'],
+      ['##WHO','#CHEF','THIEF','WELL#','OWE##'],
+      ['#SWIM','PIANO','ANGEL','SCORE','TENT#'],
+      ['ACT##','PART#','PROOF','#TUNA','##TEN'],
+      ['#FLY#','TRIAL','OUNCE','EIGHT','#TOT#'],
+      ['##SPY','#GLUE','WRIST','EACH#','EYE##'],
+      ['ACT##','CLIP#','EAGLE','#WHEN','##TAD'],
+      ['#RUB#','PAPER','APPLE','WIELD','#DRY#'],
+      ['##VOW','#LAVA','SOLAR','PAIL#','ADD##'],
+      ['#SALT','SOLAR','ALONE','MINCE','EDGE#'],
+      ['APP##','ROOF#','TRULY','#KNEE','##DEN'],
+      ['#TAP#','POLAR','EXTRA','PIETY','#CRY#'],
+      ['##ALE','#SCAN','WOUND','HATE#','ORE##'],
+      ['#SEAM','STAGE','HOTEL','EVENT','DENT#'],
+      ['EBB##','LORD#','FLEET','#TEAR','##DRY'],
+      ['#VIM#','COMET','AWARE','BEGIN','#LET#'],
+      ['##GAP','#CLUE','SLANG','PART#','AWE##'],
+      ['#SWIM','SHONE','CAMEL','APART','RENT#'],
+      ['OFF##','PART#','TREAD','#MAKE','##KEN'],
+      ['#PUT#','MINOR','ALIKE','NOTED','#TEN#'],
+      ['##TEA','#DRAG','CAUSE','ARMY#','PEP##']
     ];
     var pidx=0, P=null, grid=[], letters=[], num=[], slots=[], cur=0, dir='a', over=false, hints=0, reviewing=false;
-    function build(){P=PUZZLES[pidx];grid=P.grid.map(function(r){return r.split('');});
+    function build(){P=PUZZLES[pidx];grid=P.map(function(r){return r.split('');});
       letters=[];num=[];slots=[];var r,c;
       for(r=0;r<5;r++){letters[r]=[];num[r]=[];for(c=0;c<5;c++){letters[r][c]='';num[r][c]=0;}}
       function open(r,c){return r>=0&&r<5&&c>=0&&c<5&&grid[r][c]!=='#';}
@@ -1887,14 +2193,14 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       else{r++;if(r<5&&grid[r][c]!=='#')cur=r*5+c;}}
     function type(ch){if(over)return;var r=(cur/5)|0,c=cur%5;if(grid[r][c]==='#')return;
       letters[r][c]=ch.toUpperCase();haptic(tapBuzz);nextCell();
-      if(checkWin()){over=true;Store.del('save.cross');Stats.rec('cross',{win:true,score:hints});winFx();announce('Solved!');}
+      if(checkWin()){over=true;markDone();Store.del('save.cross');Stats.rec('cross',{win:true,score:hints});winFx();announce('Solved!');}
       else save();render();}
     function del(){if(over)return;var r=(cur/5)|0,c=cur%5;
       if(letters[r][c]){letters[r][c]='';}else{move(-1);r=(cur/5)|0;c=cur%5;letters[r][c]='';}
       save();render();}
     function hint(){if(over)return;var r=(cur/5)|0,c=cur%5;if(grid[r][c]==='#')return;
       letters[r][c]=grid[r][c];hints++;
-      if(checkWin()){over=true;Store.del('save.cross');Stats.rec('cross',{win:true,score:hints});winFx();announce('Solved!');}
+      if(checkWin()){over=true;markDone();Store.del('save.cross');Stats.rec('cross',{win:true,score:hints});winFx();announce('Solved!');}
       else{announce('Hint: that square is '+grid[r][c]+'.');save();}render();}
     var lastSel={t:0,i:-1};
     function slotFilled(s){for(var k=0;k<s.len;k++){var r=s.dir==='a'?s.r:s.r+k,c=s.dir==='a'?s.c+k:s.c;if(!letters[r][c])return false;}return true;}
@@ -1919,7 +2225,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
         var sel=i===cur&&!over,inw=hi[i];
         cells+='<div class="cw-cell'+(sel?' sel':inw?' inw':'')+'" data-cw="'+i+'">'+(num[r][c]?'<span class="cw-num">'+num[r][c]+'</span>':'')+'<span class="cw-let">'+(letters[r][c]||'')+'</span></div>';
       }
-      var clueTxt=cs?('<b>'+cs.n+(cs.dir==='a'?'A':'D')+'</b> '+(P.clues[cs.ans]||'')):'Tap a square to start';
+      var clueTxt=cs?('<b>'+cs.n+(cs.dir==='a'?'A':'D')+'</b> '+(CLUES[cs.ans]||'')):'Tap a square to start';
       var clueBar=(over&&reviewing)
         ? '<div class="cw-clue done">All answers revealed 🎉</div>'
         : '<div class="cw-clue"><button class="cw-nav" data-cwaction="prev" aria-label="Previous clue">‹</button>'
@@ -1936,14 +2242,25 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
         bottom='<div class="wd-kb">'+kb+'</div>';
       }
       app.innerHTML='<div class="game cross"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'
-        +'<div class="stats"><div class="chip"><div class="cv">'+hints+'</div><div class="cl">Hints</div></div>'
+        +'<div class="stats"><div class="chip"><div class="cv">'+(doneList().length)+'/'+PUZZLES.length+'</div><div class="cl">Solved</div></div>'
+        +'<div class="chip"><div class="cv">'+hints+'</div><div class="cl">Hints</div></div>'
         +'<button class="pausebtn" data-cwaction="new" title="New puzzle" aria-label="New puzzle">↻</button>'+helpBtn('cross')+'</div></div>'
         +'<div class="boardwrap"><div class="cw-grid">'+cells+'</div></div>'
         +clueBar
         +bottom
         +(over&&!reviewing?'<div class="overlay win"><div><div class="ot">Solved<em>!</em></div><div class="os">'+(hints?('with '+hints+' hint'+(hints>1?'s':'')):'no hints — nice!')+'</div><div class="cw-overbtns">'+shareBtn('Pocket Arcade Mini Crossword \u2014 solved with '+(hints?hints+' hint'+(hints>1?'s':''):'no hints')+' \u270F\uFE0F')+'<button class="osmall" data-cwaction="review">See the board</button><button class="osmall" data-cwaction="new">Next puzzle</button></div></div></div>':'')
         +'</div>';}
-    function newPuzzle(){pidx=(pidx+1)%PUZZLES.length;build();save();render();}
+    function doneList(){var d=Store.get('cross.done',[]);return Array.isArray(d)?d:[];}
+    function markDone(){var d=doneList();if(d.indexOf(pidx)<0){d.push(pidx);Store.set('cross.done',d);}}
+    /* Serve a random puzzle you haven't solved yet; only once every single
+       one is done does the pool reset. */
+    function pickNext(excl){var d=doneList(),avail=[],i;
+      for(i=0;i<PUZZLES.length;i++)if(d.indexOf(i)<0&&i!==excl)avail.push(i);
+      if(!avail.length){Store.set('cross.done',[]);
+        toast('All '+PUZZLES.length+' puzzles solved \u2014 starting the pool fresh!');
+        for(i=0;i<PUZZLES.length;i++)if(i!==excl)avail.push(i);}
+      return avail[(Math.random()*avail.length)|0];}
+    function newPuzzle(){pidx=pickNext(pidx);build();save();render();}
     function anyEntry(){for(var r=0;r<5;r++)for(var c=0;c<5;c++)if(letters[r][c])return true;return false;}
     function clickH(e){var a=e.target.closest('[data-cwaction]');if(a){var k=a.dataset.cwaction;
         if(k==='new'){confirmNew(!over&&anyEntry(),newPuzzle);}
@@ -1965,7 +2282,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
         if(sv&&typeof sv.pidx==='number'){pidx=sv.pidx;build();letters=sv.letters||letters;hints=sv.hints||0;
           if(typeof sv.cur==='number'&&isOpen(sv.cur))cur=sv.cur;if(sv.dir==='a'||sv.dir==='d')dir=sv.dir;
           if(checkWin()){over=true;}render();}
-        else{pidx=(Math.random()*PUZZLES.length)|0;build();render();}
+        else{pidx=pickNext(-1);build();render();}
         tipOnce('cross','Tip: tap the selected square to switch across/down; double-tap to jump to the next clue');},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
