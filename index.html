@@ -343,7 +343,6 @@ html.dark .toast{background:var(--surface-2);border:1.5px solid var(--border);co
 .g-mind .gglyph{background:linear-gradient(135deg,#f368b6,#b831d8 );background:linear-gradient(135deg,#f368b6,#a934d6);}
 .g-cross .gglyph{background:linear-gradient(135deg,#ffd34e,#f59e0b);color:#4a2c00;}
 .g-crypt .gglyph{background:linear-gradient(135deg,#7fd0ff,#2f7fe0);}
-.g-ka .gglyph{background:linear-gradient(135deg,#ff7a59,#d92d20);}
 .gtext{display:flex;flex-direction:column;min-width:0;}
 .gname{font-weight:700;font-size:19px;}
 .gdesc{font-weight:500;font-size:13px;color:var(--muted);}
@@ -859,10 +858,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       +'<div class="hk">Keyboard</div><p><kbd>arrows</kbd> move · <kbd>Space</kbd> switch direction · <kbd>Backspace</kbd> delete</p>'},
     crypt:{t:'Cryptogram',b:'<p>The quote has been scrambled with a substitution cipher — every letter consistently stands for another. Decode it.</p>'
       +'<div class="hk">Controls</div><p>Tap a letter, then type your guess for it. Matching cipher letters fill in everywhere at once; duplicates show in red. <b>Hint</b> reveals one letter.</p>'
-      +'<div class="hk">Keyboard</div><p>Type to assign · <kbd>←</kbd>/<kbd>→</kbd> move · <kbd>Backspace</kbd> clear</p>'},
-    kart:{t:'Turbo Karts',b:'<p>A retro pseudo-3D racer. Beat the rival karts to the chequered flag — your kart accelerates by itself, you just steer.</p>'
-      +'<div class="hk">Driving</div><p>Stay on the tarmac: the grass is slow. Lean into corners early or the curve will fling you wide. Bumping a rival costs you speed.</p>'
-      +'<div class="hk">Controls</div><p>Hold the left or right half of the screen to steer — or use <kbd>←</kbd>/<kbd>→</kbd>. <kbd>P</kbd> pauses.</p>'}
+      +'<div class="hk">Keyboard</div><p>Type to assign · <kbd>←</kbd>/<kbd>→</kbd> move · <kbd>Backspace</kbd> clear</p>'}
   };
   function showHelp(k){var h=HELP[k];if(!h)return;
     openModal('<div class="ot">'+h.t+'</div><div class="help-body">'+h.b+'</div>'
@@ -879,8 +875,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     {key:'mystery', name:'Mystery',       desc:'Catch the killer',      cls:'g-my',   glyph:'?'},
     {key:'mind',    name:'Mastermind',    desc:'Crack the colour code', cls:'g-mind', glyph:'◉',       score:' tries'},
     {key:'cross',   name:'Mini Crossword',desc:'Clues across & down',   cls:'g-cross',glyph:'田',      score:' hints'},
-    {key:'crypt',   name:'Cryptogram',    desc:'Decode the quote',      cls:'g-crypt',glyph:'⚿',      score:' hints'},
-    {key:'kart',    name:'Turbo Karts',   desc:'Race to the finish',    cls:'g-ka',   glyph:'🏁', time:true}
+    {key:'crypt',   name:'Cryptogram',    desc:'Decode the quote',      cls:'g-crypt',glyph:'⚿',      score:' hints'}
   ];
   function hasSave(key){return !!Store.get('save.'+key,null);}
   function gcard(g){
@@ -971,7 +966,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     Store.set('lastPlayed',key);
     app.innerHTML='<div id="screen"></div>';
     var el=document.getElementById('screen');
-    active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():(key==='wordle')?createWordle():(key==='mystery')?createMystery():(key==='mind')?createMastermind():(key==='cross')?createCrossword():(key==='kart')?createKart():createCryptogram();
+    active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():(key==='wordle')?createWordle():(key==='mystery')?createMystery():(key==='mind')?createMastermind():(key==='cross')?createCrossword():createCryptogram();
     active.mount(el);
   }
   function goHome(){ if(active&&active.unmount)active.unmount(); active=null; curView=null; renderHome(); }
@@ -2075,199 +2070,6 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
           else for(var k=0;k<Q.cipher.length;k++){if(/[A-Z]/.test(Q.cipher[k])){Q.cur=Q.cipher[k];break;}}render();}
         else newGame();},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
-  }
-
-  /* =================================================== TURBO KARTS */
-  function createKart(){
-    var app,raf=null,keyH=null,resizeH=null,cv,ctx,W=0,H=0,DPR=1;
-    var fmt=function(s){return String((s/60)|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
-    var SEG=200,ROADW=2000,CAMH=1000,CAMD=0.84,DRAW=70;
-    var CUPS={
-      Meadow:{laps:2,foes:4,top:5200,bend:2.4,sky:['#9fd8ff','#e8f6ff'],grass:['#6abf5e','#5db253'],name:'Meadow Cup',dd:'2 laps · gentle bends'},
-      Canyon:{laps:3,foes:5,top:6000,bend:3.4,sky:['#ffd9a0','#fff3df'],grass:['#c9a15f','#bd9352'],name:'Canyon Cup',dd:'3 laps · sharp switchbacks'},
-      Comet: {laps:3,foes:6,top:6800,bend:4.4,sky:['#2b2d55','#6f5aa8'],grass:['#3f3f6e','#36365f'],name:'Comet Cup', dd:'3 laps · ruthless rivals'}};
-    var RIVALS=[{n:'Pip',c:'#e84393'},{n:'Brick',c:'#e17055'},{n:'Zola',c:'#0984e3'},{n:'Mo',c:'#00b894'},{n:'Sprocket',c:'#fdcb6e'},{n:'Juno',c:'#a29bfe'}];
-    var K={screen:'start',cup:Store.get('settings.kart',{cup:'Meadow'}).cup||'Meadow'};
-    var R=null; /* live race state */
-    function savePref(){Store.set('settings.kart',{cup:K.cup});}
-    /* Track = list of segments, each with a curve value. Sections of
-       straights and alternating bends, scaled by the cup's bend factor. */
-    function buildTrack(cup){
-      var segs=[],b=CUPS[cup].bend;
-      var plan=[[60,0],[40,b],[30,0],[50,-b],[40,b*.6],[60,0],[35,-b*1.2],[30,0],[45,b],[25,-b*.5],[50,0]];
-      for(var s=0;s<plan.length;s++)for(var i=0;i<plan[s][0];i++){
-        /* ease curves in and out so corners do not snap */
-        var t=i/plan[s][0],ease=t<.2?t/.2:(t>.8?(1-t)/.2:1);
-        segs.push(plan[s][1]*ease);}
-      return segs;}
-    function newRace(){
-      var cup=CUPS[K.cup];
-      var segs=buildTrack(K.cup);
-      R={segs:segs,len:segs.length*SEG,laps:cup.laps,top:cup.top,
-         pos:0,px:0,speed:0,lap:1,sec:0,steer:0,place:cup.foes+1,
-         done:false,paused:false,foes:[]};
-      for(var i=0;i<cup.foes;i++){
-        var f=RIVALS[i];
-        R.foes.push({n:f.n,c:f.c,z:(i+1)*SEG*2,x:(i%2?-.45:.45)*((i%3)+1)/3,
-          sp:cup.top*(.86+.02*i),v:0,lap:1});}
-      K.screen='play';mountPlay();}
-    /* ---------- rendering ---------- */
-    function fitCanvas(){if(!cv)return;DPR=Math.min(window.devicePixelRatio||1,2);
-      var r=cv.getBoundingClientRect();W=Math.round(r.width*DPR);H=Math.round(r.height*DPR);
-      if(cv.width!==W)cv.width=W;if(cv.height!==H)cv.height=H;}
-    function drawKart(x,y,s,col,turn){ /* x,y = bottom-centre, s = half width */
-      if(s<2)return;
-      ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y,s*1.05,s*.22,0,0,7);ctx.fill();
-      ctx.fillStyle='#222';ctx.fillRect(x-s,y-s*.55,s*.34,s*.55);ctx.fillRect(x+s-s*.34,y-s*.55,s*.34,s*.55);
-      ctx.fillStyle=col;ctx.beginPath();
-      ctx.moveTo(x-s*.78+turn*s*.2,y-s*1.05);ctx.lineTo(x+s*.78+turn*s*.2,y-s*1.05);
-      ctx.lineTo(x+s*.95,y-s*.1);ctx.lineTo(x-s*.95,y-s*.1);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#ffe0bd';ctx.beginPath();ctx.arc(x+turn*s*.2,y-s*1.15,s*.3,0,7);ctx.fill();
-      ctx.fillStyle='#c0392b';ctx.fillRect(x-s*.32+turn*s*.2,y-s*1.5,s*.64,s*.3);}
-    function render(){
-      if(!ctx)return;fitCanvas();
-      var cup=CUPS[K.cup],segs=R.segs,N=segs.length;
-      var sky=ctx.createLinearGradient(0,0,0,H*.5);sky.addColorStop(0,cup.sky[0]);sky.addColorStop(1,cup.sky[1]);
-      ctx.fillStyle=sky;ctx.fillRect(0,0,W,H*.55);
-      ctx.fillStyle=cup.grass[0];ctx.fillRect(0,H*.5,W,H*.5);
-      var base=Math.floor(R.pos/SEG)%N,frac=(R.pos%SEG)/SEG;
-      var x=0,dx=-segs[base]*frac,maxY=H,camX=R.px*ROADW;
-      var pts=[];/* per-row projection, reused to place rival sprites */
-      for(var n=0;n<DRAW;n++){
-        var i=(base+n)%N,z=n*SEG-(R.pos%SEG)+SEG;
-        var sc=CAMD/z,sy=H/2+sc*CAMH*H/2,sw=sc*ROADW*W/2;
-        var sx=W/2+sc*(x-camX)*W/2;
-        pts.push({y:sy,w:sw,x:sx,sc:sc});
-        x+=dx;dx+=segs[i];
-        if(sy>=maxY||n===0)continue;
-        var p=pts[n-1],dark=((i/4)|0)%2;
-        ctx.fillStyle=cup.grass[dark?0:1];ctx.fillRect(0,sy,W,p.y-sy+1);
-        ctx.fillStyle=dark?'#b8443c':'#f4f0e6';
-        ctx.beginPath();ctx.moveTo(p.x-p.w*1.12,p.y);ctx.lineTo(p.x+p.w*1.12,p.y);ctx.lineTo(sx+sw*1.12,sy);ctx.lineTo(sx-sw*1.12,sy);ctx.fill();
-        ctx.fillStyle=dark?'#6e6e74':'#75757b';
-        ctx.beginPath();ctx.moveTo(p.x-p.w,p.y);ctx.lineTo(p.x+p.w,p.y);ctx.lineTo(sx+sw,sy);ctx.lineTo(sx-sw,sy);ctx.fill();
-        if(!dark){ctx.fillStyle='#e8e6dc';
-          ctx.beginPath();ctx.moveTo(p.x-p.w*.012,p.y);ctx.lineTo(p.x+p.w*.012,p.y);ctx.lineTo(sx+sw*.012,sy);ctx.lineTo(sx-sw*.012,sy);ctx.fill();}
-        if(i===0){ctx.fillStyle='#1b1b1f'; /* start/finish strip */
-          ctx.beginPath();ctx.moveTo(p.x-p.w,p.y);ctx.lineTo(p.x+p.w,p.y);ctx.lineTo(sx+sw,sy);ctx.lineTo(sx-sw,sy);ctx.fill();}
-        maxY=sy;}
-      /* rivals, far to near so close karts paint over distant ones */
-      var order=R.foes.slice().sort(function(a,b){
-        return ((b.z-R.pos+R.len)%R.len)-((a.z-R.pos+R.len)%R.len);});
-      for(var f=0;f<order.length;f++){var fo=order[f];
-        var rel=(fo.z-R.pos+R.len)%R.len;if(rel<SEG*.5||rel>=DRAW*SEG)continue;
-        var row=Math.floor(rel/SEG);if(row<1||row>=pts.length)continue;
-        var pt=pts[row];if(pt.y>=H||pt.y<=0)continue;
-        drawKart(pt.x+fo.x*pt.w,pt.y,pt.w*.16,fo.c,0);}
-      drawKart(W/2,H*.92,W*.075,'#d92d20',R.steer);
-      if(R.paused&&!R.done){ctx.fillStyle='rgba(20,20,30,.55)';ctx.fillRect(0,0,W,H);
-        ctx.fillStyle='#fff';ctx.font='700 '+(28*DPR)+'px system-ui';ctx.textAlign='center';ctx.fillText('Paused',W/2,H/2);}}
-    /* ---------- simulation ---------- */
-    function totalDist(o){return (o.lap-1)*R.len+ (o===R?R.pos:o.z);}
-    function step(dt){
-      var segs=R.segs,N=segs.length;
-      R.sec+=dt;
-      var off=Math.abs(R.px)>1.05;
-      var top=off?R.top*.38:R.top;
-      R.speed+=(top-R.speed)*(R.speed<top?.55:2.2)*dt;
-      if(off&&!R.wasOff)haptic([15]);R.wasOff=off;
-      var cur=segs[Math.floor(R.pos/SEG)%N];
-      R.px+=R.steer*1.7*dt*(R.speed/R.top);
-      R.px-=cur*(R.speed/R.top)*dt*.3;       /* centrifugal pull */
-      R.px=Math.max(-1.6,Math.min(1.6,R.px));
-      var prev=R.pos;R.pos+=R.speed*dt;
-      if(R.pos>=R.len){R.pos-=R.len;R.lap++;
-        if(R.lap>R.laps){finish();return;}
-        announce('Lap '+R.lap+' of '+R.laps);refreshChips();}
-      for(var i=0;i<R.foes.length;i++){var fo=R.foes[i];
-        fo.v+=(fo.sp-fo.v)*.55*dt;fo.z+=fo.v*dt;
-        /* rivals corner cleanly; drift their lane gently over time */
-        fo.x+=Math.sin((fo.z/R.len)*19+i)*dt*.12;fo.x=Math.max(-.7,Math.min(.7,fo.x));
-        if(fo.z>=R.len){fo.z-=R.len;fo.lap++;}
-        /* collision: rival just ahead in our lane */
-        var rel=(fo.z-R.pos+R.len)%R.len;
-        if(rel<SEG*1.2&&Math.abs(fo.x-R.px)<.28&&R.speed>fo.v){
-          R.speed=fo.v*.6;haptic([20]);}}
-      var pl=1,me=totalDist(R);
-      for(var j=0;j<R.foes.length;j++)if(totalDist(R.foes[j])>me)pl++;
-      if(pl!==R.place){R.place=pl;refreshChips();}}
-    function finish(){R.done=true;stopLoop();
-      var won=R.place===1;
-      Stats.rec('kart',{win:won,time:won?Math.round(R.sec):null});
-      if(won)winFx();else haptic(loseBuzz);
-      announce('Finished '+ord(R.place)+' in '+fmt(Math.round(R.sec))+'.');
-      mountResult();}
-    function ord(n){return n+(['th','st','nd','rd'][((n%100)>10&&(n%100)<14)?0:Math.min(n%10,4)]||'th');}
-    /* ---------- loop ---------- */
-    var lastT=0;
-    function frame(t){raf=requestAnimationFrame(frame);
-      var dt=Math.min((t-lastT)/1000,.05);lastT=t;
-      if(!R.paused&&!R.done)step(dt);
-      render();
-      var el=document.getElementById('k_time');if(el&&!R.paused)el.textContent=fmt(Math.floor(R.sec));}
-    function startLoop(){if(raf==null){lastT=performance.now();raf=requestAnimationFrame(frame);}}
-    function stopLoop(){if(raf!=null){cancelAnimationFrame(raf);raf=null;}}
-    /* ---------- screens ---------- */
-    function refreshChips(){var l=document.getElementById('k_lap'),p=document.getElementById('k_pos');
-      if(l)l.textContent=R.lap+'/'+R.laps;if(p)p.textContent=ord(R.place);}
-    function mountStart(){stopLoop();ctx=null;
-      app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">← Menu</button>'+skipBtn+helpBtn('kart')+'</div>'
-        +'<div class="kicker">Pedal Down</div><h1 class="title">Turbo <em>Karts</em></h1>'
-        +'<p class="subtitle">Out-drive the pack. Three cups, one flag.</p>'+statsLine('kart',{time:true})
-        +'<div class="label">Choose a cup</div><div class="diffs">'+Object.keys(CUPS).map(function(name,idx){
-          var d='';for(var i=0;i<4;i++)d+='<i class="'+(i<=idx+1?'f':'')+'"></i>';
-          return '<button class="diff '+(K.cup===name?'on':'')+'" data-kcup="'+name+'"><span class="dot">'+d+'</span><span class="dn">'+CUPS[name].name+'</span><span class="dd">'+CUPS[name].dd+'</span></button>';}).join('')
-        +'</div><button class="play-btn" data-kaaction="go">Start your engine</button></div>';}
-    function mountPlay(){
-      app.innerHTML='<div class="game"><div class="bar"><button class="back" data-kaaction="quit">← Quit</button>'+skipBtn
-        +'<div class="stats"><div class="chip"><div class="cv" id="k_lap">'+R.lap+'/'+R.laps+'</div><div class="cl">Lap</div></div>'
-        +'<div class="chip"><div class="cv" id="k_pos">'+ord(R.place)+'</div><div class="cl">Place</div></div>'
-        +'<div class="chip"><div class="cv" id="k_time">'+fmt(0)+'</div><div class="cl">Time</div></div>'
-        +'<button class="pausebtn" data-kaaction="pause" aria-label="Pause">❚❚</button>'+helpBtn('kart')+'</div></div>'
-        +'<div class="boardwrap" style="max-width:none"><canvas id="k_cv" style="width:100%;aspect-ratio:4/3;display:block;border-radius:var(--r-md);touch-action:none" aria-label="Race track"></canvas></div>'
-        +'<p class="subtitle" style="text-align:center;margin-top:10px">Hold a side of the track to steer · ←/→ keys</p></div>';
-      cv=document.getElementById('k_cv');ctx=cv.getContext('2d');
-      cv.addEventListener('pointerdown',function(e){e.preventDefault();
-        try{cv.setPointerCapture(e.pointerId);}catch(_){}
-        R.steer=(e.clientX<cv.getBoundingClientRect().left+cv.clientWidth/2)?-1:1;});
-      cv.addEventListener('pointermove',function(e){if(R.steer)
-        R.steer=(e.clientX<cv.getBoundingClientRect().left+cv.clientWidth/2)?-1:1;});
-      cv.addEventListener('pointerup',function(){R.steer=0;});
-      cv.addEventListener('pointercancel',function(){R.steer=0;});
-      startLoop();}
-    function mountResult(){
-      var won=R.place===1;
-      app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">← Menu</button>'+skipBtn+helpBtn('kart')+'</div>'
-        +'<div class="kicker">'+CUPS[K.cup].name+'</div><h1 class="title">'+(won?'You <em>win!</em>':ord(R.place)+' <em>place</em>')+'</h1>'
-        +'<p class="subtitle">'+(won?'First across the line':'The podium slipped away')+' · '+fmt(Math.round(R.sec))+'</p>'
-        +statsLine('kart',{time:true})
-        +'<button class="play-btn" data-kaaction="go">Race again</button>'
-        +'<button class="play-btn" data-kaaction="menu" style="margin-top:10px;background:none;color:var(--muted);box-shadow:none;border:1.5px solid var(--border)">Change cup</button></div>';}
-    function clickH(e){
-      var cup=e.target.closest('[data-kcup]');if(cup){K.cup=cup.dataset.kcup;savePref();
-        var bs=app.querySelectorAll('.diff');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].dataset.kcup===K.cup);return;}
-      var act=e.target.closest('[data-kaaction]');if(!act)return;var a=act.dataset.kaaction;
-      if(a==='go')newRace();
-      else if(a==='menu'){K.screen='start';mountStart();}
-      else if(a==='quit'){stopLoop();K.screen='start';mountStart();}
-      else if(a==='pause'&&R&&!R.done){R.paused=!R.paused;act.textContent=R.paused?'▶':'❚❚';act.setAttribute('aria-label',R.paused?'Resume':'Pause');}}
-    return {
-      mount:function(root){app=root;app.addEventListener('click',clickH);
-        keyH=function(e){if(K.screen!=='play'||!R)return;
-          if(e.key==='ArrowLeft'){R.steer=-1;e.preventDefault();}
-          else if(e.key==='ArrowRight'){R.steer=1;e.preventDefault();}
-          else if(e.key==='p'||e.key==='P'){if(!R.done)R.paused=!R.paused;}};
-        var upH=function(e){if(!R)return;
-          if((e.key==='ArrowLeft'&&R.steer===-1)||(e.key==='ArrowRight'&&R.steer===1))R.steer=0;};
-        window.addEventListener('keydown',keyH);window.addEventListener('keyup',upH);
-        this._upH=upH;
-        resizeH=function(){if(ctx)render();};window.addEventListener('resize',resizeH);
-        mountStart();},
-      autopause:function(){if(R&&!R.done)R.paused=true;},
-      unmount:function(){stopLoop();
-        if(keyH)window.removeEventListener('keydown',keyH);
-        if(this._upH)window.removeEventListener('keyup',this._upH);
-        if(resizeH)window.removeEventListener('resize',resizeH);}};
   }
 
   try{history.replaceState({arcade:'home'},'');}catch(_){}
