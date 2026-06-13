@@ -1212,6 +1212,13 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
      ============================================================ */
   function b64u(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
   function ub64(s){s=String(s).replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)));}
+  /* Seeded RNG (mulberry32). withSeed() temporarily routes Math.random through
+     the seeded generator so a single integer reproduces a whole puzzle — most
+     games are challenged with just that seed (tiny links + tidy QR codes). */
+  function makeRng(seed){var s=(seed>>>0)||1;return function(){s=(s+0x6D2B79F5)|0;var t=Math.imul(s^(s>>>15),1|s);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};}
+  function withSeed(seed,fn){var prev=Math.random,r=makeRng(seed);Math.random=r;try{return fn();}finally{Math.random=prev;}}
+  function randSeed(){return (Math.random()*4294967296)>>>0;}
+  function challengeReceived(){toast('🔗 A friend’s challenge — same puzzle');}
   var Challenge={
     make:function(game,payload){var s=b64u(JSON.stringify({g:game,d:payload}));
       return location.origin+location.pathname+'#c='+s;},
@@ -1470,6 +1477,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var hp=e.target.closest('[data-help]'); if(hp){ showHelp(hp.dataset.help); return; }
     var sh=e.target.closest('[data-share]'); if(sh){ doShare(sh.dataset.share); return; }
     var si=e.target.closest('[data-shareimg]'); if(si){ shareResultImage(si.dataset.shareimg); return; }
+    var chl=e.target.closest('[data-challenge]'); if(chl){ if(active&&active.challenge)active.challenge(); return; }
     var so=e.target.closest('[data-setopt]'); if(so){ applySetting(so); return; }
     var th=e.target.closest('[data-settheme]'); if(th){ G.theme=th.dataset.settheme; saveG(); applyPrefs();
       var bs=app.querySelectorAll('[data-settheme]');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].dataset.settheme===G.theme); return; }
@@ -1517,7 +1525,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     /* remember last-chosen difficulty + clock setting (#29) */
     var pref=Store.get('settings.sudoku',null);if(pref){if(pref.difficulty)S.difficulty=pref.difficulty;if(pref.timerOn!=null)S.timerOn=pref.timerOn;}
     function savePref(){Store.set('settings.sudoku',{difficulty:S.difficulty,timerOn:S.timerOn});}
-    function save(){if(S.screen==='play'&&!S.won){Store.set('save.sudoku',{difficulty:S.difficulty,timerOn:S.timerOn,puzzle:S.puzzle,solution:S.solution,grid:S.grid,hinted:S.hinted,notes:S.notes,hints:S.hints,seconds:S.seconds,hist:S.hist,sel:S.sel});}else{Store.del('save.sudoku');}}
+    function save(){if(S.screen==='play'&&!S.won){Store.set('save.sudoku',{difficulty:S.difficulty,timerOn:S.timerOn,puzzle:S.puzzle,solution:S.solution,grid:S.grid,hinted:S.hinted,notes:S.notes,hints:S.hints,seconds:S.seconds,hist:S.hist,sel:S.sel,seed:S.seed});}else{Store.del('save.sudoku');}}
     function ensureTimer(){var run=S.screen==='play'&&!S.won&&!S.paused&&S.timerOn;
       if(run&&!timer){timer=setInterval(function(){S.seconds++;var t=document.getElementById('s_time');if(t)t.textContent=fmt(S.seconds);},1000);}
       else if(!run&&timer){clearInterval(timer);timer=null;}}
@@ -1540,7 +1548,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       var h=S.timerOn?'<div class="chip"><div class="cv" id="s_time">'+fmt(S.seconds)+'</div><div class="cl">'+S.difficulty+'</div></div>'
         :'<div class="chip"><div class="cv" style="font-size:15px">'+S.difficulty+'</div><div class="cl">Mode</div></div>';
       h+='<div class="chip '+(e?'err':'')+'"><div class="cv">'+e+'</div><div class="cl">Errors</div></div>';
-      if(S.timerOn)h+='<button class="pausebtn" data-action="pause" aria-label="'+(S.paused?'Resume':'Pause')+'">'+(S.paused?'\u25B6':'\u275A\u275A')+'</button>';h+=helpBtn('sudoku');return h;}
+      if(S.timerOn)h+='<button class="pausebtn" data-action="pause" aria-label="'+(S.paused?'Resume':'Pause')+'">'+(S.paused?'\u25B6':'\u275A\u275A')+'</button>';
+      h+='<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">\uD83D\uDD17</button>';h+=helpBtn('sudoku');return h;}
     function buildPad(){var rem=Array(10).fill(0);for(var r=0;r<9;r++)for(var c=0;c<9;c++)if(S.grid[r][c])rem[S.grid[r][c]]++;var h='';for(var n=1;n<=9;n++)h+='<button class="num '+(rem[n]>=9?'done':'')+'" data-n="'+n+'">'+n+'<span class="rem">'+Math.max(0,9-rem[n])+'</span></button>';return h;}
     function buildTools(){return '<button class="tool '+(S.noteMode?'on':'')+'" data-action="notes" aria-pressed="'+(!!S.noteMode)+'"><span class="ic">\u270E</span>Notes<span class="badge">'+(S.noteMode?'on':'off')+'</span></button>'
       +'<button class="tool" data-action="erase"><span class="ic">\u232B</span>Erase<span class="badge">clear cell</span></button>'
@@ -1567,10 +1576,12 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       elStats=document.getElementById('stats');elBoard=document.getElementById('board');elOverlay=document.getElementById('overlay');elPad=document.getElementById('pad');elTools=document.getElementById('tools');
       refreshStats();refreshBoard();refreshPad();refreshTools();refreshOverlay();}
     function show(sc){S.screen=sc;if(sc==='start')mountStart();else mountPlay();ensureTimer();}
+    function genAndPlay(seed){S.seed=seed>>>0;var g=withSeed(S.seed,function(){return generate(DIFF[S.difficulty]);});
+      S.puzzle=g.puzzle;S.solution=g.solution;S.grid=clone(g.puzzle);
+      S.hinted=Array.from({length:9},function(){return Array(9).fill(false);});S.notes=Array.from({length:9},function(){return Array.from({length:9},function(){return [];});});
+      S.sel=null;S.noteMode=false;S.hints=0;S.seconds=0;S.paused=false;S.won=false;S.hist=[];savePref();show('play');save();}
     function begin(){var b=app.querySelector('.play-btn');if(b){b.disabled=true;b.textContent='Setting the grid\u2026';}
-      setTimeout(function(){var g=generate(DIFF[S.difficulty]);S.puzzle=g.puzzle;S.solution=g.solution;S.grid=clone(g.puzzle);
-        S.hinted=Array.from({length:9},function(){return Array(9).fill(false);});S.notes=Array.from({length:9},function(){return Array.from({length:9},function(){return [];});});
-        S.sel=null;S.noteMode=false;S.hints=0;S.seconds=0;S.paused=false;S.won=false;S.hist=[];savePref();show('play');save();},30);}
+      setTimeout(function(){genAndPlay(randSeed());},30);}
     function recordWin(){Stats.rec('sudoku',{win:true,time:S.timerOn?S.seconds:null});Store.del('save.sudoku');winFx();announce('Solved!'+(S.timerOn?(' Time '+fmt(S.seconds)):''));}
     function snapCell(r,c){S.hist.push({r:r,c:c,v:S.grid[r][c],hn:S.hinted[r][c],nt:S.notes[r][c].slice()});if(S.hist.length>200)S.hist.shift();}
     function place(n){if(!S.sel){if(n!==0&&!S.won&&!S.paused){toast('Tap a grid cell first');announce('Select a cell first');}return;}
@@ -1604,9 +1615,12 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
           else if(S.sel){var r=S.sel.r,c=S.sel.c;if(e.key==='ArrowUp')r=Math.max(0,r-1);else if(e.key==='ArrowDown')r=Math.min(8,r+1);else if(e.key==='ArrowLeft')c=Math.max(0,c-1);else if(e.key==='ArrowRight')c=Math.min(8,c+1);else return;e.preventDefault();S.sel={r:r,c:c};refreshBoard();
             var fc=elBoard.querySelector('.sel');if(fc){try{fc.focus({preventScroll:true});}catch(_){}}}};
         window.addEventListener('keydown',keyH);
+        var ch=consumeChallenge('sudoku');
+        if(ch&&ch.s!=null){if(ch.d&&DIFF[ch.d])S.difficulty=ch.d;genAndPlay(ch.s);challengeReceived();return;}
         var sv=Store.get('save.sudoku',null);
-        if(sv&&sv.grid){S.puzzle=sv.puzzle;S.solution=sv.solution;S.grid=sv.grid;S.hinted=sv.hinted;S.notes=sv.notes;S.hints=sv.hints||0;S.seconds=sv.seconds||0;S.hist=sv.hist||[];S.difficulty=sv.difficulty||S.difficulty;S.timerOn=sv.timerOn!=null?sv.timerOn:S.timerOn;S.sel=sv.sel||null;S.paused=false;S.won=false;show('play');}
+        if(sv&&sv.grid){S.puzzle=sv.puzzle;S.solution=sv.solution;S.grid=sv.grid;S.hinted=sv.hinted;S.notes=sv.notes;S.hints=sv.hints||0;S.seconds=sv.seconds||0;S.hist=sv.hist||[];S.difficulty=sv.difficulty||S.difficulty;S.timerOn=sv.timerOn!=null?sv.timerOn:S.timerOn;S.sel=sv.sel||null;S.seed=sv.seed;S.paused=false;S.won=false;show('play');}
         else show('start');},
+      challenge:function(){if(S.screen!=='play'||S.seed==null){toast('Start a puzzle first');return;}openChallenge('sudoku',{s:S.seed,d:S.difficulty},'Sudoku','Your friend solves the exact same grid.');},
       autopause:function(){if(S.screen==='play'&&!S.won&&!S.paused&&S.timerOn){S.paused=true;refreshStats();refreshOverlay();save();}},
       unmount:function(){if(timer){clearInterval(timer);timer=null;}if(keyH)window.removeEventListener('keydown',keyH);}};
   }
@@ -1615,7 +1629,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
   function createMines(){
     var app;
     var LV={Easy:{c:9,r:9,m:10},Medium:{c:9,r:12,m:20},Hard:{c:9,r:14,m:30}};
-    var M={screen:'start',level:'Easy',cols:9,rows:9,mines:10,grid:null,started:false,over:false,win:false,flags:0,seconds:0,flagMode:false,paused:false,focus:null};
+    var M={screen:'start',level:'Easy',cols:9,rows:9,mines:10,grid:null,started:false,over:false,win:false,flags:0,seconds:0,flagMode:false,paused:false,focus:null,challenge:false};
     var timer=null,keyH=null,lpTimer=null,lpFired=false,lpH=null,lpCancel=null,cmH=null;
     var pref=Store.get('settings.mines',null);if(pref&&LV[pref.level])M.level=pref.level;
     var fmt=function(s){return String((s/60)|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
@@ -1642,7 +1656,13 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     function checkWin(){for(var r=0;r<M.rows;r++)for(var c=0;c<M.cols;c++){var cl=M.grid[r][c];if(!cl.mine&&!cl.rev)return;}M.over=true;M.win=true;stopTimer();
       for(r=0;r<M.rows;r++)for(c=0;c<M.cols;c++)if(M.grid[r][c].mine){if(!M.grid[r][c].fl){M.grid[r][c].fl=true;M.flags++;}}
       Stats.rec('mines',{win:true,time:M.seconds});Store.del('save.mines');winFx();announce('Field cleared in '+fmt(M.seconds)+'.');}
-    function newGame(lv){var L=LV[lv];M.level=lv;M.cols=L.c;M.rows=L.r;M.mines=L.m;blank();M.started=false;M.over=false;M.win=false;M.flags=0;M.seconds=0;M.boom=null;M.paused=false;M.focus={r:(L.r/2)|0,c:(L.c/2)|0};stopTimer();Store.set('settings.mines',{level:lv});Store.del('save.mines');M.screen='play';render();}
+    function newGame(lv){var L=LV[lv];M.level=lv;M.cols=L.c;M.rows=L.r;M.mines=L.m;blank();M.started=false;M.over=false;M.win=false;M.flags=0;M.seconds=0;M.boom=null;M.paused=false;M.challenge=false;M.focus={r:(L.r/2)|0,c:(L.c/2)|0};stopTimer();Store.set('settings.mines',{level:lv});Store.del('save.mines');M.screen='play';render();}
+    /* Challenge: rebuild the exact mine field from a shared layout. The board
+       is already "started" so the first tap won't re-place mines. */
+    function setupChallenge(lv,mineIdx){var L=LV[lv];M.level=lv;M.cols=L.c;M.rows=L.r;M.mines=L.m;blank();
+      for(var i=0;i<mineIdx.length;i++){var idx=mineIdx[i]|0,r=(idx/M.cols)|0,c=idx%M.cols;if(r>=0&&r<M.rows&&c>=0&&c<M.cols)M.grid[r][c].mine=true;}
+      for(r=0;r<M.rows;r++)for(c=0;c<M.cols;c++){if(M.grid[r][c].mine)continue;var nb=nbrs(r,c),cnt=0;for(var k=0;k<nb.length;k++)if(M.grid[nb[k][0]][nb[k][1]].mine)cnt++;M.grid[r][c].adj=cnt;}
+      M.started=true;M.challenge=true;M.over=false;M.win=false;M.flags=0;M.seconds=0;M.boom=null;M.paused=false;M.focus={r:(M.rows/2)|0,c:(M.cols/2)|0};stopTimer();Store.del('save.mines');M.screen='play';render();}
     function cellHTML(r,c){var cl=M.grid[r][c];var cls='ms-cell ',txt='',lbl;
       var foc=(M.focus&&M.focus.r===r&&M.focus.c===c)?' foc':'';
       var ti=foc?'0':'-1';
@@ -1662,7 +1682,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-msaction="again">Skip \u00bb</button>'
         +'<div class="stats"><div class="chip'+(left<0?' err':'')+'"><div class="cv">'+left+'</div><div class="cl">Mines</div></div>'
         +'<div class="chip"><div class="cv" id="m_time">'+fmt(M.seconds)+'</div><div class="cl">'+M.level+'</div></div>'
-        +'<button class="pausebtn" data-msaction="pause" aria-label="'+(M.paused?'Resume':'Pause')+'">'+(M.paused?'\u25b6':'\u275a\u275a')+'</button>'+helpBtn('mines')+'</div></div>'
+        +'<button class="pausebtn" data-msaction="pause" aria-label="'+(M.paused?'Resume':'Pause')+'">'+(M.paused?'\u25b6':'\u275a\u275a')+'</button>'
+        +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">\ud83d\udd17</button>'+helpBtn('mines')+'</div></div>'
         +'<div class="boardwrap" style="max-width:none"><div class="ms-board" role="grid" aria-label="Minesweeper field" style="'+style+'">'+cells+'</div>'
         +(M.over?('<div class="overlay '+(M.win?'win':'')+'"><div><div class="ot">'+(M.win?'Cleared<em>!</em>':'Boom<em>.</em>')+'</div><div class="os">'+(M.win?('Swept in '+fmt(M.seconds)):'You hit a mine')+'</div><div class="accbtns">'+(M.win?shareBtn('Pocket Arcade Minesweeper ('+M.level+') \u2014 cleared in '+fmt(M.seconds)+' \uD83D\uDEA9'):'')+'<button class="osmall" data-msaction="again">Play again</button></div></div></div>')
           :(M.paused?'<div class="overlay"><div><div class="ot"><em>Paused</em></div><div class="os">The field is hidden until you return.</div><button class="osmall" data-msaction="resume">Resume</button></div></div>':''))+'</div>'
@@ -1670,6 +1691,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         +'<button class="tool" data-msaction="restart"><span class="ic">\u21BB</span>Restart<span class="badge">'+M.level+'</span></button></div></div>';}
     function announceFlag(r,c){announce((M.grid[r][c].fl?'Flagged':'Unflagged')+' row '+(r+1)+' column '+(c+1)+'. '+(M.mines-M.flags)+' mines left.');}
     function tapCell(r,c){if(M.over||M.paused)return;M.focus={r:r,c:c};
+      if(M.challenge&&!timer&&!M.over)startTimer(); /* challenge boards start the clock on first move */
       if(M.flagMode){flag(r,c);announceFlag(r,c);}else{if(M.grid[r][c].rev)chord(r,c);else reveal(r,c);}render();save();}
     function clickH(e){
       var lv=e.target.closest('[data-mslevel]');if(lv){newGame(lv.dataset.mslevel);return;}
@@ -1705,9 +1727,14 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         app.addEventListener('pointermove',lpCancel);
         app.addEventListener('contextmenu',cmH);
         tipOnce('mines','Tip: long-press or right-click a square to flag it');
+        var ch=consumeChallenge('mines');
+        if(ch&&ch.m&&LV[ch.lv]){setupChallenge(ch.lv,ch.m);challengeReceived();return;}
         var sv=Store.get('save.mines',null);
         if(sv&&sv.grid){M.level=sv.level;M.cols=sv.cols;M.rows=sv.rows;M.mines=sv.mines;M.grid=sv.grid;M.started=sv.started;M.flags=sv.flags;M.seconds=sv.seconds;M.flagMode=sv.flagMode;M.over=false;M.win=false;M.boom=null;M.paused=false;M.focus={r:(M.rows/2)|0,c:(M.cols/2)|0};M.screen='play';render();startTimer();}
         else render();},
+      challenge:function(){if(M.screen!=='play'||!M.started){toast('Make your first move first');return;}
+        var mines=[];for(var r=0;r<M.rows;r++)for(var c=0;c<M.cols;c++)if(M.grid[r][c].mine)mines.push(r*M.cols+c);
+        openChallenge('mines',{lv:M.level,m:mines},'Minesweeper','Your friend sweeps the exact same field.');},
       autopause:function(){if(M.screen==='play'&&M.started&&!M.over&&!M.paused){M.paused=true;stopTimer();render();save();}},
       unmount:function(){stopTimer();if(keyH)window.removeEventListener('keydown',keyH);
         if(lpH){app.removeEventListener('pointerdown',lpH);app.removeEventListener('pointerup',lpCancel);
@@ -1726,11 +1753,11 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var fmt=function(s){return String((s/60)|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
     function core(){return {stock:So.stock,waste:So.waste,found:So.found,tab:So.tab,moves:So.moves};}
     function snapshot(){return JSON.stringify(core());}
-    function save(){if(!So.won)Store.set('save.solitaire',{c:core(),seconds:So.seconds,hist:So.hist});else Store.del('save.solitaire');}
+    function save(){if(!So.won)Store.set('save.solitaire',{c:core(),seconds:So.seconds,hist:So.hist,seed:So.seed});else Store.del('save.solitaire');}
     function recordWin(){Stats.rec('solitaire',{win:true,time:So.seconds,score:So.moves});Store.del('save.solitaire');winFx();announce('You win! '+So.moves+' moves in '+fmt(So.seconds)+'.');}
     function undo(){if(!So.hist.length||So.won||So.paused)return;var s=JSON.parse(So.hist.pop());So.stock=s.stock;So.waste=s.waste;So.found=s.found;So.tab=s.tab;So.moves=s.moves;So.sel=null;render();save();}
-    function deal(){var d=[];for(var s=0;s<4;s++)for(var r=1;r<=13;r++)d.push({r:r,s:s,up:false});
-      for(var i=d.length-1;i>0;i--){var j=(Math.random()*(i+1))|0;var t=d[i];d[i]=d[j];d[j]=t;}
+    function deal(seed){So.seed=(seed==null?randSeed():(seed>>>0));var d=[];for(var s=0;s<4;s++)for(var r=1;r<=13;r++)d.push({r:r,s:s,up:false});
+      withSeed(So.seed,function(){for(var i=d.length-1;i>0;i--){var j=(Math.random()*(i+1))|0;var t=d[i];d[i]=d[j];d[j]=t;}});
       So.tab=[[],[],[],[],[],[],[]];for(var col=0;col<7;col++){for(var k=0;k<=col;k++){var card=d.pop();card.up=(k===col);So.tab[col].push(card);}}
       So.stock=d;So.waste=[];So.found=[[],[],[],[]];So.sel=null;So.moves=0;So.seconds=0;So.won=false;}
     function draw(){if(So.won)return;if(So.stock.length===0){while(So.waste.length){var c=So.waste.pop();c.up=false;So.stock.push(c);}}
@@ -1756,7 +1783,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       app.innerHTML='<div class="sol"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-solaction="new">Skip \u00bb</button>'
         +'<div class="stats"><div class="chip"><div class="cv" id="o_time">'+fmt(So.seconds)+'</div><div class="cl">Time</div></div>'
         +'<div class="chip"><div class="cv">'+So.moves+'</div><div class="cl">Moves</div></div>'
-        +'<button class="pausebtn" data-solaction="pause" aria-label="'+(So.paused?'Resume':'Pause')+'">'+(So.paused?'\u25B6':'\u275A\u275A')+'</button>'+helpBtn('solitaire')+'</div></div>'
+        +'<button class="pausebtn" data-solaction="pause" aria-label="'+(So.paused?'Resume':'Pause')+'">'+(So.paused?'\u25B6':'\u275A\u275A')+'</button>'
+        +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">\uD83D\uDD17</button>'+helpBtn('solitaire')+'</div></div>'
         +'<div class="boardwrap" style="max-width:none;position:relative">'
         +'<div class="sol-top">'+stock+waste+'<div class="sol-slot spacer"></div>'+found+'</div>'
         +'<div class="sol-tableau">'+tab+'</div>'
@@ -1806,8 +1834,10 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       if((z==='waste'||z==='tab')&&key===lastTap.key&&(now-lastTap.t)<350){lastTap.key='';if(autoFound(z,i,j)){So.sel=null;checkWin();render();}commit(before);return;}
       lastTap.t=now;lastTap.key=key;tap(z,i,j);commit(before);}
     return {mount:function(root){app=root;app.addEventListener('click',clickH);
+        var ch=consumeChallenge('solitaire');
         var sv=Store.get('save.solitaire',null);
-        if(sv&&sv.c){So.stock=sv.c.stock;So.waste=sv.c.waste;So.found=sv.c.found;So.tab=sv.c.tab;So.moves=sv.c.moves;So.seconds=sv.seconds||0;So.hist=sv.hist||[];So.sel=null;So.won=false;So.paused=false;}
+        if(ch&&ch.s!=null){deal(ch.s);challengeReceived();}
+        else if(sv&&sv.c){So.stock=sv.c.stock;So.waste=sv.c.waste;So.found=sv.c.found;So.tab=sv.c.tab;So.moves=sv.c.moves;So.seconds=sv.seconds||0;So.hist=sv.hist||[];So.sel=null;So.won=false;So.paused=false;So.seed=sv.seed;}
         else deal();
         render();timer=setInterval(function(){if(So.won||So.paused)return;So.seconds++;var t=document.getElementById('o_time');if(t)t.textContent=fmt(So.seconds);},1000);
         resizeH=function(){measure();};window.addEventListener('resize',resizeH);
@@ -1841,6 +1871,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
           render();};
         window.addEventListener('keydown',keyH);
         tipOnce('solitaire','Tip: double-tap a card to send it straight to a foundation');},
+      challenge:function(){if(So.seed==null){toast('Deal a game first');return;}openChallenge('solitaire',{s:So.seed},'Solitaire','Your friend gets the exact same deal.');},
       autopause:function(){if(!So.won&&!So.paused){So.paused=true;render();save();}},
       unmount:function(){if(timer){clearInterval(timer);timer=null;}if(resizeH)window.removeEventListener('resize',resizeH);
         if(keyH)window.removeEventListener('keydown',keyH);}};
@@ -1867,9 +1898,10 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var M={present:[],face:[],sel:-1,undo:[],won:false,note:''};
     var keyH=null,kIdx=-1;
     var NAMES={circle:'circle',square:'square',tri:'triangle',diamond:'diamond',star:'star',heart:'heart',flower:'flower',sun:'sun',moon:'moon',spark:'spark',cross:'cross',snow:'snowflake',triD:'down triangle',umbrella:'umbrella'};
-    function save(){if(!M.won&&M.present.length)Store.set('save.mahjong',{present:M.present,face:M.face,undo:M.undo});else Store.del('save.mahjong');}
-    function deal(){var FACES=['circle','square','tri','diamond','star','heart','flower','sun','moon','spark','cross','snow','triD','umbrella'];var counts={};FACES.forEach(function(f){counts[f]=4;});
-      var all=pos.map(function(_,i){return i;});var assign=null;for(var t=0;t<400&&!assign;t++)assign=buildSolvable(all,counts);
+    function save(){if(!M.won&&M.present.length)Store.set('save.mahjong',{present:M.present,face:M.face,undo:M.undo,seed:M.seed});else Store.del('save.mahjong');}
+    function deal(seed){M.seed=(seed==null?randSeed():(seed>>>0));var FACES=['circle','square','tri','diamond','star','heart','flower','sun','moon','spark','cross','snow','triD','umbrella'];var counts={};FACES.forEach(function(f){counts[f]=4;});
+      var all=pos.map(function(_,i){return i;});
+      var assign=withSeed(M.seed,function(){var a=null;for(var t=0;t<400&&!a;t++)a=buildSolvable(all,counts);return a;});
       M.present=pos.map(function(){return true;});M.face=pos.map(function(_,i){return assign?assign[i]:'1';});M.sel=-1;M.undo=[];M.won=false;M.note='';}
     function remaining(){var n=0;for(var i=0;i<M.present.length;i++)if(M.present[i])n++;return n;}
     function freePairExists(){var fr=[];for(var i=0;i<pos.length;i++)if(M.present[i]&&free(i,M.present))fr.push(i);
@@ -1881,6 +1913,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     function render(){var tiles='';for(var i=0;i<pos.length;i++)tiles+=tileHTML(i);
       app.innerHTML='<div class="mj"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-mjaction="new">Skip \u00bb</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+remaining()+'</div><div class="cl">Tiles</div></div>'+helpBtn('mahjong')
+        +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">\uD83D\uDD17</button>'
         +'<button class="pausebtn" data-mjaction="new" title="New board" aria-label="New board">\u21BB</button></div></div>'
         +'<div class="boardwrap" style="max-width:none"><div class="mj-board" role="grid" aria-label="Mahjong tiles">'+tiles+'</div>'
         +(M.won?'<div class="overlay win"><div><div class="ot">Cleared<em>!</em></div><div class="os">Every tile matched</div><div class="accbtns">'+shareBtn('Pocket Arcade Mahjong \u2014 board cleared! \uD83C\uDFB4')+'<button class="osmall" data-mjaction="new">New board</button></div></div></div>':'')+'</div>'
@@ -1916,8 +1949,9 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         else if(a==='undo')undo();else if(a==='hint')hint();else if(a==='shuffle')shuffle();return;}
       var t=e.target.closest('[data-mj]');if(t)tap(+t.dataset.mj);}
     return {mount:function(root){app=root;app.addEventListener('click',clickH);
-        var sv=Store.get('save.mahjong',null);
-        if(sv&&sv.present&&sv.present.length===pos.length){M.present=sv.present;M.face=sv.face;M.undo=sv.undo||[];M.sel=-1;M.won=false;M.note='';}
+        var ch=consumeChallenge('mahjong'),sv=Store.get('save.mahjong',null);
+        if(ch&&ch.s!=null){deal(ch.s);challengeReceived();}
+        else if(sv&&sv.present&&sv.present.length===pos.length){M.present=sv.present;M.face=sv.face;M.undo=sv.undo||[];M.sel=-1;M.won=false;M.note='';M.seed=sv.seed;}
         else deal();
         render();resizeH=function(){measure();};window.addEventListener('resize',resizeH);
         keyH=function(e){if(M.won)return;var k=e.key;
@@ -1931,6 +1965,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
           if(kIdx>=0)announce((NAMES[M.face[kIdx]]||'')+' tile');
           render();};
         window.addEventListener('keydown',keyH);},
+      challenge:function(){if(M.seed==null){toast('Start a board first');return;}openChallenge('mahjong',{s:M.seed},'Mahjong','Your friend gets the exact same layout.');},
       unmount:function(){if(resizeH)window.removeEventListener('resize',resizeH);
         if(keyH)window.removeEventListener('keydown',keyH);}};
   }
@@ -1942,10 +1977,10 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var WEP=[{n:'Boombox',e:'\uD83D\uDCFB'},{n:'Roller Skate',e:'\uD83D\uDEFC'},{n:'Hairspray',e:'\uD83D\uDCA8'},{n:'VHS Tape',e:'\uD83D\uDCFC'},{n:'Disco Ball',e:'\uD83E\uDEA9'},{n:'Mixtape',e:'\uD83C\uDFB5'}];
     var LOC=[{n:'the Arcade',e:'\uD83D\uDD79'},{n:'the Neon Diner',e:'\uD83C\uDF54'},{n:'the Skate Park',e:'\uD83D\uDEF9'},{n:'the Record Store',e:'\uD83D\uDCBF'},{n:'Mini Golf',e:'\u26F3'},{n:'the Mall',e:'\uD83D\uDECD'}];
     var VICT=['The Critic','Old Man Pixel','DJ Vinyl','Coach Tube','Madame Static','The Maitre D'];
-    var n=3,S=[],W=[],L=[],w=[],l=[],murderer=0,murderLoc=0,murderWeapon=0,clues=[],marks={},victim='',diff='Rookie',hints=0,result=null,accSus=-1,accWea=-1;
+    var n=3,S=[],W=[],L=[],w=[],l=[],murderer=0,murderLoc=0,murderWeapon=0,clues=[],marks={},victim='',diff='Rookie',hints=0,result=null,accSus=-1,accWea=-1,curSeed=null;
     var keyH=null,kSel=null;
     var pref=Store.get('settings.mystery',null);if(pref&&pref.diff)diff=pref.diff;
-    function save(){if(result!=='win'&&S.length){Store.set('save.mystery',{n:n,S:S,W:W,L:L,w:w,l:l,murderer:murderer,murderLoc:murderLoc,murderWeapon:murderWeapon,clues:clues,marks:marks,victim:victim,diff:diff,hints:hints});}else{Store.del('save.mystery');}}
+    function save(){if(result!=='win'&&S.length){Store.set('save.mystery',{n:n,S:S,W:W,L:L,w:w,l:l,murderer:murderer,murderLoc:murderLoc,murderWeapon:murderWeapon,clues:clues,marks:marks,victim:victim,diff:diff,hints:hints,seed:curSeed});}else{Store.del('save.mystery');}}
     function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0;var t=a[i];a[i]=a[j];a[j]=t;}return a;}
     function permsOf(k){var res=[];(function go(cur,used){if(cur.length===k){res.push(cur.slice());return;}for(var i=0;i<k;i++)if(!used[i]){used[i]=1;cur.push(i);go(cur,used);cur.pop();used[i]=0;}})([],{});return res;}
     function idxOf(a,v){return a.indexOf(v);}
@@ -1964,9 +1999,12 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       case'PosSW':return S[c.a].e+' '+S[c.a].n+' carried the '+W[c.b].n+' '+W[c.b].e+'.';
       case'PosWL':return 'The '+W[c.a].n+' '+W[c.a].e+' was at '+L[c.b].n+' '+L[c.b].e+'.';
       case'NegWL':return 'The '+W[c.a].n+' '+W[c.a].e+' was not at '+L[c.b].n+' '+L[c.b].e+'.';}}
-    function newGame(d){n=(d==='Sleuth')?4:3;diff=d;S=shuffle(SUS.slice()).slice(0,n);W=shuffle(WEP.slice()).slice(0,n);L=shuffle(LOC.slice()).slice(0,n);
-      var ok=false;for(var t=0;t<60&&!ok;t++){w=shuffle(S.map(function(_,i){return i;}));l=shuffle(S.map(function(_,i){return i;}));ok=gen();}
-      murderer=(Math.random()*n)|0;murderLoc=l[murderer];murderWeapon=w[murderer];victim=VICT[(Math.random()*VICT.length)|0];marks={};hints=0;result=null;accSus=-1;accWea=-1;Store.set('settings.mystery',{diff:diff});save();mountPlay();}
+    function newGame(d,seedArg){curSeed=(seedArg==null?randSeed():(seedArg>>>0));diff=d;
+      withSeed(curSeed,function(){
+        n=(d==='Sleuth')?4:3;S=shuffle(SUS.slice()).slice(0,n);W=shuffle(WEP.slice()).slice(0,n);L=shuffle(LOC.slice()).slice(0,n);
+        var ok=false;for(var t=0;t<60&&!ok;t++){w=shuffle(S.map(function(_,i){return i;}));l=shuffle(S.map(function(_,i){return i;}));ok=gen();}
+        murderer=(Math.random()*n)|0;murderLoc=l[murderer];murderWeapon=w[murderer];victim=VICT[(Math.random()*VICT.length)|0];});
+      marks={};hints=0;result=null;accSus=-1;accWea=-1;Store.set('settings.mystery',{diff:diff});save();mountPlay();}
     function corr(b,r,c){if(b==='SW')return w[r]===c?2:1;if(b==='SL')return l[r]===c?2:1;return (l[idxOf(w,c)]===r)?2:1;}
     function mk(b,r,c){return marks[b+'_'+r+'_'+c]||0;}
     function cellHTML(b,r,c,ge,gb){var m=mk(b,r,c);var g=m===2?'\u2713':(m===1?'\u2715':'');
@@ -1982,6 +2020,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     function buildClues(){return clues.map(function(c){return '<li>'+clueText(c)+'</li>';}).join('');}
     function mountPlay(){app.innerHTML='<div class="my"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-myaction="new">Skip \u00bb</button>'
       +'<div class="stats"><div class="chip"><div class="cv" style="font-size:15px">'+diff+'</div><div class="cl">Case</div></div>'+helpBtn('mystery')
+      +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">\uD83D\uDD17</button>'
       +'<button class="pausebtn" data-myaction="new" title="New case" aria-label="New case">\u21BB</button></div></div>'
       +'<div class="my-intro">\uD83D\uDC80 <b>'+victim+'</b> was found dead at <b>'+L[murderLoc].n+' '+L[murderLoc].e+'</b>.<br>Find the <b>killer</b> and the <b>weapon</b>.</div>'
       +'<div class="my-cluehead">The Clues</div><ol class="my-clues">'+buildClues()+'</ol>'
@@ -2045,9 +2084,12 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
           var old=app.querySelector('.kcur');if(old)old.classList.remove('kcur');
           kMark();};
         window.addEventListener('keydown',keyH);
+        var ch=consumeChallenge('mystery');
+        if(ch&&ch.s!=null){newGame(ch.d||'Rookie',ch.s);challengeReceived();return;}
         var sv=Store.get('save.mystery',null);
-        if(sv&&sv.S&&sv.S.length){n=sv.n;S=sv.S;W=sv.W;L=sv.L;w=sv.w;l=sv.l;murderer=sv.murderer;murderLoc=sv.murderLoc;murderWeapon=sv.murderWeapon;clues=sv.clues;marks=sv.marks||{};victim=sv.victim;diff=sv.diff;hints=sv.hints||0;result=null;accSus=-1;accWea=-1;mountPlay();}
+        if(sv&&sv.S&&sv.S.length){n=sv.n;S=sv.S;W=sv.W;L=sv.L;w=sv.w;l=sv.l;murderer=sv.murderer;murderLoc=sv.murderLoc;murderWeapon=sv.murderWeapon;clues=sv.clues;marks=sv.marks||{};victim=sv.victim;diff=sv.diff;hints=sv.hints||0;result=null;accSus=-1;accWea=-1;curSeed=sv.seed;mountPlay();}
         else start();},
+      challenge:function(){if(curSeed==null){toast('Start a case first');return;}openChallenge('mystery',{s:curSeed,d:diff},'Mystery','Your friend cracks the exact same case.');},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
 
@@ -2057,7 +2099,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var LV={Cozy:5,Classic:6,Tricky:7};
     var Z={screen:'start',level:'Classic',N:6,nums:{},order:[],path:[],drawing:false,seconds:0,won:false,paused:false};
     var pref=Store.get('settings.zip',null);if(pref&&LV[pref.level]){Z.level=pref.level;Z.N=LV[pref.level];}
-    function save(){if(Z.screen==='play'&&!Z.won){Store.set('save.zip',{level:Z.level,N:Z.N,nums:Z.nums,order:Z.order,path:Z.path,seconds:Z.seconds});}else{Store.del('save.zip');}}
+    function save(){if(Z.screen==='play'&&!Z.won){Store.set('save.zip',{level:Z.level,N:Z.N,nums:Z.nums,order:Z.order,path:Z.path,seconds:Z.seconds,seed:Z.seed});}else{Store.del('save.zip');}}
     var fmt=function(s){return String((s/60)|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
     var rnd=function(n){return (Math.random()*n)|0;};
     function shuffle(a){for(var i=a.length-1;i>0;i--){var j=rnd(i+1);var t=a[i];a[i]=a[j];a[j]=t;}return a;}
@@ -2082,14 +2124,17 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       }
       return res;
     }
-    function newPuzzle(){
-      var N=Z.N,sol=genHamiltonian(N);
-      var K=Math.max(5,Math.round(N*1.3));if(K>sol.length)K=sol.length;
-      var inner=[];for(var i=1;i<sol.length-1;i++)inner.push(i);
-      var pick=shuffle(inner).slice(0,K-2).sort(function(a,b){return a-b;});
-      var idxs=[0].concat(pick);idxs.push(sol.length-1);
-      Z.nums={};Z.order=[];
-      for(var v=0;v<idxs.length;v++){var cell=sol[idxs[v]];Z.nums[cell[0]*N+cell[1]]=v+1;Z.order.push(cell);}
+    function newPuzzle(seed){
+      Z.seed=(seed==null?randSeed():(seed>>>0));
+      withSeed(Z.seed,function(){
+        var N=Z.N,sol=genHamiltonian(N);
+        var K=Math.max(5,Math.round(N*1.3));if(K>sol.length)K=sol.length;
+        var inner=[];for(var i=1;i<sol.length-1;i++)inner.push(i);
+        var pick=shuffle(inner).slice(0,K-2).sort(function(a,b){return a-b;});
+        var idxs=[0].concat(pick);idxs.push(sol.length-1);
+        Z.nums={};Z.order=[];
+        for(var v=0;v<idxs.length;v++){var cell=sol[idxs[v]];Z.nums[cell[0]*N+cell[1]]=v+1;Z.order.push(cell);}
+      });
       Z.path=[];Z.won=false;Z.seconds=0;stopTimer();
     }
     function inPath(r,c){for(var i=0;i<Z.path.length;i++)if(Z.path[i][0]===r&&Z.path[i][1]===c)return true;return false;}
@@ -2154,7 +2199,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-zaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv" id="z_prog">'+Z.path.length+'/'+(Z.N*Z.N)+'</div><div class="cl">Cells</div></div>'
         +'<div class="chip"><div class="cv" id="z_time">'+fmt(Z.seconds)+'</div><div class="cl">'+Z.level+'</div></div>'
-        +'<button class="pausebtn" data-zaction="pause" aria-label="'+(Z.paused?'Resume':'Pause')+'">'+(Z.paused?'▶':'❚❚')+'</button>'+helpBtn('zip')+'</div></div>'
+        +'<button class="pausebtn" data-zaction="pause" aria-label="'+(Z.paused?'Resume':'Pause')+'">'+(Z.paused?'▶':'❚❚')+'</button>'
+        +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'+helpBtn('zip')+'</div></div>'
         +'<div class="zip-wrap">'+buildBoard()+'<div id="zoverlay"></div></div>'
         +'<div class="zip-tools"><button class="tool" data-zaction="clear"><span class="ic">⌫</span>Clear<span class="badge">path</span></button>'
         +'<button class="tool" data-zaction="new"><span class="ic">↻</span>New<span class="badge">'+Z.level+'</span></button></div></div>';
@@ -2180,9 +2226,12 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         else if(a==='new'){confirmNew(Z.path.length>0&&!Z.won,startNew);}return;}
     }
     return {mount:function(root){app=root;app.addEventListener('click',clickH);
+        var ch=consumeChallenge('zip');
+        if(ch&&ch.s!=null){if(ch.lv&&LV[ch.lv]){Z.level=ch.lv;Z.N=LV[ch.lv];}newPuzzle(ch.s);Z.paused=false;Z.screen='play';mountPlay();challengeReceived();return;}
         var sv=Store.get('save.zip',null);
-        if(sv&&sv.order&&sv.order.length){Z.level=sv.level;Z.N=sv.N;Z.nums=sv.nums;Z.order=sv.order;Z.path=sv.path||[];Z.seconds=sv.seconds||0;Z.won=false;Z.paused=false;Z.screen='play';mountPlay();if(Z.path.length)startTimer();}
+        if(sv&&sv.order&&sv.order.length){Z.level=sv.level;Z.N=sv.N;Z.nums=sv.nums;Z.order=sv.order;Z.path=sv.path||[];Z.seconds=sv.seconds||0;Z.seed=sv.seed;Z.won=false;Z.paused=false;Z.screen='play';mountPlay();if(Z.path.length)startTimer();}
         else mountStart();},
+      challenge:function(){if(Z.screen!=='play'||Z.seed==null){toast('Start a puzzle first');return;}openChallenge('zip',{s:Z.seed,lv:Z.level},'Zip','Your friend traces the exact same puzzle.');},
       autopause:function(){if(Z.screen==='play'&&!Z.won&&!Z.paused&&Z.path.length){Z.paused=true;Z.drawing=false;stopTimer();
         var pb=app.querySelector('.pausebtn');if(pb){pb.textContent='▶';pb.setAttribute('aria-label','Resume');}renderOverlay();save();}},
       unmount:function(){stopTimer();}};
@@ -2466,6 +2515,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       }
       app.innerHTML='<div class="game cross"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-cwaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+hints+'</div><div class="cl">Hints</div></div>'
+        +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'
         +'<button class="pausebtn" data-cwaction="new" title="New puzzle" aria-label="New puzzle">↻</button>'+helpBtn('cross')+'</div></div>'
         +'<div class="boardwrap"><div class="cw-grid">'+cells+'</div></div>'
         +clueBar
@@ -2490,12 +2540,15 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
           else if(k===' '){e.preventDefault();dir=dir==='a'?'d':'a';render();}
           else if(k.length===1&&/[a-zA-Z]/.test(k))type(k);};
         window.addEventListener('keydown',keyH);
+        var ch=consumeChallenge('cross');
+        if(ch&&ch.p!=null&&PUZZLES[ch.p]){pidx=ch.p|0;build();render();challengeReceived();tipOnce('cross','Tip: tap the selected square to switch across/down; double-tap to jump to the next clue');return;}
         var sv=Store.get('save.cross',null);
         if(sv&&typeof sv.pidx==='number'){pidx=sv.pidx;build();letters=sv.letters||letters;hints=sv.hints||0;
           if(typeof sv.cur==='number'&&isOpen(sv.cur))cur=sv.cur;if(sv.dir==='a'||sv.dir==='d')dir=sv.dir;
           if(checkWin()){over=true;}render();}
         else{pidx=(Math.random()*PUZZLES.length)|0;build();render();}
         tipOnce('cross','Tip: tap the selected square to switch across/down; double-tap to jump to the next clue');},
+      challenge:function(){openChallenge('cross',{p:pidx},'Mini Crossword','Your friend solves the exact same grid.');},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
 
@@ -2522,13 +2575,14 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       do{for(i=a.length-1;i>0;i--){j=(Math.random()*(i+1))|0;t=a[i];a[i]=a[j];a[j]=t;}
         var ok=true;for(i=0;i<26;i++)if(a[i]===AL[i]){ok=false;break;}}while(!ok);
       return a;}
-    function newGame(){var qd=QUOTES[(Math.random()*QUOTES.length)|0];Q.plain=qd.t;Q.author=qd.a;
-      var d=derange();Q.enc={};for(var i=0;i<26;i++)Q.enc[AL[i]]=d[i];
+    function newGame(seed){Q.seed=(seed==null?randSeed():(seed>>>0));
+      withSeed(Q.seed,function(){var qd=QUOTES[(Math.random()*QUOTES.length)|0];Q.plain=qd.t;Q.author=qd.a;
+        var d=derange();Q.enc={};for(var i=0;i<26;i++)Q.enc[AL[i]]=d[i];});
       Q.cipher=Q.plain.replace(/[A-Z]/g,function(ch){return Q.enc[ch];});
       Q.guess={};Q.cur='';Q.over=false;Q.hints=0;
       for(var k=0;k<Q.cipher.length;k++){var ch=Q.cipher[k];if(/[A-Z]/.test(ch)){Q.cur=ch;break;}}
       save();render();}
-    function save(){if(Q.cipher&&!Q.over)Store.set('save.crypt',{plain:Q.plain,author:Q.author,enc:Q.enc,guess:Q.guess,hints:Q.hints,cur:Q.cur});else Store.del('save.crypt');}
+    function save(){if(Q.cipher&&!Q.over)Store.set('save.crypt',{plain:Q.plain,author:Q.author,enc:Q.enc,guess:Q.guess,hints:Q.hints,cur:Q.cur,seed:Q.seed});else Store.del('save.crypt');}
     function cipherLetters(){var seen={},arr=[];for(var i=0;i<Q.cipher.length;i++){var ch=Q.cipher[i];if(/[A-Z]/.test(ch)&&!seen[ch]){seen[ch]=1;arr.push(ch);}}return arr;}
     function checkWin(){for(var i=0;i<Q.cipher.length;i++){var ch=Q.cipher[i];if(/[A-Z]/.test(ch)&&Q.guess[ch]!==Q.plain[i])return false;}return true;}
     function assign(letter){if(Q.over||!Q.cur)return;letter=letter.toUpperCase();
@@ -2568,6 +2622,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         else kb+='<button class="wd-key" data-cgkey="'+k+'">'+k+'</button>';});kb+='</div>';});
       app.innerHTML='<div class="game crypt"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-cgaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+Q.hints+'</div><div class="cl">Hints</div></div>'
+        +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'
         +'<button class="pausebtn" data-cgaction="new" title="New quote" aria-label="New quote">↻</button>'+helpBtn('crypt')+'</div></div>'
         +'<div class="cg-quote">'+html+'</div>'
         +(Q.over?'<div class="cg-author">— '+Q.author+'</div>':'<div class="cg-tip">Tap a letter, then type its decoding</div>')
@@ -2585,13 +2640,16 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
           else if(k==='ArrowLeft')moveCur(-1);else if(k==='ArrowRight')moveCur(1);
           else if(k.length===1&&/[a-zA-Z]/.test(k))assign(k);};
         window.addEventListener('keydown',keyH);
+        var chl=consumeChallenge('crypt');
+        if(chl&&chl.s!=null){newGame(chl.s);challengeReceived();return;}
         var sv=Store.get('save.crypt',null);
-        if(sv&&sv.plain){Q.plain=sv.plain;Q.author=sv.author;Q.enc=sv.enc;Q.guess=sv.guess||{};Q.hints=sv.hints||0;
+        if(sv&&sv.plain){Q.plain=sv.plain;Q.author=sv.author;Q.enc=sv.enc;Q.guess=sv.guess||{};Q.hints=sv.hints||0;Q.seed=sv.seed;
           Q.cipher=Q.plain.replace(/[A-Z]/g,function(ch){return Q.enc[ch];});Q.over=false;
           Q.cur='';
           if(sv.cur&&Q.cipher.indexOf(sv.cur)>=0)Q.cur=sv.cur;
           else for(var k=0;k<Q.cipher.length;k++){if(/[A-Z]/.test(Q.cipher[k])){Q.cur=Q.cipher[k];break;}}render();}
         else newGame();},
+      challenge:function(){if(Q.seed==null){toast('Start a quote first');return;}openChallenge('crypt',{s:Q.seed},'Cryptogram','Your friend decodes the exact same quote.');},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
 
