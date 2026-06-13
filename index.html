@@ -678,6 +678,110 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   .wd{flex:1;display:flex;flex-direction:column;}
 }
 @media(max-width:430px){ .mm-board{max-width:300px;} }
+
+/* ============================================================
+   THEME PALETTES — each overrides the accent colours only; the
+   neutral surfaces/ink stay shared. Light + dark variants per palette.
+   "violet" is the default baseline defined in :root / html.dark.
+   ============================================================ */
+html[data-palette="sunset"]{
+  --primary:#e85d2a; --primary-2:#fb7d4c; --primary-deep:#c94d1f; --pink:#ef3e8c;
+  --grad-primary:linear-gradient(135deg,#ff8a4c,#ef3e8c); --sh-primary:0 10px 24px rgba(232,93,42,.32);
+  --focus:#e85d2a; --tint-violet:#ffe6d6;}
+html.dark[data-palette="sunset"]{
+  --primary:#ff8e57; --primary-2:#ffb07e; --primary-deep:#f4793b; --pink:#ff6aa5;
+  --grad-primary:linear-gradient(135deg,#ff9a5c,#ff5e8a); --sh-primary:0 10px 24px rgba(255,142,87,.42);
+  --focus:#ffb07e; --tint-violet:rgba(255,142,87,.16);}
+html[data-palette="forest"]{
+  --primary:#1f9d61; --primary-2:#37c489; --primary-deep:#178a52; --pink:#0fa9a4;
+  --grad-primary:linear-gradient(135deg,#37c489,#0fa098); --sh-primary:0 10px 24px rgba(31,157,97,.30);
+  --focus:#1f9d61; --tint-violet:#d9f2e6;}
+html.dark[data-palette="forest"]{
+  --primary:#37c489; --primary-2:#5fe0a6; --primary-deep:#1f9d61; --pink:#27ccc6;
+  --grad-primary:linear-gradient(135deg,#43d699,#1fae9f); --sh-primary:0 10px 24px rgba(55,196,137,.40);
+  --focus:#5fe0a6; --tint-violet:rgba(55,196,137,.16);}
+html[data-palette="ocean"]{
+  --primary:#2f7ff0; --primary-2:#5b9bff; --primary-deep:#1f63d6; --pink:#0fa9a4;
+  --grad-primary:linear-gradient(135deg,#5b9bff,#2f7ff0); --sh-primary:0 10px 24px rgba(47,127,240,.30);
+  --focus:#2f7ff0; --tint-violet:#dbe9ff;}
+html.dark[data-palette="ocean"]{
+  --primary:#5b9bff; --primary-2:#8bb8ff; --primary-deep:#2f7ff0; --pink:#27ccc6;
+  --grad-primary:linear-gradient(135deg,#6ba6ff,#3a82f0); --sh-primary:0 10px 24px rgba(91,155,255,.40);
+  --focus:#8bb8ff; --tint-violet:rgba(91,155,255,.16);}
+html[data-palette="rose"]{
+  --primary:#e0357a; --primary-2:#f25b97; --primary-deep:#c4286a; --pink:#8a5cf6;
+  --grad-primary:linear-gradient(135deg,#f25b97,#d62e86); --sh-primary:0 10px 24px rgba(224,53,122,.30);
+  --focus:#e0357a; --tint-violet:#fbe0ee;}
+html.dark[data-palette="rose"]{
+  --primary:#f25b97; --primary-2:#ff84b4; --primary-deep:#e0357a; --pink:#a99dff;
+  --grad-primary:linear-gradient(135deg,#ff6fa6,#e23d8a); --sh-primary:0 10px 24px rgba(242,91,151,.40);
+  --focus:#ff84b4; --tint-violet:rgba(242,91,151,.16);}
+html[data-palette="mono"]{
+  --primary:#3a4252; --primary-2:#5a6478; --primary-deep:#2b3240; --pink:#6b7280;
+  --grad-primary:linear-gradient(135deg,#4a5468,#2b3240); --sh-primary:0 10px 24px rgba(40,46,58,.28);
+  --focus:#3a4252; --tint-violet:#e8eaef;}
+html.dark[data-palette="mono"]{
+  --primary:#9aa4b8; --primary-2:#b8c0d0; --primary-deep:#7e889c; --pink:#8a93a6;
+  --grad-primary:linear-gradient(135deg,#aab2c4,#7e889c); --sh-primary:0 10px 24px rgba(154,164,184,.30);
+  --focus:#b8c0d0; --tint-violet:rgba(154,164,184,.16);}
+
+/* ---------- Palette picker (Settings) ---------- */
+.pal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.pal{border:1.5px solid var(--border);background:var(--surface);border-radius:var(--r-md);
+  padding:12px 10px;cursor:pointer;font-family:inherit;box-shadow:var(--sh-sm);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:transform .15s,box-shadow .15s,border-color .15s;}
+.pal:hover{transform:translateY(-2px);box-shadow:var(--sh-md);border-color:var(--primary-2);}
+.pal:active{transform:scale(.97);}
+.pal.on{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary),var(--sh-sm);}
+.pal-sw{width:100%;height:26px;border-radius:var(--r-pill);}
+.pal-name{font-weight:700;font-size:12.5px;color:var(--ink);}
+
+/* ---------- CRT boot animation ---------- */
+.crt-boot{position:fixed;inset:0;z-index:120;background:#05060a;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;}
+.crt-boot .crt-screen{position:absolute;inset:0;
+  background:radial-gradient(120% 120% at 50% 50%,rgba(124,108,242,.10),transparent 70%);
+  animation:crtOn 1.5s cubic-bezier(.2,.8,.2,1) forwards;}
+.crt-boot .crt-line{position:absolute;left:0;right:0;top:50%;height:3px;background:#cdd6ff;
+  box-shadow:0 0 16px 3px rgba(205,214,255,.9);animation:crtLine 1.5s cubic-bezier(.2,.8,.2,1) forwards;}
+.crt-boot .crt-word{position:relative;font-family:'Shrikhand',serif;font-size:clamp(40px,12vw,72px);
+  letter-spacing:.02em;color:transparent;background:linear-gradient(118deg,var(--pink) 12%,var(--primary) 78%);
+  -webkit-background-clip:text;background-clip:text;opacity:0;animation:crtWord 1.5s ease .55s forwards;}
+.crt-boot .crt-scan{position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.28) 2px 3px);}
+@keyframes crtOn{0%{transform:scale(1,.004);filter:brightness(3);}45%{transform:scale(1,.004);}
+  70%{transform:scale(1,1);filter:brightness(1.6);}100%{transform:scale(1,1);filter:brightness(1);}}
+@keyframes crtLine{0%,42%{opacity:1;transform:scaleX(.2);}55%{opacity:1;transform:scaleX(1);}
+  70%{opacity:0;}100%{opacity:0;}}
+@keyframes crtWord{0%{opacity:0;transform:scale(.96);}30%{opacity:1;}88%{opacity:1;}100%{opacity:0;}}
+
+/* ---------- Coffee-break floating timer ---------- */
+.cbreak{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+  z-index:75;display:flex;align-items:center;gap:10px;background:#221c3a;color:#fff;
+  font-weight:700;font-size:14px;padding:8px 8px 8px 14px;border-radius:var(--r-pill);
+  box-shadow:var(--sh-lg);font-variant-numeric:tabular-nums;}
+html.dark .cbreak{background:var(--surface-2);border:1.5px solid var(--border);color:var(--ink);}
+.cbreak .cb-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);
+  box-shadow:0 0 8px var(--primary);}
+.cbreak .cb-count{font-weight:600;font-size:11px;opacity:.7;}
+.cbreak .cb-end{border:none;border-radius:var(--r-pill);background:rgba(255,255,255,.16);
+  color:inherit;font-family:inherit;font-weight:700;font-size:11px;padding:6px 11px;cursor:pointer;}
+html.dark .cbreak .cb-end{background:var(--surface);}
+
+/* ---------- Challenge / QR ---------- */
+.qrbox{display:flex;justify-content:center;margin:8px 0 4px;}
+.qrbox canvas{width:188px;height:188px;image-rendering:pixelated;border-radius:10px;
+  border:8px solid #fff;background:#fff;box-shadow:var(--sh-sm);}
+.challenge-link{font-weight:600;font-size:12px;color:var(--muted);word-break:break-all;
+  background:var(--surface-2);border-radius:var(--r-sm);padding:9px 12px;margin:10px 0 4px;
+  border:1.5px solid var(--border);max-height:60px;overflow:auto;}
+.challenge-banner{display:flex;align-items:center;gap:10px;justify-content:center;
+  font-weight:700;font-size:12.5px;color:var(--primary);background:var(--tint-violet);
+  border-radius:var(--r-pill);padding:8px 14px;margin:0 auto 16px;width:fit-content;}
+
+/* ---------- Zen mode — strip away competitive pressure ---------- */
+html.zen .gstreak,html.zen .zen-hide{display:none!important;}
 </style>
 </head>
 <body>
@@ -703,20 +807,41 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
      colour-blind palette. Applied as classes on <html> so CSS can react. */
   var G=Store.get('settings.global',{});
   if(G.haptics==null)G.haptics=true; if(!G.theme)G.theme='system'; if(G.cb==null)G.cb=false;
+  if(!G.palette)G.palette='violet'; if(G.sound==null)G.sound=false; if(G.music==null)G.music=false;
+  if(G.zen==null)G.zen=false; if(G.crt==null)G.crt=true;
   function saveG(){Store.set('settings.global',G);}
+  /* Each palette declares the browser-chrome colour (theme-color meta) for
+     light + dark so the OS status bar / address bar matches the chosen look. */
+  var PALETTES=[
+    {id:'violet',name:'Violet', sw:'linear-gradient(135deg,#7b6bf2,#ef3e8c)', light:'#6c5ce7',dark:'#1a1726'},
+    {id:'sunset',name:'Sunset', sw:'linear-gradient(135deg,#ff8a4c,#ef3e8c)', light:'#ef6b3c',dark:'#1f1512'},
+    {id:'forest',name:'Forest', sw:'linear-gradient(135deg,#37c489,#0fa098)', light:'#1f9d61',dark:'#0e1a14'},
+    {id:'ocean', name:'Ocean',  sw:'linear-gradient(135deg,#5b9bff,#2f7ff0)', light:'#2f7ff0',dark:'#0d1626'},
+    {id:'rose',  name:'Rose',   sw:'linear-gradient(135deg,#f25b97,#8a5cf6)', light:'#e0357a',dark:'#1d1018'},
+    {id:'mono',  name:'Mono',   sw:'linear-gradient(135deg,#5a6478,#2b3240)', light:'#3a4252',dark:'#15171c'}
+  ];
+  function paletteDef(id){for(var i=0;i<PALETTES.length;i++)if(PALETTES[i].id===id)return PALETTES[i];return PALETTES[0];}
   var darkMQ=null;try{darkMQ=window.matchMedia('(prefers-color-scheme: dark)');}catch(_){}
   function applyPrefs(){
     var dark=G.theme==='dark'||(G.theme==='system'&&darkMQ&&darkMQ.matches);
     document.documentElement.classList.toggle('dark',!!dark);
     document.documentElement.classList.toggle('cb',!!G.cb);
+    document.documentElement.classList.toggle('zen',!!G.zen);
+    document.documentElement.setAttribute('data-palette',G.palette||'violet');
+    var pal=paletteDef(G.palette);
     var m=document.querySelector('meta[name="theme-color"]');
-    if(m)m.setAttribute('content',dark?'#13111d':'#f4f2fc');
+    if(m)m.setAttribute('content',dark?pal.dark:pal.light);
   }
   if(darkMQ){try{darkMQ.addEventListener('change',applyPrefs);}catch(_){try{darkMQ.addListener(applyPrefs);}catch(__){}}}
   applyPrefs();
 
-  function haptic(p){if(!G.haptics)return;try{if(navigator.vibrate)navigator.vibrate(p);}catch(_){}}
   var winBuzz=[18,40,18,40,60], loseBuzz=80, tapBuzz=12;
+  function haptic(p){
+    /* Sound + (in Zen) softened failure feedback ride along with the central
+       haptic calls, so every game gets audio with no per-game wiring. */
+    if(p===tapBuzz)playSfx('tap');
+    else if(p===loseBuzz){if(G.zen)return;playSfx('bad');}
+    if(!G.haptics)return;try{if(navigator.vibrate)navigator.vibrate(p);}catch(_){}}
   function reducedMotion(){try{return window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(_){return false;}}
   /* Confetti burst on wins — pure DOM + CSS, skipped for reduced motion. */
   function confetti(){
@@ -733,7 +858,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     document.body.appendChild(w);
     setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},3900);
   }
-  function winFx(){haptic(winBuzz);confetti();}
+  function winFx(){haptic(winBuzz);confetti();playSfx('win');nextNudge();}
 
   /* Visually-hidden polite live region so screen readers hear results/messages. */
   var live=document.createElement('div');
@@ -813,7 +938,8 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 
   /* ---- Share a result: native share sheet where available, else clipboard. */
   function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'&#10;');}
-  function shareBtn(text){return '<button class="osmall ghost" data-share="'+escAttr(text)+'">Share</button>';}
+  function shareBtn(text){return '<button class="osmall ghost" data-share="'+escAttr(text)+'">Share</button>'
+    +'<button class="osmall ghost" data-shareimg="'+escAttr(text)+'" aria-label="Share as image" title="Share as image">🖼</button>';}
   function doShare(text){
     if(navigator.share){navigator.share({text:text}).catch(function(){});return;}
     function legacy(){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
@@ -823,6 +949,341 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(function(){toast('Copied to clipboard');},legacy);}
     else legacy();}
+
+  /* ---- Embedded QR encoder (MIT, kazuhikoarase/qrcode-generator core via
+     papnkukn/qrcode-svg). Used client-side for challenge-link QR codes. ---- */
+  var QRMOD=(function(){
+  /**
+   * @fileoverview
+   * - modified davidshimjs/qrcodejs library for use in node.js
+   * - Using the 'QRCode for Javascript library'
+   * - Fixed dataset of 'QRCode for Javascript library' for support full-spec.
+   * - this library has no dependencies.
+   *
+   * @version 0.9.1 (2016-02-12)
+   * @author davidshimjs, papnkukn
+   * @see <a href="http://www.d-project.com/" target="_blank">http://www.d-project.com/</a>
+   * @see <a href="http://jeromeetienne.github.com/jquery-qrcode/" target="_blank">http://jeromeetienne.github.com/jquery-qrcode/</a>
+   * @see <a href="https://github.com/davidshimjs/qrcodejs" target="_blank">https://github.com/davidshimjs/qrcodejs</a>
+   */
+  
+  //---------------------------------------------------------------------
+  // QRCode for JavaScript
+  //
+  // Copyright (c) 2009 Kazuhiko Arase
+  //
+  // URL: http://www.d-project.com/
+  //
+  // Licensed under the MIT license:
+  //   http://www.opensource.org/licenses/mit-license.php
+  //
+  // The word "QR Code" is registered trademark of 
+  // DENSO WAVE INCORPORATED
+  //   http://www.denso-wave.com/qrcode/faqpatent-e.html
+  //
+  //---------------------------------------------------------------------
+  function QR8bitByte(data) {
+    this.mode = QRMode.MODE_8BIT_BYTE;
+    this.data = data;
+    this.parsedData = [];
+  
+    // Added to support UTF-8 Characters
+    for (var i = 0, l = this.data.length; i < l; i++) {
+      var byteArray = [];
+      var code = this.data.charCodeAt(i);
+  
+      if (code > 0x10000) {
+        byteArray[0] = 0xF0 | ((code & 0x1C0000) >>> 18);
+        byteArray[1] = 0x80 | ((code & 0x3F000) >>> 12);
+        byteArray[2] = 0x80 | ((code & 0xFC0) >>> 6);
+        byteArray[3] = 0x80 | (code & 0x3F);
+      } else if (code > 0x800) {
+        byteArray[0] = 0xE0 | ((code & 0xF000) >>> 12);
+        byteArray[1] = 0x80 | ((code & 0xFC0) >>> 6);
+        byteArray[2] = 0x80 | (code & 0x3F);
+      } else if (code > 0x80) {
+        byteArray[0] = 0xC0 | ((code & 0x7C0) >>> 6);
+        byteArray[1] = 0x80 | (code & 0x3F);
+      } else {
+        byteArray[0] = code;
+      }
+  
+      this.parsedData.push(byteArray);
+    }
+  
+    this.parsedData = Array.prototype.concat.apply([], this.parsedData);
+  
+    if (this.parsedData.length != this.data.length) {
+      this.parsedData.unshift(191);
+      this.parsedData.unshift(187);
+      this.parsedData.unshift(239);
+    }
+  }
+  
+  QR8bitByte.prototype = {
+    getLength: function (buffer) {
+      return this.parsedData.length;
+    },
+    write: function (buffer) {
+      for (var i = 0, l = this.parsedData.length; i < l; i++) {
+        buffer.put(this.parsedData[i], 8);
+      }
+    }
+  };
+  
+  function QRCodeModel(typeNumber, errorCorrectLevel) {
+    this.typeNumber = typeNumber;
+    this.errorCorrectLevel = errorCorrectLevel;
+    this.modules = null;
+    this.moduleCount = 0;
+    this.dataCache = null;
+    this.dataList = [];
+  }
+  
+  QRCodeModel.prototype={addData:function(data){var newData=new QR8bitByte(data);this.dataList.push(newData);this.dataCache=null;},isDark:function(row,col){if(row<0||this.moduleCount<=row||col<0||this.moduleCount<=col){throw new Error(row+","+col);}
+  return this.modules[row][col];},getModuleCount:function(){return this.moduleCount;},make:function(){this.makeImpl(false,this.getBestMaskPattern());},makeImpl:function(test,maskPattern){this.moduleCount=this.typeNumber*4+17;this.modules=new Array(this.moduleCount);for(var row=0;row<this.moduleCount;row++){this.modules[row]=new Array(this.moduleCount);for(var col=0;col<this.moduleCount;col++){this.modules[row][col]=null;}}
+  this.setupPositionProbePattern(0,0);this.setupPositionProbePattern(this.moduleCount-7,0);this.setupPositionProbePattern(0,this.moduleCount-7);this.setupPositionAdjustPattern();this.setupTimingPattern();this.setupTypeInfo(test,maskPattern);if(this.typeNumber>=7){this.setupTypeNumber(test);}
+  if(this.dataCache==null){this.dataCache=QRCodeModel.createData(this.typeNumber,this.errorCorrectLevel,this.dataList);}
+  this.mapData(this.dataCache,maskPattern);},setupPositionProbePattern:function(row,col){for(var r=-1;r<=7;r++){if(row+r<=-1||this.moduleCount<=row+r)continue;for(var c=-1;c<=7;c++){if(col+c<=-1||this.moduleCount<=col+c)continue;if((0<=r&&r<=6&&(c==0||c==6))||(0<=c&&c<=6&&(r==0||r==6))||(2<=r&&r<=4&&2<=c&&c<=4)){this.modules[row+r][col+c]=true;}else{this.modules[row+r][col+c]=false;}}}},getBestMaskPattern:function(){var minLostPoint=0;var pattern=0;for(var i=0;i<8;i++){this.makeImpl(true,i);var lostPoint=QRUtil.getLostPoint(this);if(i==0||minLostPoint>lostPoint){minLostPoint=lostPoint;pattern=i;}}
+  return pattern;},createMovieClip:function(target_mc,instance_name,depth){var qr_mc=target_mc.createEmptyMovieClip(instance_name,depth);var cs=1;this.make();for(var row=0;row<this.modules.length;row++){var y=row*cs;for(var col=0;col<this.modules[row].length;col++){var x=col*cs;var dark=this.modules[row][col];if(dark){qr_mc.beginFill(0,100);qr_mc.moveTo(x,y);qr_mc.lineTo(x+cs,y);qr_mc.lineTo(x+cs,y+cs);qr_mc.lineTo(x,y+cs);qr_mc.endFill();}}}
+  return qr_mc;},setupTimingPattern:function(){for(var r=8;r<this.moduleCount-8;r++){if(this.modules[r][6]!=null){continue;}
+  this.modules[r][6]=(r%2==0);}
+  for(var c=8;c<this.moduleCount-8;c++){if(this.modules[6][c]!=null){continue;}
+  this.modules[6][c]=(c%2==0);}},setupPositionAdjustPattern:function(){var pos=QRUtil.getPatternPosition(this.typeNumber);for(var i=0;i<pos.length;i++){for(var j=0;j<pos.length;j++){var row=pos[i];var col=pos[j];if(this.modules[row][col]!=null){continue;}
+  for(var r=-2;r<=2;r++){for(var c=-2;c<=2;c++){if(r==-2||r==2||c==-2||c==2||(r==0&&c==0)){this.modules[row+r][col+c]=true;}else{this.modules[row+r][col+c]=false;}}}}}},setupTypeNumber:function(test){var bits=QRUtil.getBCHTypeNumber(this.typeNumber);for(var i=0;i<18;i++){var mod=(!test&&((bits>>i)&1)==1);this.modules[Math.floor(i/3)][i%3+this.moduleCount-8-3]=mod;}
+  for(var i=0;i<18;i++){var mod=(!test&&((bits>>i)&1)==1);this.modules[i%3+this.moduleCount-8-3][Math.floor(i/3)]=mod;}},setupTypeInfo:function(test,maskPattern){var data=(this.errorCorrectLevel<<3)|maskPattern;var bits=QRUtil.getBCHTypeInfo(data);for(var i=0;i<15;i++){var mod=(!test&&((bits>>i)&1)==1);if(i<6){this.modules[i][8]=mod;}else if(i<8){this.modules[i+1][8]=mod;}else{this.modules[this.moduleCount-15+i][8]=mod;}}
+  for(var i=0;i<15;i++){var mod=(!test&&((bits>>i)&1)==1);if(i<8){this.modules[8][this.moduleCount-i-1]=mod;}else if(i<9){this.modules[8][15-i-1+1]=mod;}else{this.modules[8][15-i-1]=mod;}}
+  this.modules[this.moduleCount-8][8]=(!test);},mapData:function(data,maskPattern){var inc=-1;var row=this.moduleCount-1;var bitIndex=7;var byteIndex=0;for(var col=this.moduleCount-1;col>0;col-=2){if(col==6)col--;while(true){for(var c=0;c<2;c++){if(this.modules[row][col-c]==null){var dark=false;if(byteIndex<data.length){dark=(((data[byteIndex]>>>bitIndex)&1)==1);}
+  var mask=QRUtil.getMask(maskPattern,row,col-c);if(mask){dark=!dark;}
+  this.modules[row][col-c]=dark;bitIndex--;if(bitIndex==-1){byteIndex++;bitIndex=7;}}}
+  row+=inc;if(row<0||this.moduleCount<=row){row-=inc;inc=-inc;break;}}}}};QRCodeModel.PAD0=0xEC;QRCodeModel.PAD1=0x11;QRCodeModel.createData=function(typeNumber,errorCorrectLevel,dataList){var rsBlocks=QRRSBlock.getRSBlocks(typeNumber,errorCorrectLevel);var buffer=new QRBitBuffer();for(var i=0;i<dataList.length;i++){var data=dataList[i];buffer.put(data.mode,4);buffer.put(data.getLength(),QRUtil.getLengthInBits(data.mode,typeNumber));data.write(buffer);}
+  var totalDataCount=0;for(var i=0;i<rsBlocks.length;i++){totalDataCount+=rsBlocks[i].dataCount;}
+  if(buffer.getLengthInBits()>totalDataCount*8){throw new Error("code length overflow. ("
+  +buffer.getLengthInBits()
+  +">"
+  +totalDataCount*8
+  +")");}
+  if(buffer.getLengthInBits()+4<=totalDataCount*8){buffer.put(0,4);}
+  while(buffer.getLengthInBits()%8!=0){buffer.putBit(false);}
+  while(true){if(buffer.getLengthInBits()>=totalDataCount*8){break;}
+  buffer.put(QRCodeModel.PAD0,8);if(buffer.getLengthInBits()>=totalDataCount*8){break;}
+  buffer.put(QRCodeModel.PAD1,8);}
+  return QRCodeModel.createBytes(buffer,rsBlocks);};QRCodeModel.createBytes=function(buffer,rsBlocks){var offset=0;var maxDcCount=0;var maxEcCount=0;var dcdata=new Array(rsBlocks.length);var ecdata=new Array(rsBlocks.length);for(var r=0;r<rsBlocks.length;r++){var dcCount=rsBlocks[r].dataCount;var ecCount=rsBlocks[r].totalCount-dcCount;maxDcCount=Math.max(maxDcCount,dcCount);maxEcCount=Math.max(maxEcCount,ecCount);dcdata[r]=new Array(dcCount);for(var i=0;i<dcdata[r].length;i++){dcdata[r][i]=0xff&buffer.buffer[i+offset];}
+  offset+=dcCount;var rsPoly=QRUtil.getErrorCorrectPolynomial(ecCount);var rawPoly=new QRPolynomial(dcdata[r],rsPoly.getLength()-1);var modPoly=rawPoly.mod(rsPoly);ecdata[r]=new Array(rsPoly.getLength()-1);for(var i=0;i<ecdata[r].length;i++){var modIndex=i+modPoly.getLength()-ecdata[r].length;ecdata[r][i]=(modIndex>=0)?modPoly.get(modIndex):0;}}
+  var totalCodeCount=0;for(var i=0;i<rsBlocks.length;i++){totalCodeCount+=rsBlocks[i].totalCount;}
+  var data=new Array(totalCodeCount);var index=0;for(var i=0;i<maxDcCount;i++){for(var r=0;r<rsBlocks.length;r++){if(i<dcdata[r].length){data[index++]=dcdata[r][i];}}}
+  for(var i=0;i<maxEcCount;i++){for(var r=0;r<rsBlocks.length;r++){if(i<ecdata[r].length){data[index++]=ecdata[r][i];}}}
+  return data;};var QRMode={MODE_NUMBER:1<<0,MODE_ALPHA_NUM:1<<1,MODE_8BIT_BYTE:1<<2,MODE_KANJI:1<<3};var QRErrorCorrectLevel={L:1,M:0,Q:3,H:2};var QRMaskPattern={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7};var QRUtil={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:(1<<10)|(1<<8)|(1<<5)|(1<<4)|(1<<2)|(1<<1)|(1<<0),G18:(1<<12)|(1<<11)|(1<<10)|(1<<9)|(1<<8)|(1<<5)|(1<<2)|(1<<0),G15_MASK:(1<<14)|(1<<12)|(1<<10)|(1<<4)|(1<<1),getBCHTypeInfo:function(data){var d=data<<10;while(QRUtil.getBCHDigit(d)-QRUtil.getBCHDigit(QRUtil.G15)>=0){d^=(QRUtil.G15<<(QRUtil.getBCHDigit(d)-QRUtil.getBCHDigit(QRUtil.G15)));}
+  return((data<<10)|d)^QRUtil.G15_MASK;},getBCHTypeNumber:function(data){var d=data<<12;while(QRUtil.getBCHDigit(d)-QRUtil.getBCHDigit(QRUtil.G18)>=0){d^=(QRUtil.G18<<(QRUtil.getBCHDigit(d)-QRUtil.getBCHDigit(QRUtil.G18)));}
+  return(data<<12)|d;},getBCHDigit:function(data){var digit=0;while(data!=0){digit++;data>>>=1;}
+  return digit;},getPatternPosition:function(typeNumber){return QRUtil.PATTERN_POSITION_TABLE[typeNumber-1];},getMask:function(maskPattern,i,j){switch(maskPattern){case QRMaskPattern.PATTERN000:return(i+j)%2==0;case QRMaskPattern.PATTERN001:return i%2==0;case QRMaskPattern.PATTERN010:return j%3==0;case QRMaskPattern.PATTERN011:return(i+j)%3==0;case QRMaskPattern.PATTERN100:return(Math.floor(i/2)+Math.floor(j/3))%2==0;case QRMaskPattern.PATTERN101:return(i*j)%2+(i*j)%3==0;case QRMaskPattern.PATTERN110:return((i*j)%2+(i*j)%3)%2==0;case QRMaskPattern.PATTERN111:return((i*j)%3+(i+j)%2)%2==0;default:throw new Error("bad maskPattern:"+maskPattern);}},getErrorCorrectPolynomial:function(errorCorrectLength){var a=new QRPolynomial([1],0);for(var i=0;i<errorCorrectLength;i++){a=a.multiply(new QRPolynomial([1,QRMath.gexp(i)],0));}
+  return a;},getLengthInBits:function(mode,type){if(1<=type&&type<10){switch(mode){case QRMode.MODE_NUMBER:return 10;case QRMode.MODE_ALPHA_NUM:return 9;case QRMode.MODE_8BIT_BYTE:return 8;case QRMode.MODE_KANJI:return 8;default:throw new Error("mode:"+mode);}}else if(type<27){switch(mode){case QRMode.MODE_NUMBER:return 12;case QRMode.MODE_ALPHA_NUM:return 11;case QRMode.MODE_8BIT_BYTE:return 16;case QRMode.MODE_KANJI:return 10;default:throw new Error("mode:"+mode);}}else if(type<41){switch(mode){case QRMode.MODE_NUMBER:return 14;case QRMode.MODE_ALPHA_NUM:return 13;case QRMode.MODE_8BIT_BYTE:return 16;case QRMode.MODE_KANJI:return 12;default:throw new Error("mode:"+mode);}}else{throw new Error("type:"+type);}},getLostPoint:function(qrCode){var moduleCount=qrCode.getModuleCount();var lostPoint=0;for(var row=0;row<moduleCount;row++){for(var col=0;col<moduleCount;col++){var sameCount=0;var dark=qrCode.isDark(row,col);for(var r=-1;r<=1;r++){if(row+r<0||moduleCount<=row+r){continue;}
+  for(var c=-1;c<=1;c++){if(col+c<0||moduleCount<=col+c){continue;}
+  if(r==0&&c==0){continue;}
+  if(dark==qrCode.isDark(row+r,col+c)){sameCount++;}}}
+  if(sameCount>5){lostPoint+=(3+sameCount-5);}}}
+  for(var row=0;row<moduleCount-1;row++){for(var col=0;col<moduleCount-1;col++){var count=0;if(qrCode.isDark(row,col))count++;if(qrCode.isDark(row+1,col))count++;if(qrCode.isDark(row,col+1))count++;if(qrCode.isDark(row+1,col+1))count++;if(count==0||count==4){lostPoint+=3;}}}
+  for(var row=0;row<moduleCount;row++){for(var col=0;col<moduleCount-6;col++){if(qrCode.isDark(row,col)&&!qrCode.isDark(row,col+1)&&qrCode.isDark(row,col+2)&&qrCode.isDark(row,col+3)&&qrCode.isDark(row,col+4)&&!qrCode.isDark(row,col+5)&&qrCode.isDark(row,col+6)){lostPoint+=40;}}}
+  for(var col=0;col<moduleCount;col++){for(var row=0;row<moduleCount-6;row++){if(qrCode.isDark(row,col)&&!qrCode.isDark(row+1,col)&&qrCode.isDark(row+2,col)&&qrCode.isDark(row+3,col)&&qrCode.isDark(row+4,col)&&!qrCode.isDark(row+5,col)&&qrCode.isDark(row+6,col)){lostPoint+=40;}}}
+  var darkCount=0;for(var col=0;col<moduleCount;col++){for(var row=0;row<moduleCount;row++){if(qrCode.isDark(row,col)){darkCount++;}}}
+  var ratio=Math.abs(100*darkCount/moduleCount/moduleCount-50)/5;lostPoint+=ratio*10;return lostPoint;}};var QRMath={glog:function(n){if(n<1){throw new Error("glog("+n+")");}
+  return QRMath.LOG_TABLE[n];},gexp:function(n){while(n<0){n+=255;}
+  while(n>=256){n-=255;}
+  return QRMath.EXP_TABLE[n];},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)};for(var i=0;i<8;i++){QRMath.EXP_TABLE[i]=1<<i;}
+  for(var i=8;i<256;i++){QRMath.EXP_TABLE[i]=QRMath.EXP_TABLE[i-4]^QRMath.EXP_TABLE[i-5]^QRMath.EXP_TABLE[i-6]^QRMath.EXP_TABLE[i-8];}
+  for(var i=0;i<255;i++){QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]]=i;}
+  function QRPolynomial(num,shift){if(num.length==undefined){throw new Error(num.length+"/"+shift);}
+  var offset=0;while(offset<num.length&&num[offset]==0){offset++;}
+  this.num=new Array(num.length-offset+shift);for(var i=0;i<num.length-offset;i++){this.num[i]=num[i+offset];}}
+  QRPolynomial.prototype={get:function(index){return this.num[index];},getLength:function(){return this.num.length;},multiply:function(e){var num=new Array(this.getLength()+e.getLength()-1);for(var i=0;i<this.getLength();i++){for(var j=0;j<e.getLength();j++){num[i+j]^=QRMath.gexp(QRMath.glog(this.get(i))+QRMath.glog(e.get(j)));}}
+  return new QRPolynomial(num,0);},mod:function(e){if(this.getLength()-e.getLength()<0){return this;}
+  var ratio=QRMath.glog(this.get(0))-QRMath.glog(e.get(0));var num=new Array(this.getLength());for(var i=0;i<this.getLength();i++){num[i]=this.get(i);}
+  for(var i=0;i<e.getLength();i++){num[i]^=QRMath.gexp(QRMath.glog(e.get(i))+ratio);}
+  return new QRPolynomial(num,0).mod(e);}};function QRRSBlock(totalCount,dataCount){this.totalCount=totalCount;this.dataCount=dataCount;}
+  QRRSBlock.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]];QRRSBlock.getRSBlocks=function(typeNumber,errorCorrectLevel){var rsBlock=QRRSBlock.getRsBlockTable(typeNumber,errorCorrectLevel);if(rsBlock==undefined){throw new Error("bad rs block @ typeNumber:"+typeNumber+"/errorCorrectLevel:"+errorCorrectLevel);}
+  var length=rsBlock.length/3;var list=[];for(var i=0;i<length;i++){var count=rsBlock[i*3+0];var totalCount=rsBlock[i*3+1];var dataCount=rsBlock[i*3+2];for(var j=0;j<count;j++){list.push(new QRRSBlock(totalCount,dataCount));}}
+  return list;};QRRSBlock.getRsBlockTable=function(typeNumber,errorCorrectLevel){switch(errorCorrectLevel){case QRErrorCorrectLevel.L:return QRRSBlock.RS_BLOCK_TABLE[(typeNumber-1)*4+0];case QRErrorCorrectLevel.M:return QRRSBlock.RS_BLOCK_TABLE[(typeNumber-1)*4+1];case QRErrorCorrectLevel.Q:return QRRSBlock.RS_BLOCK_TABLE[(typeNumber-1)*4+2];case QRErrorCorrectLevel.H:return QRRSBlock.RS_BLOCK_TABLE[(typeNumber-1)*4+3];default:return undefined;}};function QRBitBuffer(){this.buffer=[];this.length=0;}
+  QRBitBuffer.prototype={get:function(index){var bufIndex=Math.floor(index/8);return((this.buffer[bufIndex]>>>(7-index%8))&1)==1;},put:function(num,length){for(var i=0;i<length;i++){this.putBit(((num>>>(length-i-1))&1)==1);}},getLengthInBits:function(){return this.length;},putBit:function(bit){var bufIndex=Math.floor(this.length/8);if(this.buffer.length<=bufIndex){this.buffer.push(0);}
+  if(bit){this.buffer[bufIndex]|=(0x80>>>(this.length%8));}
+  this.length++;}};var QRCodeLimitLength=[[17,14,11,7],[32,26,20,14],[53,42,32,24],[78,62,46,34],[106,84,60,44],[134,106,74,58],[154,122,86,64],[192,152,108,84],[230,180,130,98],[271,213,151,119],[321,251,177,137],[367,287,203,155],[425,331,241,177],[458,362,258,194],[520,412,292,220],[586,450,322,250],[644,504,364,280],[718,560,394,310],[792,624,442,338],[858,666,482,382],[929,711,509,403],[1003,779,565,439],[1091,857,611,461],[1171,911,661,511],[1273,997,715,535],[1367,1059,751,593],[1465,1125,805,625],[1528,1190,868,658],[1628,1264,908,698],[1732,1370,982,742],[1840,1452,1030,790],[1952,1538,1112,842],[2068,1628,1168,898],[2188,1722,1228,958],[2303,1809,1283,983],[2431,1911,1351,1051],[2563,1989,1423,1093],[2699,2099,1499,1139],[2809,2213,1579,1219],[2953,2331,1663,1273]];
+  
+  
+  /** Constructor */
+  function build(text,level){level=level||'M';var ec={L:1,M:0,Q:3,H:2}[level];var col={L:0,M:1,Q:2,H:3}[level];
+  var bytes=unescape(encodeURIComponent(text)).length;var type=0;
+  for(var t=1;t<=40;t++){if(QRCodeLimitLength[t-1][col]>=bytes){type=t;break;}}
+  if(!type)type=40;var m=new QRCodeModel(type,ec);m.addData(text);m.make();return m;}
+  return {build:build};
+  })();
+  
+
+  /* ============================================================
+     SOUND — tiny synthesized blips + a gentle generative pad,
+     all Web Audio (no files, fully offline). Opt-in via Settings.
+     Routed through haptic()/winFx() so games need no extra wiring.
+     ============================================================ */
+  var AC=null,musicTimer=null;
+  function audioCtx(){if(AC)return AC;try{var C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C();}catch(_){}return AC;}
+  function blip(freq,dur,type,vol,when){var ac=audioCtx();if(!ac)return;var t=when||ac.currentTime;
+    var o=ac.createOscillator(),g=ac.createGain();o.type=type||'sine';o.frequency.value=freq;
+    g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol||0.16,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(ac.destination);
+    o.start(t);o.stop(t+dur+0.03);}
+  function playSfx(name){
+    if(!G.sound)return;var ac=audioCtx();if(!ac)return;
+    if(ac.state==='suspended'){try{ac.resume();}catch(_){}}
+    var t=ac.currentTime;
+    if(name==='tap')blip(430,0.05,'triangle',0.09,t);
+    else if(name==='select')blip(580,0.06,'triangle',0.11,t);
+    else if(name==='bad'){blip(190,0.16,'sawtooth',0.09,t);blip(130,0.2,'sawtooth',0.07,t+0.05);}
+    else if(name==='win'){var ns=[523.25,659.25,783.99,1046.5];for(var i=0;i<ns.length;i++)blip(ns[i],0.2,'triangle',0.13,t+i*0.10);}
+    else if(name==='boot'){var o=ac.createOscillator(),g=ac.createGain();o.type='sawtooth';
+      o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(880,t+0.5);
+      g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(0.07,t+0.06);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.72);}}
+  var MSCALE=[261.63,293.66,329.63,392.00,440.00,523.25,587.33];
+  function ensureMusic(){if(musicTimer||!G.music)return;var ac=audioCtx();if(!ac)return;
+    if(ac.state==='suspended'){try{ac.resume();}catch(_){}}
+    function step(){if(!G.music){stopMusic();return;}var ac=audioCtx();if(!ac)return;var t=ac.currentTime;
+      var n=MSCALE[(Math.random()*MSCALE.length)|0];blip(n,1.7,'sine',0.05,t);
+      if(Math.random()<0.5)blip(n/2,2.3,'sine',0.033,t+0.25);}
+    step();musicTimer=setInterval(step,1950);}
+  function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}}
+  /* First user gesture unlocks the audio context (autoplay policy) + starts music. */
+  function audioUnlock(){var ac=audioCtx();if(ac&&ac.state==='suspended'){try{ac.resume();}catch(_){}}if(G.music)ensureMusic();}
+  document.addEventListener('pointerdown',audioUnlock,true);
+  document.addEventListener('keydown',audioUnlock,true);
+
+  /* ============================================================
+     SHARE AS IMAGE — render a branded result card to a canvas and
+     share it (Web Share files) or download it. Wordle-style emoji
+     grids in the text are drawn as coloured tiles.
+     ============================================================ */
+  function cssVar(n){try{return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}catch(_){return '';}}
+  var SQ={'🟩':'g','🟨':'y','⬜':'b','⬛':'d','🟦':'p','🟫':'d'};
+  function gridChars(line){var arr=Array.from(line);var out=[],any=false;
+    for(var i=0;i<arr.length;i++){var ch=arr[i];if(SQ[ch]){out.push(SQ[ch]);any=true;}else if(ch===' '){}else return null;}
+    return any?out:null;}
+  function shareResultImage(text){
+    var lines=String(text).split('\n');var title=(lines.shift()||'Pocket Arcade').trim();
+    var dark=document.documentElement.classList.contains('dark');
+    var p1=cssVar('--primary')||'#6c5ce7',p2=cssVar('--primary-2')||'#8a7bff',pink=cssVar('--pink')||'#ef3e8c';
+    var ink=dark?'#f1eefc':'#221c3a',muted=dark?'#a9a3c2':'#5e5878';
+    var W=720,H=720,cv=document.createElement('canvas');cv.width=W;cv.height=H;var x=cv.getContext('2d');
+    var bg=x.createLinearGradient(0,0,W,H);bg.addColorStop(0,dark?'#1a1726':'#f6f3fe');bg.addColorStop(1,dark?'#13111d':'#ece6fb');
+    x.fillStyle=bg;x.fillRect(0,0,W,H);
+    var top=x.createLinearGradient(0,0,W,0);top.addColorStop(0,p2);top.addColorStop(1,pink);x.fillStyle=top;x.fillRect(0,0,W,14);
+    x.textAlign='center';x.fillStyle=p1;x.font='700 24px system-ui,-apple-system,sans-serif';
+    x.fillText('P O C K E T   A R C A D E',W/2,86);
+    x.fillStyle=ink;x.font='800 46px system-ui,-apple-system,sans-serif';
+    var tl=title.split(' '),ln='',ty=160;
+    for(var w=0;w<tl.length;w++){var test=ln?ln+' '+tl[w]:tl[w];if(x.measureText(test).width>W-100&&ln){x.fillText(ln,W/2,ty);ty+=56;ln=tl[w];}else ln=test;}
+    if(ln)x.fillText(ln,W/2,ty);
+    var gy=ty+70;
+    for(var i=0;i<lines.length;i++){var raw=lines[i];var g=gridChars(raw);
+      if(g&&g.length){var ts=Math.min(64,(W-120)/g.length-8),gap=8,tw=g.length*(ts+gap)-gap,sx=(W-tw)/2;
+        for(var j=0;j<g.length;j++){var col=g[j]==='g'?'#22b573':g[j]==='y'?'#f0a431':g[j]==='p'?p1:(dark?'#3b3552':'#d4cfe6');
+          x.fillStyle=col;var rx=sx+j*(ts+gap);roundRect(x,rx,gy,ts,ts,9);x.fill();}
+        gy+=ts+gap+4;}
+      else{var t2=(raw||'').trim();if(!t2){gy+=14;continue;}x.fillStyle=muted;x.font='600 26px system-ui,-apple-system,sans-serif';
+        x.fillText(t2,W/2,gy+24);gy+=44;}}
+    x.fillStyle=muted;x.font='600 19px system-ui,-apple-system,sans-serif';
+    x.fillText('ten little games · plays offline',W/2,H-44);
+    try{cv.toBlob(function(b){if(b)shareBlob(b,title);else toast('Couldn’t make image');},'image/png');}
+    catch(_){toast('Couldn’t make image');}}
+  function roundRect(x,X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath();}
+  function shareBlob(blob,title){
+    var file=null;try{file=new File([blob],'pocket-arcade.png',{type:'image/png'});}catch(_){}
+    if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+      navigator.share({files:[file],title:title}).catch(function(){});return;}
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='pocket-arcade.png';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},4000);toast('Saved result image');}
+
+  /* ============================================================
+     CHALLENGE LINKS + QR — encode a puzzle into the URL fragment so
+     a friend opens the exact same one. No server: it all lives in
+     the link. QR is rendered client-side from the embedded encoder.
+     ============================================================ */
+  function b64u(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+  function ub64(s){s=String(s).replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)));}
+  var Challenge={
+    make:function(game,payload){var s=b64u(JSON.stringify({g:game,d:payload}));
+      return location.origin+location.pathname+'#c='+s;},
+    parse:function(hash){if(!hash)return null;var m=/[#&]c=([^&]+)/.exec(hash);if(!m)return null;
+      try{var o=JSON.parse(ub64(m[1]));if(o&&o.g)return o;}catch(_){}return null;}
+  };
+  var pendingChallenge=null;
+  function consumeChallenge(game){if(pendingChallenge&&pendingChallenge.g===game){var d=pendingChallenge.d;pendingChallenge=null;return d;}return null;}
+  function drawQR(text,canvas){var m=QRMOD.build(text,'M');var n=m.getModuleCount();var q=4,sz=n+q*2;
+    canvas.width=sz;canvas.height=sz;var x=canvas.getContext('2d');
+    x.fillStyle='#ffffff';x.fillRect(0,0,sz,sz);x.fillStyle='#0b0a14';
+    for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(m.isDark(r,c))x.fillRect(c+q,r+q,1,1);}
+  function copyText(text){
+    function legacy(){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+      document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Link copied');}catch(_){toast('Couldn’t copy');}document.body.removeChild(ta);}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(function(){toast('Link copied');},legacy);else legacy();}
+  function shareURL(url,title){if(navigator.share){navigator.share({title:title||'Pocket Arcade challenge',url:url}).catch(function(){});}else copyText(url);}
+  function openChallenge(game,payload,gameName,desc){
+    var url=Challenge.make(game,payload);
+    openModal('<div class="ot">Challenge a friend</div>'
+      +'<div class="os">'+(desc||'Send this puzzle — they get the exact same one.')+'</div>'
+      +'<div class="qrbox"><canvas id="qrc" aria-label="QR code for the challenge link"></canvas></div>'
+      +'<div class="challenge-link" id="qrlink"></div>'
+      +'<div class="accbtns"><button class="osmall" data-modal="share" data-modal-focus>Share link</button>'
+      +'<button class="osmall ghost" data-modal="copy">Copy</button>'
+      +'<button class="osmall ghost" data-modal="ok">Done</button></div>',
+      {on:{share:function(){shareURL(url,gameName);},copy:function(){copyText(url);}}});
+    var lk=document.getElementById('qrlink');if(lk)lk.textContent=url;
+    var c=document.getElementById('qrc');if(c){try{drawQR(url,c);}catch(_){if(c.parentNode)c.parentNode.style.display='none';}}}
+
+  /* ============================================================
+     COFFEE BREAK — a gentle timed session of quick games with a
+     floating countdown. When time's up it wraps you up kindly.
+     ============================================================ */
+  var QUICK=['wordle','mines','zip','crypt','mahjong','cross'];
+  var CB={active:false,endAt:0,played:0,timer:null,el:null};
+  function fmtMs(ms){var s=Math.max(0,Math.round(ms/1000));return ((s/60)|0)+':'+String(s%60).padStart(2,'0');}
+  function openRandomQuick(){var k=QUICK[(Math.random()*QUICK.length)|0];CB.played++;openGame(k);pushGame(k);}
+  function startCoffeeBreak(mins){CB.active=true;CB.endAt=Date.now()+mins*60000;CB.played=0;
+    if(!CB.el){CB.el=document.createElement('div');CB.el.className='cbreak';document.body.appendChild(CB.el);}
+    renderCb();if(CB.timer)clearInterval(CB.timer);CB.timer=setInterval(tickCb,1000);openRandomQuick();}
+  function renderCb(){if(!CB.el)return;CB.el.innerHTML='<span class="cb-dot"></span>☕ <span id="cb-time">'+fmtMs(CB.endAt-Date.now())+'</span>'
+    +'<span class="cb-count">'+CB.played+' done</span>'
+    +'<button class="cb-end" data-cbaction="skip">Skip</button><button class="cb-end" data-cbaction="end">End</button>';}
+  function tickCb(){if(!CB.active)return;var left=CB.endAt-Date.now();var t=document.getElementById('cb-time');
+    if(t)t.textContent=fmtMs(left);if(left<=0)finishCoffeeBreak();}
+  function stopCb(){if(CB.timer){clearInterval(CB.timer);CB.timer=null;}CB.active=false;
+    if(CB.el&&CB.el.parentNode)CB.el.parentNode.removeChild(CB.el);CB.el=null;}
+  function endCoffeeBreak(){stopCb();goHome();}
+  function finishCoffeeBreak(){var n=CB.played;stopCb();confetti();playSfx('win');
+    openModal('<div class="ot">Break’s over<em>.</em></div><div class="os">You played '+n+' puzzle'+(n===1?'':'s')+'. Nicely done — back to it.</div>'
+      +'<div class="accbtns"><button class="osmall" data-modal="ok" data-modal-focus>Done</button></div>',{on:{ok:goHome}});}
+  function chooseCoffeeBreak(){
+    openModal('<div class="ot">Coffee break</div><div class="os">A short run of quick puzzles, then we’ll wrap you up.</div>'
+      +'<div class="accbtns"><button class="osmall" data-modal="m3" data-modal-focus>3 min</button>'
+      +'<button class="osmall" data-modal="m5">5 min</button>'
+      +'<button class="osmall" data-modal="m10">10 min</button></div>',
+      {on:{m3:function(){startCoffeeBreak(3);},m5:function(){startCoffeeBreak(5);},m10:function(){startCoffeeBreak(10);}}});}
+
+  /* ============================================================
+     CRT BOOT — a quick arcade-cabinet power-on, once per app load.
+     ============================================================ */
+  function crtBoot(done){
+    if(!G.crt||reducedMotion()){if(done)done();return;}
+    var d=document.createElement('div');d.className='crt-boot';d.setAttribute('aria-hidden','true');
+    d.innerHTML='<div class="crt-screen"></div><div class="crt-line"></div><div class="crt-word">ARCADE</div><div class="crt-scan"></div>';
+    document.body.appendChild(d);playSfx('boot');
+    setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);if(done)done();},1560);}
+
+  /* ============================================================
+     NEXT NUDGE — after any win, a gentle prompt to try another game.
+     ============================================================ */
+  function openRandomOther(){var last=Store.get('lastPlayed',null);
+    var pool=GAMES.filter(function(g){return g.key!==last;});var g=pool[(Math.random()*pool.length)|0]||GAMES[0];
+    openGame(g.key);pushGame(g.key);}
+  function nextNudge(){if(CB.active)return;
+    setTimeout(function(){toast('Nice win! Up for another?','Surprise me »',function(){openRandomOther();});},1100);}
 
   /* ---- How to play: rules, controls and shortcuts for every game. ---- */
   function helpBtn(k){return '<button class="pausebtn" data-help="'+k+'" aria-label="How to play" title="How to play">?</button>';}
@@ -904,6 +1365,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       +'<p class="subtitle">Ten little games \u00B7 no internet needed</p>'
       +'<div class="gamegrid">'+cont+list.map(gcard).join('')+'</div>'
       +'<div class="home-actions">'
+        +'<button class="osmall ghost" data-coffee>☕ Coffee break</button>'
         +'<button class="osmall ghost" data-view="stats">📊 Stats</button>'
         +'<button class="osmall ghost" data-view="settings">⚙︎ Settings</button>'
       +'</div>'
@@ -938,9 +1400,18 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       +'<div class="label">Theme</div>'
       +'<div class="diffs t3 set-theme">'+themes.map(function(t){
         return '<button class="diff'+(G.theme===t[0]?' on':'')+'" data-settheme="'+t[0]+'"><span class="dn">'+t[1]+'</span><span class="dd">'+t[2]+'</span></button>';}).join('')+'</div>'
+      +'<div class="label">Palette</div>'
+      +'<div class="pal-grid">'+PALETTES.map(function(p){
+        return '<button class="pal'+(G.palette===p.id?' on':'')+'" data-setpal="'+p.id+'" aria-label="'+p.name+' palette"><span class="pal-sw" style="background:'+p.sw+'"></span><span class="pal-name">'+p.name+'</span></button>';}).join('')+'</div>'
+      +'<div class="label">Sound</div>'
+      +swRow('Sound effects','Gentle blips on taps and wins','sound',G.sound)
+      +swRow('Music','A soft generative soundtrack','music',G.music)
       +'<div class="label">Feedback</div>'
       +swRow('Vibration','Buzz on taps and wins','haptics',G.haptics)
       +swRow('Colour-blind mode','Orange/blue tiles, numbered pegs','cb',G.cb)
+      +'<div class="label">Comfort & flair</div>'
+      +swRow('Zen mode','Hide streaks; no failure buzz','zen',G.zen)
+      +swRow('Power-on animation','CRT arcade boot when you open the app','crt',G.crt)
       +'</div>';
   }
   function applySetting(el){
@@ -948,6 +1419,8 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     G[k]=!G[k];saveG();applyPrefs();
     el.classList.toggle('on',G[k]);el.setAttribute('aria-checked',G[k]);
     if(k==='haptics'&&G.haptics)haptic(tapBuzz);
+    if(k==='music'){if(G.music)ensureMusic();else stopMusic();}
+    if(k==='sound'&&G.sound){var ac=audioCtx();if(ac&&ac.state==='suspended'){try{ac.resume();}catch(_){}}playSfx('select');}
   }
   function updateReadyNote(){var n=document.getElementById('ready-note');if(!n)return;
     n.classList.toggle('off',!navigator.onLine);
@@ -989,9 +1462,13 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     var nav=e.target.closest('[data-nav]'); if(nav){ if(nav.dataset.nav==='menu')navMenu(); return; }
     var hp=e.target.closest('[data-help]'); if(hp){ showHelp(hp.dataset.help); return; }
     var sh=e.target.closest('[data-share]'); if(sh){ doShare(sh.dataset.share); return; }
+    var si=e.target.closest('[data-shareimg]'); if(si){ shareResultImage(si.dataset.shareimg); return; }
     var so=e.target.closest('[data-setopt]'); if(so){ applySetting(so); return; }
     var th=e.target.closest('[data-settheme]'); if(th){ G.theme=th.dataset.settheme; saveG(); applyPrefs();
       var bs=app.querySelectorAll('[data-settheme]');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].dataset.settheme===G.theme); return; }
+    var pl=e.target.closest('[data-setpal]'); if(pl){ G.palette=pl.dataset.setpal; saveG(); applyPrefs();
+      var ps=app.querySelectorAll('[data-setpal]');for(var pi=0;pi<ps.length;pi++)ps[pi].classList.toggle('on',ps[pi].dataset.setpal===G.palette); return; }
+    var cf=e.target.closest('[data-coffee]'); if(cf){ chooseCoffeeBreak(); return; }
     var vw=e.target.closest('[data-view]'); if(vw){ openView(vw.dataset.view); pushView(vw.dataset.view); return; }
     var g=e.target.closest('[data-game]'); if(g){
       var now=Date.now(); if(now-lastOpen<400)return; lastOpen=now; /* swallow accidental double-taps */
@@ -1000,6 +1477,12 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   /* Switches are focusable divs — let Enter/Space activate them like buttons. */
   app.addEventListener('keydown',function(e){
     if((e.key==='Enter'||e.key===' ')&&e.target.getAttribute&&e.target.getAttribute('role')==='switch'){e.preventDefault();e.target.click();}
+  });
+  /* The coffee-break chip lives on <body> (it survives game re-renders),
+     so its buttons need a document-level handler. */
+  document.addEventListener('click',function(e){
+    var cb=e.target.closest('[data-cbaction]');if(!cb)return;
+    if(cb.dataset.cbaction==='skip')openRandomQuick();else endCoffeeBreak();
   });
   /* Auto-pause running clocks when the app goes to the background so
      best-times aren't punished by a phone call or tab switch. */
@@ -2071,7 +2554,15 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   }
 
   try{history.replaceState({arcade:'home'},'');}catch(_){}
-  renderHome();
+  /* A challenge link (#c=…) routes straight into the shared puzzle. */
+  pendingChallenge=Challenge.parse(location.hash);
+  function boot(){
+    if(pendingChallenge){var key=pendingChallenge.g;
+      try{history.replaceState({arcade:'home'},'',location.pathname+location.search);}catch(_){}
+      renderHome();openGame(key);pushGame(key);
+    }else renderHome();
+  }
+  crtBoot(boot);
 })();
 
 if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
