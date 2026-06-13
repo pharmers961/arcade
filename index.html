@@ -878,7 +878,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     document.body.appendChild(w);
     setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},3900);
   }
-  function winFx(){haptic(winBuzz);confetti();playSfx('win');nextNudge();}
+  function winFx(){haptic(winBuzz);confetti();playSfx('win');}
 
   /* Visually-hidden polite live region so screen readers hear results/messages. */
   var live=document.createElement('div');
@@ -1311,15 +1311,6 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     document.body.appendChild(d);playSfx('boot');
     setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);if(done)done();},1560);}
 
-  /* ============================================================
-     NEXT NUDGE — after any win, a gentle prompt to try another game.
-     ============================================================ */
-  function openRandomOther(){var last=Store.get('lastPlayed',null);
-    var pool=GAMES.filter(function(g){return g.key!==last;});var g=pool[(Math.random()*pool.length)|0]||GAMES[0];
-    openGame(g.key);pushGame(g.key);}
-  function nextNudge(){if(CB.active)return;
-    setTimeout(function(){toast('Nice win! Up for another?','Surprise me »',function(){openRandomOther();});},1100);}
-
   /* Peek — hide a finished-game overlay so the board can be reviewed, with a
      floating button to bring the result back. */
   function clearPeekFab(){var f=document.querySelector('.peek-fab');if(f&&f.parentNode)f.parentNode.removeChild(f);}
@@ -1505,7 +1496,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var sh=e.target.closest('[data-share]'); if(sh){ doShare(sh.dataset.share); return; }
     var si=e.target.closest('[data-shareimg]'); if(si){ shareResultImage(si.dataset.shareimg); return; }
     var chl=e.target.closest('[data-challenge]'); if(chl){ if(active&&active.challenge)active.challenge(); return; }
-    var pk=e.target.closest('[data-peek]'); if(pk){ var ov=pk.closest('.overlay'); if(ov){ov.classList.add('peeked');showPeekFab(ov);} return; }
+    var pk=e.target.closest('[data-peek]'); if(pk){ var ov=pk.closest('.overlay'); if(ov){ov.classList.add('peeked');showPeekFab(ov);
+        var ar=document.querySelector('.mm-row.answer'); if(ar)ar.scrollIntoView({behavior:'smooth',block:'center'});} return; }
     var so=e.target.closest('[data-setopt]'); if(so){ applySetting(so); return; }
     var th=e.target.closest('[data-settheme]'); if(th){ G.theme=th.dataset.settheme; saveG(); applyPrefs();
       var bs=app.querySelectorAll('[data-settheme]');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].dataset.settheme===G.theme); return; }
