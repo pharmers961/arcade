@@ -826,7 +826,6 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
 
   /* ---- How to play: rules, controls and shortcuts for every game. ---- */
   function helpBtn(k){return '<button class="pausebtn" data-help="'+k+'" aria-label="How to play" title="How to play">?</button>';}
-  var skipBtn='<button class="skip-btn" data-nav="skip" title="Skip to next game">Skip »</button>';
   var HELP={
     sudoku:{t:'Sudoku',b:'<p>Fill the 9×9 grid so every row, column and 3×3 box contains the digits 1–9 exactly once. Every puzzle has a single solution.</p>'
       +'<div class="hk">Difficulty</div><p>Gentle starts with 44 given clues, Balanced 35, Tricky 30 and Fiendish just 25 — fewer givens means harder deductions.</p>'
@@ -979,7 +978,6 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   function pushGame(key){try{history.pushState({arcade:'game',key:key},'');}catch(_){}}
   function pushView(v){try{history.pushState({arcade:'view',view:v},'');}catch(_){}}
   function navMenu(){if(active||curView){try{history.back();return;}catch(_){}}goHome();}
-  function skipGame(){var cur=Store.get('lastPlayed',null);var idx=0;for(var i=0;i<GAMES.length;i++){if(GAMES[i].key===cur){idx=i;break;}}var next=GAMES[(idx+1)%GAMES.length];openGame(next.key);pushGame(next.key);}
   window.addEventListener('popstate',function(e){
     var st=e.state;
     if(st&&st.arcade==='game'){ if(!active)openGame(st.key); }
@@ -988,7 +986,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
   });
   var lastOpen=0;
   app.addEventListener('click',function(e){
-    var nav=e.target.closest('[data-nav]'); if(nav){ if(nav.dataset.nav==='menu')navMenu(); else if(nav.dataset.nav==='skip')skipGame(); return; }
+    var nav=e.target.closest('[data-nav]'); if(nav){ if(nav.dataset.nav==='menu')navMenu(); return; }
     var hp=e.target.closest('[data-help]'); if(hp){ showHelp(hp.dataset.help); return; }
     var sh=e.target.closest('[data-share]'); if(sh){ doShare(sh.dataset.share); return; }
     var so=e.target.closest('[data-setopt]'); if(so){ applySetting(so); return; }
@@ -1067,14 +1065,14 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
     function refreshPad(){elPad.innerHTML=buildPad();}
     function refreshTools(){elTools.innerHTML=buildTools();}
     function refreshOverlay(){elOverlay.innerHTML=buildOverlay();ensureTimer();}
-    function mountStart(){app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn+helpBtn('sudoku')+'</div>'
+    function mountStart(){app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">\u2190 Menu</button>'+helpBtn('sudoku')+'</div>'
       +'<div class="kicker">A Quiet Puzzle</div><h1 class="title">Su<em>do</em>ku</h1>'
       +'<p class="subtitle">Nine by nine. One solution.</p>'+statsLine('sudoku',{time:true})+'<div class="label">Choose your challenge</div>'
       +'<div class="diffs">'+Object.keys(DIFF).map(function(name,idx){var d='';for(var i=0;i<4;i++)d+='<i class="'+(i<=idx?'f':'')+'"></i>';
         return '<button class="diff '+(S.difficulty===name?'on':'')+'" data-diff="'+name+'"><span class="dot">'+d+'</span><span class="dn">'+name+'</span><span class="dd">'+DIFF[name]+' clues to start</span></button>';}).join('')+'</div>'
       +'<div class="toggle"><div><div class="tl">Show the clock</div><div class="ts">Track your solving time</div></div><div class="sw '+(S.timerOn?'on':'')+'" data-action="toggle-timer" role="switch" aria-checked="'+(!!S.timerOn)+'" tabindex="0" aria-label="Show the clock"><i></i></div></div>'
       +'<button class="play-btn" data-action="begin">Begin</button></div>';}
-    function mountPlay(){app.innerHTML='<div class="game"><div class="bar"><button class="back" data-action="back">\u2190 New</button>'+skipBtn+'<div class="stats" id="stats"></div></div>'
+    function mountPlay(){app.innerHTML='<div class="game"><div class="bar"><button class="back" data-action="back">\u2190 New</button><button class="skip-btn" data-action="playagain">Skip \u00bb</button><div class="stats" id="stats"></div></div>'
       +'<div class="boardwrap"><div class="board" id="board" role="grid" aria-label="Sudoku grid"></div><div id="overlay"></div></div><div class="pad" id="pad" role="group" aria-label="Number pad"></div><div class="tools t4" id="tools"></div></div>';
       elStats=document.getElementById('stats');elBoard=document.getElementById('board');elOverlay=document.getElementById('overlay');elPad=document.getElementById('pad');elTools=document.getElementById('tools');
       refreshStats();refreshBoard();refreshPad();refreshTools();refreshOverlay();}
@@ -1163,7 +1161,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       else{cls+='hide';if(cl.fl){txt='\uD83D\uDEA9';lbl='flagged';}else lbl='hidden';}
       return '<div class="'+cls+foc+'" data-r="'+r+'" data-c="'+c+'" role="gridcell" tabindex="'+ti+'" aria-label="row '+(r+1)+' column '+(c+1)+', '+lbl+'">'+txt+'</div>';}
     function render(){
-      if(M.screen==='start'){app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn+helpBtn('mines')+'</div>'
+      if(M.screen==='start'){app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">\u2190 Menu</button>'+helpBtn('mines')+'</div>'
         +'<div class="kicker">Flags & Nerve</div><h1 class="title">Mine<em>sweep</em></h1><p class="subtitle">Clear the field</p>'
         +statsLine('mines',{time:true})
         +'<div class="label">Choose a field</div><div class="diffs">'+Object.keys(LV).map(function(name,idx){var d='';for(var i=0;i<4;i++)d+='<i class="'+(i<=idx+1?'f':'')+'"></i>';
@@ -1171,7 +1169,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var left=M.mines-M.flags;
       var cells='';for(var r=0;r<M.rows;r++)for(var c=0;c<M.cols;c++)cells+=cellHTML(r,c);
       var style='grid-template-columns:repeat('+M.cols+',1fr);grid-template-rows:repeat('+M.rows+',1fr);aspect-ratio:'+M.cols+'/'+M.rows+';width:min(100%,calc((100svh - 230px) * '+M.cols+' / '+M.rows+'));margin:0 auto;';
-      app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn
+      app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-msaction="again">Skip \u00bb</button>'
         +'<div class="stats"><div class="chip'+(left<0?' err':'')+'"><div class="cv">'+left+'</div><div class="cl">Mines</div></div>'
         +'<div class="chip"><div class="cv" id="m_time">'+fmt(M.seconds)+'</div><div class="cl">'+M.level+'</div></div>'
         +'<button class="pausebtn" data-msaction="pause" aria-label="'+(M.paused?'Resume':'Pause')+'">'+(M.paused?'\u25b6':'\u275a\u275a')+'</button>'+helpBtn('mines')+'</div></div>'
@@ -1265,7 +1263,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var waste=So.waste.length?cardHTML(So.waste[So.waste.length-1],'waste',0,So.waste.length-1):'<div class="sol-slot" data-z="waste" data-i="0"></div>';
       var found='';for(var f=0;f<4;f++)found+=(So.found[f].length?cardHTML(So.found[f][So.found[f].length-1],'found',f,So.found[f].length-1):'<div class="sol-slot sol-found" data-z="found" data-i="'+f+'">'+SU[f]+'</div>');
       var tab='';for(var c=0;c<7;c++){tab+='<div class="sol-col">';if(So.tab[c].length===0)tab+='<div class="sol-slot" data-z="tab" data-i="'+c+'"></div>';else for(var j=0;j<So.tab[c].length;j++)tab+=cardHTML(So.tab[c][j],'tab',c,j);tab+='</div>';}
-      app.innerHTML='<div class="sol"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn
+      app.innerHTML='<div class="sol"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-solaction="new">Skip \u00bb</button>'
         +'<div class="stats"><div class="chip"><div class="cv" id="o_time">'+fmt(So.seconds)+'</div><div class="cl">Time</div></div>'
         +'<div class="chip"><div class="cv">'+So.moves+'</div><div class="cl">Moves</div></div>'
         +'<button class="pausebtn" data-solaction="pause" aria-label="'+(So.paused?'Resume':'Pause')+'">'+(So.paused?'\u25B6':'\u275A\u275A')+'</button>'+helpBtn('solitaire')+'</div></div>'
@@ -1391,7 +1389,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       var st='left:calc('+p.x+'*var(--tw) + '+(3-p.z)+'*var(--zo));top:calc('+p.y+'*var(--th) + '+(3-p.z)+'*var(--zo));z-index:'+(p.z*100+p.y*8+p.x)+';background:'+fc[1]+';color:'+fc[0]+';';
       return '<div class="'+cls+'" style="'+st+'" data-mj="'+i+'" role="gridcell" aria-label="'+(NAMES[f]||f)+' tile'+(free(i,M.present)?'':', blocked')+'"><span class="mg">'+g+'</span></div>';}
     function render(){var tiles='';for(var i=0;i<pos.length;i++)tiles+=tileHTML(i);
-      app.innerHTML='<div class="mj"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn
+      app.innerHTML='<div class="mj"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-mjaction="new">Skip \u00bb</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+remaining()+'</div><div class="cl">Tiles</div></div>'+helpBtn('mahjong')
         +'<button class="pausebtn" data-mjaction="new" title="New board" aria-label="New board">\u21BB</button></div></div>'
         +'<div class="boardwrap" style="max-width:none"><div class="mj-board" role="grid" aria-label="Mahjong tiles">'+tiles+'</div>'
@@ -1492,7 +1490,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       for(lk=0;lk<n;lk++){h+='<div class="myh">'+L[lk].e+'</div>';for(j=0;j<n;j++)h+=cellHTML('LW',lk,j,j===n-1,false);for(k=0;k<n;k++)h+='<div class="myc blank"></div>';}
       return '<div class="my-grid" role="grid" aria-label="Deduction grid" style="grid-template-columns:1.6em repeat('+(2*n)+',1fr)">'+h+'</div>';}
     function buildClues(){return clues.map(function(c){return '<li>'+clueText(c)+'</li>';}).join('');}
-    function mountPlay(){app.innerHTML='<div class="my"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn
+    function mountPlay(){app.innerHTML='<div class="my"><div class="sol-bar"><button class="back" data-nav="menu">\u2190 Menu</button><button class="skip-btn" data-myaction="new">Skip \u00bb</button>'
       +'<div class="stats"><div class="chip"><div class="cv" style="font-size:15px">'+diff+'</div><div class="cl">Case</div></div>'+helpBtn('mystery')
       +'<button class="pausebtn" data-myaction="new" title="New case" aria-label="New case">\u21BB</button></div></div>'
       +'<div class="my-intro">\uD83D\uDC80 <b>'+victim+'</b> was found dead at <b>'+L[murderLoc].n+' '+L[murderLoc].e+'</b>.<br>Find the <b>killer</b> and the <b>weapon</b>.</div>'
@@ -1527,7 +1525,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
           else{haptic(loseBuzz);announce('Wrong accusation — look again.');}renderOverlay();}return;}
       var lv=e.target.closest('[data-mylevel]');if(lv){newGame(lv.dataset.mylevel);return;}
       var cell=e.target.closest('[data-mk]');if(cell){var key=cell.dataset.mk;marks[key]=((marks[key]||0)+1)%3;save();document.getElementById('my-grid-wrap').innerHTML=buildGrid();return;}}
-    function start(){app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">\u2190 Menu</button>'+skipBtn+helpBtn('mystery')+'</div>'
+    function start(){app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">\u2190 Menu</button>'+helpBtn('mystery')+'</div>'
       +'<div class="kicker">A Cold Case</div><h1 class="title">Who<em>dun</em>it</h1><p class="subtitle">Read the clues. Name the killer.</p>'
       +statsLine('mystery',{})
       +'<div class="label">Choose your case</div><div class="diffs">'
@@ -1663,7 +1661,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       if(Z.won){ov.innerHTML='<div class="overlay win"><div><div class="ot">Zipped<em>!</em></div><div class="os">Every cell filled in '+fmt(Z.seconds)+'</div><div class="accbtns">'+shareBtn('Pocket Arcade Zip ('+Z.level+') \u2014 zipped in '+fmt(Z.seconds)+' \u26A1')+'<button class="osmall" data-zaction="new">New puzzle</button></div></div></div>';return;}
       ov.innerHTML=Z.paused?'<div class="overlay"><div><div class="ot"><em>Paused</em></div><div class="os">The clock is resting.</div><button class="osmall" data-zaction="resume">Resume</button></div></div>':'';}
     function mountPlay(){
-      app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'+skipBtn
+      app.innerHTML='<div class="game"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-zaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv" id="z_prog">'+Z.path.length+'/'+(Z.N*Z.N)+'</div><div class="cl">Cells</div></div>'
         +'<div class="chip"><div class="cv" id="z_time">'+fmt(Z.seconds)+'</div><div class="cl">'+Z.level+'</div></div>'
         +'<button class="pausebtn" data-zaction="pause" aria-label="'+(Z.paused?'Resume':'Pause')+'">'+(Z.paused?'▶':'❚❚')+'</button>'+helpBtn('zip')+'</div></div>'
@@ -1677,7 +1675,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       redraw();renderOverlay();
     }
     function mountStart(){Z.screen='start';
-      app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">← Menu</button>'+skipBtn+helpBtn('zip')+'</div>'
+      app.innerHTML='<div class="start"><div class="gtop"><button class="back" data-nav="menu">← Menu</button>'+helpBtn('zip')+'</div>'
         +'<div class="kicker">One Line</div><h1 class="title">Zi<em>p</em></h1><p class="subtitle">Connect the dots in order. Fill every cell.</p>'
         +statsLine('zip',{time:true})
         +'<div class="label">Choose a grid</div><div class="diffs">'+Object.keys(LV).map(function(name,idx){var d='';for(var i=0;i<4;i++)d+='<i class="'+(i<=idx+1?'f':'')+'"></i>';
@@ -1754,7 +1752,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
         else if(k==='back')kb+='<button class="wd-key wide" data-wkey="back">⌫</button>';
         else kb+='<button class="wd-key '+(W.key[k]||'')+'" data-wkey="'+k+'">'+k+'</button>';
       });kb+='</div>';});
-      app.innerHTML='<div class="wd"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'+skipBtn
+      app.innerHTML='<div class="wd"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-waction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+W.rows.length+'/6</div><div class="cl">Guesses</div></div>'
         +'<button class="pausebtn" data-waction="stats" aria-label="Statistics">📊</button>'
         +'<button class="pausebtn" data-waction="new" title="New word" aria-label="New word">↻</button>'+helpBtn('wordle')+'</div></div>'
@@ -1827,7 +1825,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
       }
       var pal='';for(var c=1;c<=COLORS;c++)pal+='<button class="mm-pick c'+c+'" data-mmcol="'+c+'" aria-label="colour '+c+'"></button>';
       var secret='';if(M.over){for(var k=0;k<4;k++)secret+='<div class="mm-slot c'+M.code[k]+'"></div>';}
-      app.innerHTML='<div class="game mind"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'+skipBtn
+      app.innerHTML='<div class="game mind"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-mmaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+M.guesses.length+'/'+ROWS+'</div><div class="cl">Tries</div></div>'
         +'<button class="pausebtn" data-mmaction="new" title="New code" aria-label="New code">↻</button>'+helpBtn('mind')+'</div></div>'
         +'<div class="mm-board">'+rows+'</div>'
@@ -1941,7 +1939,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
           else kb+='<button class="wd-key" data-cwkey="'+k+'">'+k+'</button>';});kb+='</div>';});
         bottom='<div class="wd-kb">'+kb+'</div>';
       }
-      app.innerHTML='<div class="game cross"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'+skipBtn
+      app.innerHTML='<div class="game cross"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-cwaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+hints+'</div><div class="cl">Hints</div></div>'
         +'<button class="pausebtn" data-cwaction="new" title="New puzzle" aria-label="New puzzle">↻</button>'+helpBtn('cross')+'</div></div>'
         +'<div class="boardwrap"><div class="cw-grid">'+cells+'</div></div>'
@@ -2043,7 +2041,7 @@ button:focus-visible,.gcard:focus-visible,.num:focus-visible,.tool:focus-visible
         if(k==='hint')kb+='<button class="wd-key wide" data-cgaction="hint">Hint</button>';
         else if(k==='back')kb+='<button class="wd-key wide" data-cgaction="back">⌫</button>';
         else kb+='<button class="wd-key" data-cgkey="'+k+'">'+k+'</button>';});kb+='</div>';});
-      app.innerHTML='<div class="game crypt"><div class="bar"><button class="back" data-nav="menu">← Menu</button>'+skipBtn
+      app.innerHTML='<div class="game crypt"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-cgaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+Q.hints+'</div><div class="cl">Hints</div></div>'
         +'<button class="pausebtn" data-cgaction="new" title="New quote" aria-label="New quote">↻</button>'+helpBtn('crypt')+'</div></div>'
         +'<div class="cg-quote">'+html+'</div>'
