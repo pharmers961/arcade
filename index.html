@@ -787,6 +787,15 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
    the padding isn't swallowed by the phone layout's vertical centering. */
 body.cb-on .sk-root{align-items:flex-start;padding-top:max(64px,calc(env(safe-area-inset-top) + 60px));}
 body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has(.wd){min-height:calc(100svh - 92px);}
+
+/* ---------- Peek: dismiss a finished-game overlay to review the board ---------- */
+.overlay.peeked{display:none!important;}
+.peek-fab{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:85;border:none;border-radius:var(--r-pill);background:var(--grad-primary);color:#fff;
+  font-family:inherit;font-weight:700;font-size:14px;letter-spacing:.02em;padding:13px 22px;
+  box-shadow:var(--sh-primary);cursor:pointer;}
+.peek-fab:hover{filter:brightness(1.06);}
+.peek-fab:active{transform:translateX(-50%) scale(.96);}
 </style>
 </head>
 <body>
@@ -943,8 +952,14 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
 
   /* ---- Share a result: native share sheet where available, else clipboard. */
   function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'&#10;');}
+  /* Result-overlay buttons reused across games. shareBtn() now also offers a
+     "Challenge a friend" link (the top-bar one is hidden behind the overlay)
+     and a "See board" peek that dismisses the overlay to review your work. */
+  function peekBtnHtml(){return '<button class="osmall ghost" data-peek>👁 See board</button>';}
+  function challengeBtnHtml(){return '<button class="osmall ghost" data-challenge>🔗 Challenge</button>';}
   function shareBtn(text){return '<button class="osmall ghost" data-share="'+escAttr(text)+'">Share</button>'
-    +'<button class="osmall ghost" data-shareimg="'+escAttr(text)+'" aria-label="Share as image" title="Share as image">🖼</button>';}
+    +'<button class="osmall ghost" data-shareimg="'+escAttr(text)+'" aria-label="Share as image" title="Share as image">🖼</button>'
+    +challengeBtnHtml()+peekBtnHtml();}
   function doShare(text){
     if(navigator.share){navigator.share({text:text}).catch(function(){});return;}
     function legacy(){var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
@@ -1299,6 +1314,11 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
   function nextNudge(){if(CB.active)return;
     setTimeout(function(){toast('Nice win! Up for another?','Surprise me »',function(){openRandomOther();});},1100);}
 
+  /* Peek — hide a finished-game overlay so the board can be reviewed, with a
+     floating button to bring the result back. */
+  function clearPeekFab(){var f=document.querySelector('.peek-fab');if(f&&f.parentNode)f.parentNode.removeChild(f);}
+  function showPeekFab(ov){clearPeekFab();var f=document.createElement('button');f.className='peek-fab';f.textContent='Show result ▸';f._ov=ov;document.body.appendChild(f);}
+
   /* ---- How to play: rules, controls and shortcuts for every game. ---- */
   function helpBtn(k){return '<button class="pausebtn" data-help="'+k+'" aria-label="How to play" title="How to play">?</button>';}
   var HELP={
@@ -1446,6 +1466,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
   var curView=null;
   function openGame(key){
     if(active&&active.unmount)active.unmount();
+    clearPeekFab();
     curView=null;
     /* remember recency for the home-screen sort + Continue card */
     var rc=Store.get('recent',{});rc[key]=Date.now();Store.set('recent',rc);
@@ -1455,8 +1476,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     active=(key==='sudoku')?createSudoku():(key==='mines')?createMines():(key==='solitaire')?createSolitaire():(key==='zip')?createZip():(key==='mahjong')?createMahjong():(key==='wordle')?createWordle():(key==='mystery')?createMystery():(key==='mind')?createMastermind():(key==='cross')?createCrossword():createCryptogram();
     active.mount(el);
   }
-  function goHome(){ if(active&&active.unmount)active.unmount(); active=null; curView=null; renderHome(); }
-  function openView(v){ if(active&&active.unmount)active.unmount(); active=null; curView=v;
+  function goHome(){ if(active&&active.unmount)active.unmount(); clearPeekFab(); active=null; curView=null; renderHome(); }
+  function openView(v){ if(active&&active.unmount)active.unmount(); clearPeekFab(); active=null; curView=v;
     if(v==='stats')renderStatsView(); else renderSettingsView(); }
   /* History so the phone/browser Back button returns to the menu instead of
      closing the app. Opening a game pushes an entry; Back (popstate) pops it
@@ -1478,6 +1499,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     var sh=e.target.closest('[data-share]'); if(sh){ doShare(sh.dataset.share); return; }
     var si=e.target.closest('[data-shareimg]'); if(si){ shareResultImage(si.dataset.shareimg); return; }
     var chl=e.target.closest('[data-challenge]'); if(chl){ if(active&&active.challenge)active.challenge(); return; }
+    var pk=e.target.closest('[data-peek]'); if(pk){ var ov=pk.closest('.overlay'); if(ov){ov.classList.add('peeked');showPeekFab(ov);} return; }
     var so=e.target.closest('[data-setopt]'); if(so){ applySetting(so); return; }
     var th=e.target.closest('[data-settheme]'); if(th){ G.theme=th.dataset.settheme; saveG(); applyPrefs();
       var bs=app.querySelectorAll('[data-settheme]');for(var i=0;i<bs.length;i++)bs[i].classList.toggle('on',bs[i].dataset.settheme===G.theme); return; }
@@ -1496,6 +1518,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
   /* The coffee-break chip lives on <body> (it survives game re-renders),
      so its buttons need a document-level handler. */
   document.addEventListener('click',function(e){
+    var pf=e.target.closest('.peek-fab');if(pf){var ov=pf._ov;if(ov&&ov.isConnected)ov.classList.remove('peeked');clearPeekFab();return;}
     var cb=e.target.closest('[data-cbaction]');if(!cb)return;
     if(cb.dataset.cbaction==='skip')openRandomQuick();else endCoffeeBreak();
   });
@@ -1685,7 +1708,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         +'<button class="pausebtn" data-msaction="pause" aria-label="'+(M.paused?'Resume':'Pause')+'">'+(M.paused?'\u25b6':'\u275a\u275a')+'</button>'
         +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">\ud83d\udd17</button>'+helpBtn('mines')+'</div></div>'
         +'<div class="boardwrap" style="max-width:none"><div class="ms-board" role="grid" aria-label="Minesweeper field" style="'+style+'">'+cells+'</div>'
-        +(M.over?('<div class="overlay '+(M.win?'win':'')+'"><div><div class="ot">'+(M.win?'Cleared<em>!</em>':'Boom<em>.</em>')+'</div><div class="os">'+(M.win?('Swept in '+fmt(M.seconds)):'You hit a mine')+'</div><div class="accbtns">'+(M.win?shareBtn('Pocket Arcade Minesweeper ('+M.level+') \u2014 cleared in '+fmt(M.seconds)+' \uD83D\uDEA9'):'')+'<button class="osmall" data-msaction="again">Play again</button></div></div></div>')
+        +(M.over?('<div class="overlay '+(M.win?'win':'')+'"><div><div class="ot">'+(M.win?'Cleared<em>!</em>':'Boom<em>.</em>')+'</div><div class="os">'+(M.win?('Swept in '+fmt(M.seconds)):'You hit a mine')+'</div><div class="accbtns">'+(M.win?shareBtn('Pocket Arcade Minesweeper ('+M.level+') \u2014 cleared in '+fmt(M.seconds)+' \uD83D\uDEA9'):(challengeBtnHtml()+peekBtnHtml()))+'<button class="osmall" data-msaction="again">Play again</button></div></div></div>')
           :(M.paused?'<div class="overlay"><div><div class="ot"><em>Paused</em></div><div class="os">The field is hidden until you return.</div><button class="osmall" data-msaction="resume">Resume</button></div></div>':''))+'</div>'
         +'<div class="ms-tools"><button class="tool '+(M.flagMode?'on':'')+'" data-msaction="flagmode" aria-pressed="'+(!!M.flagMode)+'"><span class="ic">\uD83D\uDEA9</span>Flag<span class="badge">'+(M.flagMode?'on':'off')+'</span></button>'
         +'<button class="tool" data-msaction="restart"><span class="ic">\u21BB</span>Restart<span class="badge">'+M.level+'</span></button></div></div>';}
@@ -2031,7 +2054,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
       +'<div id="my-overlay"></div></div>';}
     function renderOverlay(){var ov=document.getElementById('my-overlay');if(!ov)return;
       if(result==='win'){ov.innerHTML='<div class="overlay win"><div><div class="ot">Case closed<em>!</em></div><div class="os">'+S[murderer].e+' '+S[murderer].n+' did it with the '+W[murderWeapon].n+' '+W[murderWeapon].e+' at '+L[murderLoc].n+'.</div><div class="accbtns">'+shareBtn('Pocket Arcade Mystery ('+diff+') \u2014 case closed with '+hints+' hint'+(hints===1?'':'s')+' \uD83D\uDD75')+'<button class="osmall" data-myaction="new">New case</button></div></div></div>';return;}
-      if(result==='lose'){ov.innerHTML='<div class="overlay"><div><div class="ot">Not quite<em>.</em></div><div class="os">The evidence doesn\u2019t fit. Look again.</div><button class="osmall" data-myaction="accuse">Try again</button></div></div>';return;}
+      if(result==='lose'){ov.innerHTML='<div class="overlay"><div><div class="ot">Not quite<em>.</em></div><div class="os">The evidence doesn\u2019t fit. Look again.</div><div class="accbtns">'+peekBtnHtml()+'<button class="osmall" data-myaction="accuse">Try again</button></div></div></div>';return;}
       if(result==='open'){var sus=S.map(function(x,i){return '<button class="pick'+(accSus===i?' on':'')+'" data-pick="s_'+i+'">'+x.e+' '+x.n+'</button>';}).join('');
         var wep=W.map(function(x,i){return '<button class="pick'+(accWea===i?' on':'')+'" data-pick="w_'+i+'">'+x.e+' '+x.n+'</button>';}).join('');
         ov.innerHTML='<div class="overlay"><div class="accbox"><div class="ot" style="font-size:24px">Accusation</div>'
@@ -2329,6 +2352,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         var sv=Store.get('save.wordle',null);
         if(sv&&sv.target){W.target=sv.target;W.rows=sv.rows||[];W.key=sv.key||{};W.cur='';W.over=false;W.won=false;W.msg='';render();}
         else newGame();},
+      challenge:function(){openChallenge('wordle',{w:W.target},'Wordle','Can your friend get this word? They’ll get the exact same one.');},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
 
@@ -2395,7 +2419,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         +(M.over?(function(){
           var wTitle=M.won?(M.mode==='duo'?'Player 2 wins<em>!</em>':'Cracked it<em>!</em>'):(M.mode==='duo'?'Player 1 wins<em>.</em>':'So close<em>.</em>');
           var wSub=M.won?('Solved in '+M.guesses.length):(M.mode==='duo'?'Player 2 didn\u2019t crack it. The code was':'The code was');
-          var shareHtml=(M.won&&M.mode==='solo')?shareBtn('Pocket Arcade Mastermind \u2014 cracked the code in '+M.guesses.length+'/10 \uD83C\uDFAF'):'';
+          var shareHtml=(M.won&&M.mode==='solo')?shareBtn('Pocket Arcade Mastermind \u2014 cracked the code in '+M.guesses.length+'/10 \uD83C\uDFAF'):(M.mode==='solo'?(challengeBtnHtml()+peekBtnHtml()):peekBtnHtml());
           return '<div class="overlay '+(M.won?'win':'')+'"><div><div class="ot">'+wTitle+'</div><div class="os">'+wSub+'</div><div class="mm-secret">'+secret+'</div><div class="accbtns" style="margin-top:18px">'+shareHtml+'<button class="osmall" data-mmaction="new">New code</button></div></div></div>';})():'')
         +'</div>';}
     function clickH(e){var col=e.target.closest('[data-mmcol]');if(col){place(+col.dataset.mmcol);return;}
@@ -2418,6 +2442,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         var sv=Store.get('save.mind',null);
         if(sv&&sv.code&&sv.code.length===4){M.mode='solo';M.challenge=false;M.setup=false;M.code=sv.code;M.guesses=sv.guesses||[];M.cur=[];M.over=false;M.won=false;render();}
         else newGame();},
+      challenge:function(){if(M.setup){toast('Set the code first');return;}openChallenge('mind',{code:M.code},'Mastermind','Your friend cracks this exact secret code.');},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
 
