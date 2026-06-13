@@ -782,6 +782,11 @@ html.dark .cbreak .cb-end{background:var(--surface);}
 
 /* ---------- Zen mode — strip away competitive pressure ---------- */
 html.zen .gstreak,html.zen .zen-hide{display:none!important;}
+
+/* Give the coffee-break chip its own room above the content. Top-align so
+   the padding isn't swallowed by the phone layout's vertical centering. */
+body.cb-on .sk-root{align-items:flex-start;padding-top:max(64px,calc(env(safe-area-inset-top) + 60px));}
+body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has(.wd){min-height:calc(100svh - 92px);}
 </style>
 </head>
 <body>
@@ -1246,6 +1251,7 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
   function fmtMs(ms){var s=Math.max(0,Math.round(ms/1000));return ((s/60)|0)+':'+String(s%60).padStart(2,'0');}
   function openRandomQuick(){var k=QUICK[(Math.random()*QUICK.length)|0];CB.played++;openGame(k);pushGame(k);}
   function startCoffeeBreak(mins){CB.active=true;CB.endAt=Date.now()+mins*60000;CB.played=0;
+    document.body.classList.add('cb-on');
     if(!CB.el){CB.el=document.createElement('div');CB.el.className='cbreak';document.body.appendChild(CB.el);}
     renderCb();if(CB.timer)clearInterval(CB.timer);CB.timer=setInterval(tickCb,1000);openRandomQuick();}
   function renderCb(){if(!CB.el)return;CB.el.innerHTML='<span class="cb-dot"></span>☕ <span id="cb-time">'+fmtMs(CB.endAt-Date.now())+'</span>'
@@ -1254,6 +1260,7 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
   function tickCb(){if(!CB.active)return;var left=CB.endAt-Date.now();var t=document.getElementById('cb-time');
     if(t)t.textContent=fmtMs(left);if(left<=0)finishCoffeeBreak();}
   function stopCb(){if(CB.timer){clearInterval(CB.timer);CB.timer=null;}CB.active=false;
+    document.body.classList.remove('cb-on');
     if(CB.el&&CB.el.parentNode)CB.el.parentNode.removeChild(CB.el);CB.el=null;}
   function endCoffeeBreak(){stopCb();goHome();}
   function finishCoffeeBreak(){var n=CB.played;stopCb();confetti();playSfx('win');
@@ -2186,7 +2193,7 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
     var app, keyH=null;
     var WORDS='about above abuse actor acute admit adopt adult after again agent agree ahead alarm album alert alien alike alive allow alone along aloud alter amber angel anger angle angry ankle apart apple apply arena argue arise armor aroma array arrow aside asset audio audit avoid awake award aware bacon badge baker basic basil batch beach beard beast began begin begun being belly bench berry birth black blade blame blank blast blaze bleak blend bless blind block blond blood bloom blown blues blunt board boast bonus boost booth bound brace brain brake brand brave bread break breed brick bride brief bring broad broke brook broom brown brush buddy build built bunch burst cabin cable camel candy canon cargo carol carry catch cause cedar chain chair chalk charm chart chase cheap cheat check cheek cheer chess chest chief child chili chill china chirp choir chose chunk civic civil claim clamp clash clasp class clean clear clerk click cliff climb cling cloak clock clone close cloth cloud clown coach coast cobra cocoa colon color comet comic coral couch could count court cover crack craft crane crash crate crawl crazy cream creek crepe crest crime crisp crook cross crowd crown crumb crush crust cubic curly curry curve cycle daddy daily dairy daisy dance dated dealt death debut decay delay delta dense depth diary diner dingo dirty ditch dizzy dodge doing donor doubt dough dozen drain drama drank dream dress dried drift drill drink drive drone drove drown dryer eagle early earth easel eaten ebony eight elbow elder elect elite ember empty enemy enjoy enter entry equal equip erase error essay event every evict evoke exact exalt excel exist extra fable faint fairy faith false fancy fault favor feast fence ferry fetch fever fiber field fiery fifth fifty fight final finch flame flash flask fleet flesh flick fling flint float flock flood floor flora flour flown fluid flush flute foamy focus force forge forgo forty forum found frame frank fraud freak fresh fried frill frock front frost frown fruit fudge funny furry fuzzy ghost giant giddy given giver glade gland glare glass gleam glide globe gloom glory gloss glove going goose grace grade grain grand grant grape graph grasp grass grave gravy graze great greed green greet grief grill grime grind groan groin groom gross group grove growl grown grunt guard guava guess guest guide guild gully gummy habit hairy halve handy happy hardy harsh haste hatch haunt haven havoc hazel heart heavy hedge hefty hello hippo hobby honey honor horde horse hotel hound house hover human humid humor hurry husky ideal idiot igloo image imply inbox index inert infer inlet inner input intro irony issue ivory jelly jewel joint joker jolly joust judge juice juicy jumbo jumpy kayak kebab khaki kiosk kitty knack kneel knelt knife knock known koala label labor lance lapse large laser latch later layer leafy leaky learn lease leash least leave ledge lemon level lever light lilac limbo limit linen liner lingo lived liver llama loath lobby local lodge logic loose lorry loser lover lower loyal lucky lunar lunch lunge lyric macro madam magic major maker mango manor maple march marsh match mayor meant medal media melon mercy merge merit metal meter midst might mimic mince miner minor minus mirth mixed mocha modal model moist molar money month moral motor motto mound mount mourn mouse mouth mover movie mower mucky muddy mulch mummy mural music musty nacho naive nanny nasty naval needy nerve never newly niche niece night noble noise nomad north nosey notch noted novel nudge nurse nutty oasis ocean offer often olive onion onset opera optic orbit organ otter ought ounce outer ovary owner ozone paint panda panel panic paper party pasta paste patch patio pause peace peach pearl pedal penny perch peril pesky petal petty phase phone photo piano picky piece piety pilot pinch pixel pizza place plaid plain plane plank plant plate plaza plead pluck plumb plume plump plush poach point polar porch pouch pound power prank press price pride prime print prior prism prize probe prone proof prose proud prove prowl prune psalm pulse punch pupil puppy purge purse pushy quack quail quake quart queen query quest queue quick quiet quill quilt quirk quite quota quote rabid radar radio rainy raise rally ranch range rapid raven reach react ready realm rebel refer reign relax relay remit renew repay reply rerun reset resin retro rhino rhyme rider ridge rifle right rigid rinse risen risky rival river roach roast robin robot rocky rogue roomy roost rotor rouge rough round route rover royal ruddy ruler rumor rural rusty saint salad salon salsa salty sandy satin sauce sauna saved savor scald scale scalp scaly scamp scant scare scarf scary scene scent scoff scold scoop scope score scorn scout scowl scram scrap scrub scuba seedy serve setup seven sever shade shady shaft shake shaky shall shame shape share shark sharp shawl shear sheen sheep sheet shelf shell shine shiny shire shirt shoal shock shone shore short shout shove shown showy shrub shrug siege sieve sight sigma silky silly since siren sixth sixty skate skier skill skirt skull skunk slang slant slate sleek sleep sleet slept slice slick slide slime slimy sling slope sloth slump small smart smash smear smell smile smirk smith smoke smoky snack snail snake snaky snare sneak sniff snore snort snout snowy snuck soapy sober soggy solar solid solve sonar sonic sooty sorry sound south space spade spank spare spark spasm spawn speak spear speck speed spell spend spent spice spicy spike spill spine spiny spire spite splat split spoil spoke spook spool spoon sport spout spray spree sprig spurt squad squat squid stack staff stage stain stair stake stale stalk stall stamp stand stare stark start stash state stave steak steal steam steed steel steep steer stern stick stiff still sting stink stock stoic stoke stole stomp stone stony stood stool stoop store stork storm story stout stove strap straw stray strip strut stuck study stuff stump stung stunt style suave sugar suite sulky sunny super surge surly swamp swarm swear sweat sweep sweet swell swept swift swine swing swirl swish sword sworn synod syrup table taboo tacit tacky taffy taken tally tango tangy taper tardy tarot taste tasty taunt teach tease teddy tempo tempt tenor tense tenth tepid terse thank theft their theme there these thick thief thigh thing think third thong thorn those three threw throb throw thumb thump tidal tiger tight tilde timer timid tipsy title toast today token tonal tonic tooth topaz topic torch total touch tough towel tower toxic toxin trace track tract trade trail train trait tramp trash tread treat trend trial tribe trice trick tried tripe trite troll troop trout truce truck truly trump trunk trust truth tulip tumor tunic turbo tutor twang tweak tweed tweet twice twine twirl twist tying udder ulcer ultra uncle under undid undue unfit unify union unite unity unlit until unwed unzip upper upset urban urine usage usher using usual usurp utter vague valet valid valor value valve vapor vault vegan venom venue verge verse video vigil villa vinyl viola viper viral virus visit vital vivid vocal vodka vogue voice vouch vowel wafer wager wagon waist waltz waste watch water weary weave wedge weedy weigh weird whale wharf wheat wheel where which whiff while whine whirl whisk white whole whoop whose widen wider width wield wimpy wince winch windy wiser witch witty woman world worry worse worst worth would wound woven wrath wreck wrist write wrong wrote wrung yacht yearn yeast yield young youth zebra zesty'.split(' ');
     var WSET={}; WORDS.forEach(function(w){WSET[w]=1;});
-    var W={target:'',rows:[],cur:'',over:false,won:false,msg:'',key:{},showStats:false};
+    var W={target:'',rows:[],cur:'',over:false,won:false,msg:'',key:{},showStats:false,challenge:false};
     function save(){if(W.target&&!W.over){Store.set('save.wordle',{target:W.target,rows:W.rows,key:W.key});}else{Store.del('save.wordle');}}
     function loadHist(){return Store.get('wordle.hist',{dist:[0,0,0,0,0,0],played:0,wins:0,streak:0,max:0});}
     function recordHist(won,guesses){var h=loadHist();h.played++;
@@ -2198,7 +2205,7 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
       var wp=h.played?Math.round(h.wins/h.played*100):0;
       return '<div class="wd-stats"><div class="wd-statnums"><b>'+h.played+'</b> played · <b>'+wp+'%</b> wins · streak <b>'+h.streak+'</b> (max '+h.max+')</div>'
         +'<div class="wd-disthead">Guess distribution</div>'+bars+'</div>';}
-    function newGame(){W.target=WORDS[(Math.random()*WORDS.length)|0];W.rows=[];W.cur='';W.over=false;W.won=false;W.msg='';W.key={};Store.del('save.wordle');render();}
+    function newGame(){W.target=WORDS[(Math.random()*WORDS.length)|0];W.rows=[];W.cur='';W.over=false;W.won=false;W.msg='';W.key={};W.challenge=false;Store.del('save.wordle');render();}
     function score(guess){var res=['a','a','a','a','a'];var t=W.target.split('');var i,j;
       for(i=0;i<5;i++){if(guess[i]===t[i]){res[i]='c';t[i]=null;}}
       for(i=0;i<5;i++){if(res[i]==='c')continue;j=t.indexOf(guess[i]);if(j>=0){res[i]='p';t[j]=null;}}
@@ -2238,7 +2245,9 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
       app.innerHTML='<div class="wd"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-waction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+W.rows.length+'/6</div><div class="cl">Guesses</div></div>'
         +'<button class="pausebtn" data-waction="stats" aria-label="Statistics">📊</button>'
+        +'<button class="pausebtn" data-waction="challenge" title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'
         +'<button class="pausebtn" data-waction="new" title="New word" aria-label="New word">↻</button>'+helpBtn('wordle')+'</div></div>'
+        +(W.challenge?'<div class="challenge-banner">🔗 A friend’s challenge — same word</div>':'')
         +'<div class="wd-grid" role="grid" aria-label="Wordle guesses">'+grid+'</div>'
         +'<div class="wd-msg" id="wd-msg" role="status" aria-live="polite">'+W.msg+'</div>'
         +'<div class="wd-kb">'+kb+'</div>'
@@ -2254,6 +2263,7 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
       if(W.showStats&&!W.over&&e.target.classList&&e.target.classList.contains('overlay')){W.showStats=false;render();return;}
       var act=e.target.closest('[data-waction]');if(act){var a=act.dataset.waction;
         if(a==='new'){confirmNew(W.rows.length>0&&!W.over,function(){W.showStats=false;newGame();});}
+        else if(a==='challenge'){openChallenge('wordle',{w:W.target},'Wordle','Can your friend get this word? They’ll get the exact same one.');}
         else if(a==='stats'){W.showStats=!W.showStats;render();}
         else if(a==='closestats'){W.showStats=false;render();}return;}
       var key=e.target.closest('[data-wkey]');if(key){var k=key.dataset.wkey;if(k==='enter')submit();else if(k==='back')del();else type(k);return;}}
@@ -2265,6 +2275,8 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
           if(e.key==='Enter')submit();else if(e.key==='Backspace')del();
           else{var k=(e.key||'').toLowerCase();if(k.length===1&&k>='a'&&k<='z')type(k);}};
         window.addEventListener('keydown',keyH);
+        var ch=consumeChallenge('wordle');
+        if(ch&&ch.w&&WSET[ch.w]){W.target=ch.w;W.rows=[];W.cur='';W.over=false;W.won=false;W.msg='';W.key={};W.challenge=true;Store.del('save.wordle');render();return;}
         var sv=Store.get('save.wordle',null);
         if(sv&&sv.target){W.target=sv.target;W.rows=sv.rows||[];W.key=sv.key||{};W.cur='';W.over=false;W.won=false;W.msg='';render();}
         else newGame();},
@@ -2275,25 +2287,39 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
   function createMastermind(){
     var app, keyH=null;
     var COLORS=6, ROWS=10;
-    var M={code:[],guesses:[],cur:[],over:false,won:false};
-    function newGame(){M.code=[];for(var i=0;i<4;i++)M.code.push(1+((Math.random()*COLORS)|0));
+    var M={code:[],guesses:[],cur:[],over:false,won:false,mode:'solo',setup:false,challenge:false};
+    function newGame(){M.mode='solo';M.challenge=false;M.setup=false;M.code=[];for(var i=0;i<4;i++)M.code.push(1+((Math.random()*COLORS)|0));
       M.guesses=[];M.cur=[];M.over=false;M.won=false;save();render();}
-    function save(){if(M.code.length&&!M.over)Store.set('save.mind',{code:M.code,guesses:M.guesses});else Store.del('save.mind');}
+    /* Pass-and-play: Player 1 sets a secret code, then hands the device to
+       Player 2 to crack it. */
+    function startDuo(){M.mode='duo';M.challenge=false;M.setup=true;M.code=[];M.cur=[];M.guesses=[];M.over=false;M.won=false;Store.del('save.mind');render();}
+    function lockCode(){if(M.cur.length<4)return;M.code=M.cur.slice();M.cur=[];M.setup=false;M.guesses=[];M.over=false;M.won=false;haptic(tapBuzz);render();}
+    function save(){if(M.mode==='solo'&&!M.challenge&&!M.setup&&M.code.length&&!M.over)Store.set('save.mind',{code:M.code,guesses:M.guesses});else Store.del('save.mind');}
     function fb(g){var black=0,white=0,c=M.code.slice(),q=g.slice(),i,j;
       for(i=0;i<4;i++)if(q[i]===c[i]){black++;c[i]=q[i]=0;}
       for(i=0;i<4;i++)if(q[i]){j=c.indexOf(q[i]);if(j>=0){white++;c[j]=0;}}
       return {b:black,w:white};}
     function place(col){if(M.over||M.cur.length>=4)return;M.cur.push(col);haptic(tapBuzz);render();}
     function back(){if(M.over||!M.cur.length)return;M.cur.pop();render();}
-    function submit(){if(M.over||M.cur.length<4)return;var g=M.cur.slice(),f=fb(g);
+    function submit(){if(M.setup||M.over||M.cur.length<4)return;var g=M.cur.slice(),f=fb(g);
       M.guesses.push({g:g,b:f.b,w:f.w});M.cur=[];
-      if(f.b===4){M.won=true;M.over=true;Stats.rec('mind',{win:true,score:M.guesses.length});winFx();announce('Cracked it in '+M.guesses.length+'!');}
-      else if(M.guesses.length>=ROWS){M.over=true;Stats.rec('mind',{win:false});haptic(loseBuzz);announce('Out of guesses.');}
+      if(f.b===4){M.won=true;M.over=true;if(M.mode==='solo')Stats.rec('mind',{win:true,score:M.guesses.length});winFx();announce((M.mode==='duo'?'Player 2 cracked it in ':'Cracked it in ')+M.guesses.length+'!');}
+      else if(M.guesses.length>=ROWS){M.over=true;if(M.mode==='solo')Stats.rec('mind',{win:false});haptic(loseBuzz);announce('Out of guesses.');}
       else announce(f.b+' exact, '+f.w+' misplaced. '+(ROWS-M.guesses.length)+' '+(ROWS-M.guesses.length===1?'try':'tries')+' left.');
       save();render();}
     function pegs(b,w){var h='';var i;for(i=0;i<b;i++)h+='<i class="mm-peg b"></i>';for(i=0;i<w;i++)h+='<i class="mm-peg w"></i>';
       for(i=b+w;i<4;i++)h+='<i class="mm-peg e"></i>';return h;}
+    function palHTML(){var pal='';for(var c=1;c<=COLORS;c++)pal+='<button class="mm-pick c'+c+'" data-mmcol="'+c+'" aria-label="colour '+c+'"></button>';return pal;}
+    function renderSetup(){
+      var slots='';for(var s=0;s<4;s++){var v=M.cur[s];slots+='<div class="mm-slot'+(v?' c'+v:' empty')+'"></div>';}
+      app.innerHTML='<div class="game mind"><div class="bar"><button class="back" data-nav="menu">← Menu</button><span></span>'+helpBtn('mind')+'</div>'
+        +'<div class="challenge-banner">👥 Player 1 · set a secret 4-colour code</div>'
+        +'<div class="mm-board" style="justify-content:center;min-height:auto"><div class="mm-row active"><div class="mm-slots">'+slots+'</div></div></div>'
+        +'<div class="mm-pal">'+palHTML()+'<button class="mm-ctl" data-mmaction="back" aria-label="Delete">⌫</button>'
+        +'<button class="mm-ctl go" data-mmaction="lock" aria-label="Lock in code and pass to Player 2"'+(M.cur.length<4?' disabled':'')+'>🔒</button></div>'
+        +'</div>';}
     function render(){
+      if(M.setup){renderSetup();return;}
       var rows='';
       for(var r=0;r<ROWS;r++){var gr=M.guesses[r];
         var slots='';
@@ -2306,26 +2332,42 @@ html.zen .gstreak,html.zen .zen-hide{display:none!important;}
           :(r===M.guesses.length&&!M.over?'Current guess':'Empty row');
         rows+='<div class="mm-row'+(r===M.guesses.length&&!M.over?' active':'')+'" role="group" aria-label="'+rlbl+'"><div class="mm-slots">'+slots+'</div><div class="mm-fb" aria-hidden="true">'+(gr?pegs(gr.b,gr.w):'<i class="mm-peg e"></i><i class="mm-peg e"></i><i class="mm-peg e"></i><i class="mm-peg e"></i>')+'</div></div>';
       }
-      var pal='';for(var c=1;c<=COLORS;c++)pal+='<button class="mm-pick c'+c+'" data-mmcol="'+c+'" aria-label="colour '+c+'"></button>';
       var secret='';if(M.over){for(var k=0;k<4;k++)secret+='<div class="mm-slot c'+M.code[k]+'"></div>';}
+      var banner=M.challenge?'<div class="challenge-banner">🔗 A friend’s code — crack it</div>'
+        :(M.mode==='duo'?'<div class="challenge-banner">👥 Player 2 · crack Player 1’s code</div>':'');
       app.innerHTML='<div class="game mind"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-mmaction="new">Skip »</button>'
         +'<div class="stats"><div class="chip"><div class="cv">'+M.guesses.length+'/'+ROWS+'</div><div class="cl">Tries</div></div>'
+        +'<button class="pausebtn" data-mmaction="duo" title="2-player hot-seat" aria-label="Two-player hot-seat">👥</button>'
+        +'<button class="pausebtn" data-mmaction="challenge" title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'
         +'<button class="pausebtn" data-mmaction="new" title="New code" aria-label="New code">↻</button>'+helpBtn('mind')+'</div></div>'
+        +banner
         +'<div class="mm-board">'+rows+'</div>'
-        +'<div class="mm-pal">'+pal+'<button class="mm-ctl" data-mmaction="back" aria-label="Delete">⌫</button><button class="mm-ctl go" data-mmaction="go" aria-label="Submit guess">✓</button></div>'
-        +(M.over?'<div class="overlay '+(M.won?'win':'')+'"><div><div class="ot">'+(M.won?'Cracked it<em>!</em>':'So close<em>.</em>')+'</div><div class="os">'+(M.won?('Solved in '+M.guesses.length):'The code was')+'</div><div class="mm-secret">'+secret+'</div><div class="accbtns" style="margin-top:18px">'+(M.won?shareBtn('Pocket Arcade Mastermind \u2014 cracked the code in '+M.guesses.length+'/10 \uD83C\uDFAF'):'')+'<button class="osmall" data-mmaction="new">New code</button></div></div></div>':'')
+        +'<div class="mm-pal">'+palHTML()+'<button class="mm-ctl" data-mmaction="back" aria-label="Delete">⌫</button><button class="mm-ctl go" data-mmaction="go" aria-label="Submit guess">✓</button></div>'
+        +(M.over?(function(){
+          var wTitle=M.won?(M.mode==='duo'?'Player 2 wins<em>!</em>':'Cracked it<em>!</em>'):(M.mode==='duo'?'Player 1 wins<em>.</em>':'So close<em>.</em>');
+          var wSub=M.won?('Solved in '+M.guesses.length):(M.mode==='duo'?'Player 2 didn\u2019t crack it. The code was':'The code was');
+          var shareHtml=(M.won&&M.mode==='solo')?shareBtn('Pocket Arcade Mastermind \u2014 cracked the code in '+M.guesses.length+'/10 \uD83C\uDFAF'):'';
+          return '<div class="overlay '+(M.won?'win':'')+'"><div><div class="ot">'+wTitle+'</div><div class="os">'+wSub+'</div><div class="mm-secret">'+secret+'</div><div class="accbtns" style="margin-top:18px">'+shareHtml+'<button class="osmall" data-mmaction="new">New code</button></div></div></div>';})():'')
         +'</div>';}
     function clickH(e){var col=e.target.closest('[data-mmcol]');if(col){place(+col.dataset.mmcol);return;}
       var a=e.target.closest('[data-mmaction]');if(a){var k=a.dataset.mmaction;
-        if(k==='new'){confirmNew(M.guesses.length>0&&!M.over,newGame);}
+        if(k==='new'){confirmNew((M.guesses.length>0||M.setup)&&!M.over,newGame);}
+        else if(k==='duo'){confirmNew((M.guesses.length>0||M.setup)&&!M.over,startDuo);}
+        else if(k==='lock')lockCode();
+        else if(k==='challenge'){if(M.setup){toast('Set the code first');return;}openChallenge('mind',{code:M.code},'Mastermind','Your friend cracks this exact secret code.');}
         else if(k==='back')back();else if(k==='go')submit();return;}}
     return {mount:function(root){app=root;app.addEventListener('click',clickH);
         keyH=function(e){if(M.over){if(e.key==='Enter')newGame();return;}
-          if(e.key==='Enter')submit();else if(e.key==='Backspace'){e.preventDefault();back();}
+          if(e.key==='Enter'){e.preventDefault();if(M.setup)lockCode();else submit();}
+          else if(e.key==='Backspace'){e.preventDefault();back();}
           else if(e.key>='1'&&e.key<='6')place(+e.key);};
         window.addEventListener('keydown',keyH);
+        var ch=consumeChallenge('mind');
+        if(ch&&ch.code&&ch.code.length===4){M.mode='solo';M.challenge=true;M.setup=false;
+          M.code=ch.code.map(function(n){return Math.max(1,Math.min(COLORS,n|0));});
+          M.guesses=[];M.cur=[];M.over=false;M.won=false;Store.del('save.mind');render();return;}
         var sv=Store.get('save.mind',null);
-        if(sv&&sv.code&&sv.code.length===4){M.code=sv.code;M.guesses=sv.guesses||[];M.cur=[];M.over=false;M.won=false;render();}
+        if(sv&&sv.code&&sv.code.length===4){M.mode='solo';M.challenge=false;M.setup=false;M.code=sv.code;M.guesses=sv.guesses||[];M.cur=[];M.over=false;M.won=false;render();}
         else newGame();},
       unmount:function(){if(keyH)window.removeEventListener('keydown',keyH);}};
   }
