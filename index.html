@@ -2497,7 +2497,49 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         EQUAL:'The same amount; the “=” sign',ADDED:'Put in besides',LARGE:'A size up from medium'}},
       {grid:['OTHER','R#E#A','DRAFT','E#R#I','RADIO'],clues:{
         OTHER:'“Each ___” (mutually)',DRAFT:'A rough first version',RADIO:'You tune it to a station',
-        ORDER:'Put in sequence',HEARD:'Picked up with your ears',RATIO:'A proportion like 2:1'}}
+        ORDER:'Put in sequence',HEARD:'Picked up with your ears',RATIO:'A proportion like 2:1'}},
+      {grid:['CLICK','A#N#E','RANGE','R#E#P','YARDS'],clues:{
+        CLICK:'Sound of a mouse',RANGE:'A span from low to high; a mountain chain',YARDS:'Three-foot lengths; or backyards',
+        CARRY:'Tote or haul',INNER:'On the inside',KEEPS:'Holds onto; “for ___”'}},
+      {grid:['FIRST','R#I#O','EIGHT','S#H#A','HOTEL'],clues:{
+        FIRST:'Before all others',EIGHT:'Number after seven',HOTEL:'Where travellers stay the night',
+        FRESH:'Just-picked; not stale',RIGHT:'Correct; opposite of left',TOTAL:'The full sum'}},
+      {grid:['FIRST','O#O#O','COURT','U#T#A','STEEL'],clues:{
+        FIRST:'“___ come, ___ served”',COURT:'Where tennis is played; or a judge’s room',STEEL:'Strong iron alloy',
+        FOCUS:'Sharpen attention',ROUTE:'A path or way to go',TOTAL:'Add up to'}},
+      {grid:['STATE','T#P#N','INPUT','L#L#E','LAYER'],clues:{
+        STATE:'Nevada or Maine, e.g.',INPUT:'Data you type in',LAYER:'A single thickness, as of cake',
+        STILL:'Not moving; or even now',APPLY:'Put on; or send in a request',ENTER:'Go in; or the keyboard key'}},
+      {grid:['STATE','T#G#V','AWARE','F#I#R','FUNNY'],clues:{
+        STATE:'Declare openly',AWARE:'In the know; conscious of',FUNNY:'Likely to make you laugh',
+        STAFF:'A workplace’s employees',AGAIN:'One more time',EVERY:'Each and all'}},
+      {grid:['MUSIC','A#U#Y','TOPIC','C#E#L','HORSE'],clues:{
+        MUSIC:'What you hear at a concert',TOPIC:'The subject being discussed',HORSE:'It gallops and neighs',
+        MATCH:'A game; or a fire-starter',SUPER:'Really great',CYCLE:'A bike; or a repeating loop'}},
+      {grid:['WORLD','H#A#I','OWNER','L#G#T','EVERY'],clues:{
+        WORLD:'The Earth and all on it',OWNER:'The one who possesses it',EVERY:'Each one',
+        WHOLE:'Entire, complete',RANGE:'Extent or span',DIRTY:'Covered in grime'}},
+      {grid:['MUSIC','A#T#O','THIRD','C#L#E','HELPS'],clues:{
+        MUSIC:'Tunes from a playlist',THIRD:'After second; the bronze spot',HELPS:'Lends a hand',
+        MATCH:'Pair up; a contest',STILL:'Motionless',CODES:'Secret messages; lines of programming'}},
+      {grid:['PRICE','A#N#X','TOPIC','C#U#E','HOTEL'],clues:{
+        PRICE:'The cost of something',TOPIC:'A theme or subject',HOTEL:'Holiday stopover with rooms',
+        PATCH:'A fix for a hole or a bug',INPUT:'Information fed in',EXCEL:'Do really well'}},
+      {grid:['EMAIL','N#G#A','TRACK','E#I#E','RINGS'],clues:{
+        EMAIL:'Electronic mail',TRACK:'A running oval; or to follow',RINGS:'Phone sounds; jewellery for fingers',
+        ENTER:'Step inside',AGAIN:'Once more',LAKES:'Erie and Tahoe, e.g.'}},
+      {grid:['CLICK','R#D#I','OCEAN','S#A#D','SALES'],clues:{
+        CLICK:'Press a mouse button',OCEAN:'A vast body of saltwater',SALES:'Store discounts; deals closed',
+        CROSS:'Go across; an X shape',IDEAL:'Perfect; just right',KINDS:'Types or sorts'}},
+      {grid:['EMAIL','X#L#A','CELLS','E#O#E','LOWER'],clues:{
+        EMAIL:'A note to your inbox',CELLS:'Tiny units of life; jail rooms',LOWER:'Drop down; below',
+        EXCEL:'Shine; outdo the rest',ALLOW:'Permit',LASER:'A focused beam of light'}},
+      {grid:['PRICE','L#D#N','AHEAD','N#A#E','SOLID'],clues:{
+        PRICE:'What’s on the tag',AHEAD:'In front; up the road',SOLID:'Firm, not liquid',
+        PLANS:'Schemes and arrangements',IDEAL:'The very best kind',ENDED:'Finished, over'}},
+      {grid:['WORLD','O#O#A','RIGHT','R#E#E','YARDS'],clues:{
+        WORLD:'The globe',RIGHT:'Correct; or a turn direction',YARDS:'Lawns; or 36-inch units',
+        WORRY:'Fret and stress',ROGER:'“___ that” — message received',DATES:'Calendar days; sweet fruits'}}
     ];
     var pidx=0, P=null, grid=[], letters=[], num=[], slots=[], cur=0, dir='a', over=false, hints=0, reviewing=false;
     function build(){P=PUZZLES[pidx];grid=P.grid.map(function(r){return r.split('');});
