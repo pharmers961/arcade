@@ -2461,7 +2461,43 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         CAT:'Purring pet',ELBOW:'Mid-arm joint',YOUTH:'A young person',ESSAY:'Short written piece',EEL:'Snake-like fish'}},
       {grid:['#MAR#','PERIL','RAISE','ONSET','#TEN#'],clues:{
         MAR:'Spoil or scratch',PERIL:'Grave danger',RAISE:'Lift up; a pay bump',ONSET:'The very start',TEN:'A perfect score',
-        PRO:'Expert; opposite of con',MEANT:'Intended',ARISE:'Get up; come about',RISEN:'Gone up, like dough',LET:'Allow'}}
+        PRO:'Expert; opposite of con',MEANT:'Intended',ARISE:'Get up; come about',RISEN:'Gone up, like dough',LET:'Allow'}},
+      {grid:['STATE','H#D#A','ORDER','R#E#L','TODAY'],clues:{
+        STATE:'California or Texas, e.g.',ORDER:'Command; or a diner request',TODAY:'This very day',
+        SHORT:'Not tall',ADDED:'Tacked on; summed in',EARLY:'Ahead of the set time'}},
+      {grid:['STATE','M#L#V','ABOVE','L#N#N','LIGHT'],clues:{
+        STATE:'Express in words',ABOVE:'Higher up; overhead',LIGHT:'Not heavy; or a lamp’s glow',
+        SMALL:'Little, not large',ALONG:'“Come ___!” (let’s go)',EVENT:'A scheduled happening'}},
+      {grid:['FIRST','I#I#H','NEVER','A#E#E','LARGE'],clues:{
+        FIRST:'Number one; before all others',NEVER:'Not at any time',LARGE:'Big in size',
+        FINAL:'The last one; a title game',RIVER:'Flowing water like the Nile',THREE:'The number after two'}},
+      {grid:['FIRST','I#E#I','LEAST','E#D#L','STYLE'],clues:{
+        FIRST:'“Ladies ___”',LEAST:'The smallest amount; “at ___”',STYLE:'Fashion or flair',
+        FILES:'Folders on a computer',READY:'All set to go',TITLE:'A book’s name'}},
+      {grid:['MUSIC','E#T#H','ABOVE','N#R#C','SPEAK'],clues:{
+        MUSIC:'What a band makes',ABOVE:'Up overhead',SPEAK:'Talk out loud',
+        MEANS:'A method; “by all ___”',STORE:'A shop; or to stock away',CHECK:'Tick mark; or a diner bill'}},
+      {grid:['MUSIC','E#T#L','TRADE','A#R#A','LATER'],clues:{
+        MUSIC:'Songs and melodies',TRADE:'Swap; or a skilled job',LATER:'“See you ___!”',
+        METAL:'Iron or gold, e.g.',START:'Begin',CLEAR:'Easy to see through'}},
+      {grid:['PRICE','A#M#V','GRADE','E#G#N','SHEET'],clues:{
+        PRICE:'What you pay; a tag shows it',GRADE:'A mark like A or B',SHEET:'Bedding; or a piece of paper',
+        PAGES:'Leaves of a book',IMAGE:'A picture',EVENT:'A scheduled happening'}},
+      {grid:['OTHER','C#E#U','EMAIL','A#R#E','NOTES'],clues:{
+        OTHER:'The remaining one',EMAIL:'Message sent online',NOTES:'Quick written reminders',
+        OCEAN:'The Atlantic or Pacific',HEART:'It pumps blood; ♥',RULES:'A game’s do’s and don’ts'}},
+      {grid:['WORLD','O#A#E','MEDIA','E#A#T','NORTH'],clues:{
+        WORLD:'The whole planet',MEDIA:'TV, papers and news outlets',NORTH:'Opposite of south',
+        WOMEN:'Ladies',RADAR:'It tracks planes on a screen',DEATH:'The end of life'}},
+      {grid:['WORLD','A#U#R','THREE','E#A#S','RULES'],clues:{
+        WORLD:'“Top of the ___”',THREE:'A trio’s number',RULES:'Regulations to follow',
+        WATER:'H₂O',RURAL:'Of the countryside',DRESS:'A frock; or to put on clothes'}},
+      {grid:['EMAIL','Q#D#A','UNDER','A#E#G','LODGE'],clues:{
+        EMAIL:'Inbox message',UNDER:'Beneath',LODGE:'A cabin in the woods',
+        EQUAL:'The same amount; the “=” sign',ADDED:'Put in besides',LARGE:'A size up from medium'}},
+      {grid:['OTHER','R#E#A','DRAFT','E#R#I','RADIO'],clues:{
+        OTHER:'“Each ___” (mutually)',DRAFT:'A rough first version',RADIO:'You tune it to a station',
+        ORDER:'Put in sequence',HEARD:'Picked up with your ears',RATIO:'A proportion like 2:1'}}
     ];
     var pidx=0, P=null, grid=[], letters=[], num=[], slots=[], cur=0, dir='a', over=false, hints=0, reviewing=false;
     function build(){P=PUZZLES[pidx];grid=P.grid.map(function(r){return r.split('');});
@@ -2507,7 +2543,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
     function selectCell(i){if(!isOpen(i))return;var now=Date.now();
       if(i===cur){
         if(i===lastSel.i&&now-lastSel.t<350){lastSel={t:0,i:-1};jumpNextUnfilled();return;}
-        dir=dir==='a'?'d':'a';}
+        dir=dir==='a'?'d':'a';cur=i;if(!curSlot())dir=dir==='a'?'d':'a';}
+      else{cur=i;if(!curSlot())dir=dir==='a'?'d':'a';}
       lastSel={t:now,i:i};cur=i;render();}
     function slotIndex(cs){for(var i=0;i<slots.length;i++)if(slots[i]===cs)return i;return -1;}
     function navSlot(d){if(over)return;var cs=curSlot(),i=cs?slotIndex(cs):-1,ni;
