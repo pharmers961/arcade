@@ -578,6 +578,12 @@ html.dark .wd-key.a{background:#332e49;color:#8d87a8;border-color:#332e49;}
 .c1{background:#ef3e8c;} .c2{background:#14b8b2;} .c3{background:#fbbf24;}
 .c4{background:#8b5cf6;} .c5{background:#fb7d3c;} .c6{background:#22b573;}
 .mm-secret{display:flex;gap:9px;justify-content:center;margin-top:14px;}
+.mm-row.answer{margin-top:10px;border-style:dashed;border-color:var(--primary-2);
+  background:var(--tint-teal);box-shadow:none;position:relative;}
+.mm-row.answer::before{content:'';position:absolute;left:12px;right:12px;top:-6px;height:1px;
+  background:repeating-linear-gradient(90deg,var(--line) 0 5px,transparent 5px 10px);}
+.mm-answer-tag{font-size:11px;font-weight:800;color:var(--muted);width:26px;flex:none;
+  text-align:center;letter-spacing:.03em;text-transform:uppercase;}
 
 /* ---------- Crossword ---------- */
 .cw-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);
@@ -2406,6 +2412,9 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         rows+='<div class="mm-row'+(r===M.guesses.length&&!M.over?' active':'')+'" role="group" aria-label="'+rlbl+'"><div class="mm-slots">'+slots+'</div><div class="mm-fb" aria-hidden="true">'+(gr?pegs(gr.b,gr.w):'<i class="mm-peg e"></i><i class="mm-peg e"></i><i class="mm-peg e"></i><i class="mm-peg e"></i>')+'</div></div>';
       }
       var secret='';if(M.over){for(var k=0;k<4;k++)secret+='<div class="mm-slot c'+M.code[k]+'"></div>';}
+      var answerRow='';
+      if(M.over&&!M.won){var asl='';for(var a2=0;a2<4;a2++)asl+='<div class="mm-slot c'+M.code[a2]+'"></div>';
+        answerRow='<div class="mm-row answer" role="group" aria-label="The secret code, shown for comparison"><div class="mm-slots">'+asl+'</div><div class="mm-answer-tag" aria-hidden="true">Code</div></div>';}
       var banner=M.challenge?'<div class="challenge-banner">🔗 A friend’s code — crack it</div>'
         :(M.mode==='duo'?'<div class="challenge-banner">👥 Player 2 · crack Player 1’s code</div>':'');
       app.innerHTML='<div class="game mind"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-mmaction="new">Skip »</button>'
@@ -2414,7 +2423,7 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         +'<button class="pausebtn" data-mmaction="challenge" title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'
         +'<button class="pausebtn" data-mmaction="new" title="New code" aria-label="New code">↻</button>'+helpBtn('mind')+'</div></div>'
         +banner
-        +'<div class="mm-board">'+rows+'</div>'
+        +'<div class="mm-board">'+rows+answerRow+'</div>'
         +'<div class="mm-pal">'+palHTML()+'<button class="mm-ctl" data-mmaction="back" aria-label="Delete">⌫</button><button class="mm-ctl go" data-mmaction="go" aria-label="Submit guess">✓</button></div>'
         +(M.over?(function(){
           var wTitle=M.won?(M.mode==='duo'?'Player 2 wins<em>!</em>':'Cracked it<em>!</em>'):(M.mode==='duo'?'Player 1 wins<em>.</em>':'So close<em>.</em>');
