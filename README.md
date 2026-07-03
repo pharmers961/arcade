@@ -24,7 +24,7 @@ shortcuts, and wins can be shared (native share sheet or clipboard).
 - **Wordle** — guess the five-letter word in six tries (1200+ word list)
 - **Mystery** — a logic-grid murder deduction puzzle (original cases)
 - **Mastermind** — crack the hidden four-colour code in ten tries
-- **Mini Crossword** — hand-made 5×5 grids with across/down clues and hints
+- **Mini Crossword** — 34 fully-checked 5×5 grids (every letter crosses two answers) with across/down clues and hints
 - **Cryptogram** — decode a substitution-ciphered quote, with hints
 
 ## Run it
