@@ -619,6 +619,20 @@ html.dark .cw-cell.sel{background:rgba(138,123,255,.22);}
   .game.cross .wd-kb{width:100%;margin-left:0;padding:0;}
   .game.cross .wd-key{height:50px;font-size:18px;}
 }
+@media(max-width:430px){
+  /* the cross bar carries two chips + three buttons: slim it so nothing clips */
+  .game.cross .bar{gap:8px;}
+  .game.cross .stats{gap:6px;}
+  .game.cross .chip{min-width:0;padding:7px 8px;}
+  .game.cross .chip .cv{font-size:15px;}
+  /* ↻ duplicates the Skip » button, so drop it when space is tight */
+  .game.cross .bar .pausebtn[data-cwaction="new"]{display:none;}
+}
+@media(max-width:350px){
+  .game.cross .bar{gap:6px;}
+  .game.cross .bar .pausebtn{width:38px;height:38px;}
+  .game.cross .skip-btn{padding:6px 7px;}
+}
 @media(min-width:768px){ .game.cross .boardwrap{max-width:min(440px, calc(100svh - 360px));} }
 
 /* ---------- Cryptogram ---------- */
@@ -2631,7 +2645,8 @@ body.cb-on #screen:has(.game),body.cb-on #screen:has(.mj),body.cb-on #screen:has
         bottom='<div class="wd-kb">'+kb+'</div>';
       }
       app.innerHTML='<div class="game cross"><div class="bar"><button class="back" data-nav="menu">← Menu</button><button class="skip-btn" data-cwaction="new">Skip »</button>'
-        +'<div class="stats"><div class="chip"><div class="cv">'+hints+'</div><div class="cl">Hints</div></div>'
+        +'<div class="stats"><div class="chip"><div class="cv">'+(pidx+1)+'/'+PUZZLES.length+'</div><div class="cl">Puzzle</div></div>'
+        +'<div class="chip"><div class="cv">'+hints+'</div><div class="cl">Hints</div></div>'
         +'<button class="pausebtn" data-challenge title="Challenge a friend" aria-label="Challenge a friend">🔗</button>'
         +'<button class="pausebtn" data-cwaction="new" title="New puzzle" aria-label="New puzzle">↻</button>'+helpBtn('cross')+'</div></div>'
         +'<div class="boardwrap"><div class="cw-grid">'+cells+'</div></div>'
